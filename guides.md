@@ -150,8 +150,15 @@ $ echo $?
 
 ### Configuration
 
-__TODO__
+A command line tool should be configurable. Setting alternative domains for
+staging, changing the default output format come to my mind.
 
 ### Output
 
-__TODO__ json, yaml
+Every command should have a `--json` and `--yaml` flag to indicate that we want
+to display the response as JSON or Yaml.
+
+The default output should be human readable, and should use colors to indicate
+important fields and values.
+
+If the command is piped into another command, no colors should be used.
