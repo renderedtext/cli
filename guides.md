@@ -1,6 +1,20 @@
 # Guides & Constraints
 
-### Development language
+This document serves as a guide that highlights the important details while
+developing the CLI. Please consult this guide before merging any Pull Request.
+
+Content:
+
+- [Development language](#development-language)
+- [Simple setup](#simple-setup)
+- [Authentication](#authentication)
+- [Excellent help screens](#excellent-help-screens)
+- [Command line Tab Completion](#command-line-tab-completion)
+- [Errors and warnings](#errors-and-warnings)
+- [Configuration](#configuration)
+- [Format of the Output](#format-of-the-output)
+
+## Development language
 
 We decided to write the CLI in Ruby. Our assumption is
 that most of our customers have Ruby preinstalled, or that they have the
@@ -14,9 +28,7 @@ every significant Ruby version (2.0, 2.1., 2.2, 2.3, 2.4).
 The choice of the language dictates the preferable installation method of `gem
 install semaphore-cli`.
 
-
-
-### Simple setup
+## Simple setup
 
 Developers like to set up and test tools fast. In this area, docker serves as
 a good example as it can be installed with one command:
@@ -41,9 +53,7 @@ should support installation of specific versions of the client. For example,
 `wget -qO- https://cli.semaphoreci.com/v1.0.3 | sh` will install the `v1.0.3`
 version on the user's system.
 
-
-
-### Authentication
+## Authentication
 
 For start, we don’t want to store raw credentials, like a
 username and password. Yes, the developer is responsible for their own machine’s
@@ -64,9 +74,7 @@ Non-interactive usage of the `login` command will not be supported as it would
 encourage unsafe practices for the CLI. In a non-interactive environments (e.g
 CI builds) users should inject the `~/.semaphoreci` file in the environment.
 
-
-
-### Excellent help screens
+## Excellent help screens
 
 Getting started with a CLI is unlike using other software for the first time.
 There is not always a welcome screen, no confirmation email with a link to
@@ -90,9 +98,7 @@ team:create` should go in details about the `team:create` command, explaining
 the required and optional parameters, the preconditions for successful
 execution, and the expected results.
 
-
-
-### Command line Tab Completion
+## Command line Tab Completion
 
 Using the command line is all about controlling a computer at the speed of
 thought. CLIs aren’t typically seen on the same level as other interfaces. Yet,
@@ -101,8 +107,7 @@ they share the commonality that a good interface helps users get things done.
 Tab completion significantly improves the usability of a command line tool. Bash
 and Zsh completion should be implemented and installed out of the box.
 
-
-### Errors and warnings
+## Errors and warnings
 
 A command line tool should not fail silently, neither should it fail with a `0`
 exit status. We should provide meaningful exit statuses accompanied with
@@ -147,13 +152,12 @@ $ echo $?
 1
 ```
 
-
-### Configuration
+## Configuration
 
 A command line tool should be configurable. Setting alternative domains for
 staging, changing the default output format come to my mind.
 
-### Output
+## Format of the Output
 
 Every command should have a `--json` and `--yaml` flag to indicate that we want
 to display the response as JSON or Yaml.
