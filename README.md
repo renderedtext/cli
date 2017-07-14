@@ -2,6 +2,8 @@
 
 ![Semaphore logo](https://d1dkupr86d302v.cloudfront.net/assets/application_bootstrap/layout/semaphore-logo-a6d954e176b6975b511f314a0cc808dc94a8030210077e3a6e904fbe69dc5354.svg)
 
+__Note:__ This tool is still in the early phase of development.
+
 The Semaphore CLI is used to manage Semaphore projects from the command line.
 
 For more info about Semaphore see <https://www.semaphoreci.com>
