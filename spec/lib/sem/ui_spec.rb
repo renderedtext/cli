@@ -4,7 +4,7 @@ describe Sem::UI do
 
   describe ".strong" do
     it "sets the color to green" do
-      expect(Sem::UI.strong("test")).to eq("\e[31m;test\e[0m")
+      expect(Sem::UI.strong("test")).to eq("\e[32mtest\e[0m")
     end
   end
 
@@ -23,6 +23,17 @@ describe Sem::UI do
       ]
 
       expect { Sem::UI.list(list) }.to output("  projects\n  teams\n  orgs\n").to_stdout
+    end
+  end
+
+  describe ".table" do
+    it "prints a table to the console" do
+      table = [
+        ["projects", "manage projects"],
+        ["teams", "manage teams"]
+      ]
+
+      expect { Sem::UI.table(table) }.to output("  projects manage projects\n  teams manage teams\n").to_stdout
     end
   end
 
