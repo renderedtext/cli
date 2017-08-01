@@ -1,0 +1,99 @@
+require: rubocop-rspec
+
+AllCops:
+  DisplayCopNames: true
+
+  Exclude:
+    - "*.gemspec"
+
+Style/StringLiterals:
+  EnforcedStyle: double_quotes
+
+Style/StringLiteralsInInterpolation:
+  EnforcedStyle: double_quotes
+
+Style/NumericLiterals:
+  Enabled: false
+
+Style/Documentation:
+  Enabled: false
+
+Style/HashSyntax:
+  EnforcedStyle: hash_rockets
+
+Style/CollectionMethods:
+  StyleGuide: "https://github.com/bbatsov/ruby-style-guide#map-find-select-reduce-size"
+  Enabled: true
+
+Metrics/LineLength:
+  Max: 120
+
+Style/EmptyLinesAroundClassBody:
+  Enabled: false
+
+Style/EmptyLinesAroundModuleBody:
+  Enabled: false
+
+Style/MultilineMethodCallIndentation:
+  EnforcedStyle: indented
+  IndentationWidth: 2
+
+Style/SpecialGlobalVars:
+  Enabled: false
+
+Style/PercentLiteralDelimiters:
+  Enabled: false
+
+RSpec/InstanceVariable:
+  Enabled: false
+
+RSpec/MultipleExpectations:
+  Max: 5
+
+Metrics/BlockLength:
+  Exclude:
+    - "Rakefile"
+    - "**/*.rake"
+    - "spec/**/*.rb"
+
+Style/EmptyLinesAroundBlockBody:
+  Enabled: false
+
+RSpec/BeforeAfterAll:
+  Enabled: false
+
+RSpec/ExampleLength:
+  Enabled: false
+
+RSpec/DescribedClass:
+  Enabled: false
+
+Style/IndentArray:
+  EnforcedStyle: consistent
+
+Style/MultilineMethodCallBraceLayout:
+  Enabled: false
+
+RSpec/MessageSpies:
+  Enabled: false
+
+Style/MultilineBlockLayout:
+  Enabled: false
+
+RSpec/SubjectStub:
+  Enabled: false
+
+RSpec/DescribeClass:
+  Enabled: false
+
+RSpec/LeadingSubject:
+  Enabled: false
+
+Style/WordArray:
+  Enabled: false
+
+RSpec/NotToNot:
+  Enabled: false
+
+Metrics/MethodLength:
+  Enabled: false
