@@ -1,7 +1,15 @@
 class Sem::Commands::Help
 
   def self.run(_params)
-    puts "Help screen. :TADA:"
+    Sem::UI.info "Usage: sem COMMAND"
+    Sem::UI.info ""
+    Sem::UI.info "Help topics, type #{Sem::UI.strong "sem help TOPIC"} for more details:"
+    Sem::UI.info ""
+    Sem::UI.table [
+      ["teams", "manage teams and team membership"],
+      ["projects", "manage projects"],
+      ["orgs", "manage organizations"]
+    ]
   end
 
 end

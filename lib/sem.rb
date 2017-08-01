@@ -3,6 +3,7 @@ require "sem/version"
 module Sem
   module_function
 
+  require_relative "sem/ui"
   require_relative "sem/commands"
 
   def run(params)
