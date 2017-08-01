@@ -1,5 +1,9 @@
 require "sem/version"
 
 module Sem
-  # Your code goes here...
+  module_function
+
+  def hello
+    puts "Hello"
+  end
 end
