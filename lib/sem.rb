@@ -1,4 +1,5 @@
 require "sem/version"
+require "terminal-table"
 
 module Sem
   module_function
