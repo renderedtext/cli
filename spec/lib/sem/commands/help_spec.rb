@@ -9,9 +9,9 @@ describe Sem::Commands::Help do
         "",
         "Help topics, type \e[32msem help TOPIC\e[0m for more details:",
         "",
-        "  teams manage teams and team membership",
-        "  projects manage projects",
-        "  orgs manage organizations",
+        "  teams      manage teams and team membership",
+        "  projects   manage projects",
+        "  orgs       manage organizations",
         "",
         ""
       ]

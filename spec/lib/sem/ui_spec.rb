@@ -33,7 +33,13 @@ describe Sem::UI do
         ["teams", "manage teams"]
       ]
 
-      expect { Sem::UI.table(table) }.to output("  projects manage projects\n  teams    manage teams\n").to_stdout
+      output = [
+        "  projects   manage projects",
+        "  teams      manage teams",
+        ""
+      ]
+
+      expect { Sem::UI.table(table) }.to output(output.join("\n")).to_stdout
     end
   end
 
