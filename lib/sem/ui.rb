@@ -20,6 +20,10 @@ module Sem
       puts message
     end
 
+    def error(message)
+      puts message
+    end
+
     def list(items)
       items.each do |item|
         info "  #{item}"
