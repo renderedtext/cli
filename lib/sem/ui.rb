@@ -28,7 +28,14 @@ module Sem
 
     def table(rows)
       table = Terminal::Table.new(:rows => rows)
-      table.style = { :border_top => false, :border_bottom => false, :border_y => " " }
+
+      table.style = {
+        :border_top => false,
+        :border_bottom => false,
+        :border_y => "",
+        :padding_left => 0,
+        :padding_right => 2
+      }
 
       puts table
     end
