@@ -1,3 +1,4 @@
+require "io/console"
 require "sem/version"
 require "terminal-table"
 
