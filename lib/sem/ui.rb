@@ -44,5 +44,9 @@ module Sem
       puts table
     end
 
+    def show_hash(hash)
+      table(hash.map { |key, value| ["#{key}:", value.to_s] })
+    end
+
   end
 end
