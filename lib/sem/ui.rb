@@ -20,6 +20,10 @@ module Sem
       puts message
     end
 
+    def error(message)
+      puts message
+    end
+
     def list(items)
       items.each do |item|
         info "  #{item}"
@@ -38,6 +42,10 @@ module Sem
       }
 
       puts table
+    end
+
+    def show_hash(hash)
+      table(hash.map { |key, value| ["#{key}:", value.to_s] })
     end
 
   end
