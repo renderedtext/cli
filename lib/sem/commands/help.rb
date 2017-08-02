@@ -10,9 +10,9 @@ module Sem
         Sem::UI.info ""
 
         Sem::UI.table [
-          ["teams", "manage teams and team membership"],
-          ["projects", "manage projects"],
-          ["orgs", "manage organizations"]
+          ["  teams", "manage teams and team membership"],
+          ["  projects", "manage projects"],
+          ["  orgs", "manage organizations"]
         ]
 
         Sem::UI.info ""

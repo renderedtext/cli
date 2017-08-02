@@ -34,8 +34,8 @@ describe Sem::UI do
       ]
 
       output = [
-        "  projects   manage projects",
-        "  teams      manage teams",
+        "projects  manage projects",
+        "teams     manage teams",
         ""
       ]
 

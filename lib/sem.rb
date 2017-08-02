@@ -14,6 +14,7 @@ module Sem
     case command
     when "help"  then Sem::Commands::Help.run(params)
     when "login" then Sem::Commands::Login.run(params)
+    when "teams" then Sem::Commands::Teams.run(params)
     end
   end
 
