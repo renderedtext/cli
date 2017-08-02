@@ -2,6 +2,16 @@ module Sem
   module UI
     module_function
 
+    def ask(question, options = {})
+      print "#{question}: "
+
+      if options[:hidden]
+        STDIN.noecho(&:gets).chomp
+      else
+        STDIN.gets.chomp
+      end
+    end
+
     def strong(message)
       "\e[32m#{message}\e[0m"
     end

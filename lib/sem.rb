@@ -1,3 +1,4 @@
+require "io/console"
 require "sem/version"
 require "terminal-table"
 
@@ -11,7 +12,8 @@ module Sem
     command = params.shift
 
     case command
-    when "help" then Sem::Commands::Help.run(params)
+    when "help"  then Sem::Commands::Help.run(params)
+    when "login" then Sem::Commands::Login.run(params)
     end
   end
 
