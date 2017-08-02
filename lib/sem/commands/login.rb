@@ -3,8 +3,8 @@ module Sem
     module Login
 
       def self.run(_params)
-        username  = Sem::UI.ask("Username: ")
-        _password = Sem::UI.ask("Password: ", :hidden => true)
+        username  = Sem::UI.ask("Username")
+        _password = Sem::UI.ask("Password", :hidden => true)
 
         Sem::UI.info ""
         Sem::UI.info ""

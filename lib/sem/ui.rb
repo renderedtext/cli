@@ -3,7 +3,7 @@ module Sem
     module_function
 
     def ask(question, options = {})
-      print "#{question}"
+      print "#{question}: "
 
       if options[:hidden]
         STDIN.noecho(&:gets).chomp
