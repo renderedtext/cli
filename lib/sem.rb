@@ -2,6 +2,8 @@ require "io/console"
 require "sem/version"
 require "terminal-table"
 
+require "thor"
+
 module Sem
   module_function
 
