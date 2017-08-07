@@ -8,6 +8,8 @@ require "thor"
 require "sem/thor_ext/top_level_thor"
 require "sem/thor_ext/subcommand_thor"
 
+require "sem/cli"
+
 module Sem
   module_function
 

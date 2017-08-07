@@ -22,8 +22,8 @@ module Sem
 
         list.sort! { |a, b| a[0] <=> b[0] }
 
-        shell.say "Usage: fwt COMMAND"
-        shell.say "Help topics, type fwt help TOPIC for more details: \n\n"
+        shell.say "Usage: sem COMMAND"
+        shell.say "Help topics, type sem help TOPIC for more details: \n\n"
 
         shell.print_table(list, :indent => 2, :truncate => true)
         shell.say
