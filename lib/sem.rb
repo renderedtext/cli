@@ -4,6 +4,10 @@ require "terminal-table"
 
 require "thor"
 
+# Thor monkeypatchinging to support namespace:command
+require "sem/thor_ext/top_level_thor"
+require "sem/thor_ext/subcommand_thor"
+
 module Sem
   module_function
 
