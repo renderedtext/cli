@@ -10,8 +10,12 @@ module Sem
     #
 
     class SubcommandThor < Thor
-      def self.banner(command, namespace = nil, subcommand = false)
-        "#{self.namespace}:#{command.formatted_usage(self, false, subcommand)}"
+
+      #
+      # Overide orriginal implementation and show namespace fom the commands banner.
+      #
+      def self.banner(command, _show_namespace = nil, subcommand = false)
+        "#{namespace}:#{command.formatted_usage(self, false, subcommand)}"
       end
 
       def self.help(shell, subcommand = false)
@@ -30,12 +34,12 @@ module Sem
         class_options_help(shell)
       end
 
-      def self.printable_commands(all = true, subcommand = false)
+      def self.printable_commands(all = true, _subcommand = false)
         (all ? all_commands : commands).map do |_, command|
           next if command.hidden?
           item = []
           item << banner(command, true, false)
-          item << (command.description ? "    #{command.description.gsub(/\s+/m, ' ')}" : "")
+          item << (command.description ? "    #{command.description.gsub(/\s+/m, " ")}" : "")
           item
         end.compact
       end

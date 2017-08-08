@@ -9,6 +9,5 @@ module Sem
 
     desc "teams", "manage teams and team membership"
     subcommand "teams", Sem::CLI::Teams
-
   end
 end
