@@ -28,8 +28,8 @@ module Sem
       def self.start(args = nil)
         args ||= ARGV
 
-        args = if ARGV.empty?
-                 ARGV
+        args = if args.empty?
+                 args
                elsif args[0] == "help"
                  [args.shift] + args.shift.split(":") + args
                else
@@ -47,7 +47,7 @@ module Sem
       end
 
       def self.help(shell, subcommand = false)
-        shell.say "Usage: fwt COMMAND"
+        shell.say "Usage: sem COMMAND"
         shell.say
         shell.say "Help topics, type sem help TOPIC for more details:"
         shell.say
