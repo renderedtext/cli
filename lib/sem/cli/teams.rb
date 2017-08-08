@@ -14,8 +14,16 @@ class Sem::CLI::Teams < Sem::ThorExt::SubcommandThor
 
   desc "info [NAME]", "show information about a team"
   def info(name)
-    puts "Showing info for #{name}"
-    puts "NOT IMPLEMENTED"
+    info = [
+      ["ID", "3bc7ed43-ac8a-487e-b488-c38bc757a034"],
+      ["Name", "renderedtext/developers"],
+      ["Permission", "write"],
+      ["Members", "72 members"],
+      ["Created", "2017-08-01 13:14:40 +0200"],
+      ["Updated", "2017-08-02 13:14:40 +0200"]
+    ]
+
+    print_table(info)
   end
 
 end
