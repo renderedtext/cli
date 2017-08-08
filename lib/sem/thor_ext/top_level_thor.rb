@@ -25,8 +25,8 @@ module Sem
       #   The input 'help teams:info' is converted to 'help teams info'
       #   and then sent to the super class.
       #
-      def self.start
-        args = ARGV
+      def self.start(args = nil)
+        args ||= ARGV
 
         args = if ARGV.empty?
                  ARGV
