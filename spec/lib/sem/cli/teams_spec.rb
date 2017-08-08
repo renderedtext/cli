@@ -30,12 +30,27 @@ describe Sem::CLI::Teams do
         "Updated     2017-08-02 13:14:40 +0200"
       ]
 
-      expect(stdout.strip).to eq(msg.join("\n"))
       expect(stderr).to eq("")
+      expect(stdout.strip).to eq(msg.join("\n"))
     end
   end
 
   describe "#create" do
+    it "creates a team and displays it" do
+      stdout, stderr = sem_run("teams:create renderedtext/new-developers --permission write")
+
+      msg = [
+        "ID          3bc7ed43-ac8a-487e-b488-c38bc757a034",
+        "Name        renderedtext/new-developers",
+        "Permission  write",
+        "Members     0 members",
+        "Created     2017-08-01 13:14:40 +0200",
+        "Updated     2017-08-02 13:14:40 +0200"
+      ]
+
+      expect(stderr).to eq("")
+      expect(stdout.strip).to eq(msg.join("\n"))
+    end
   end
 
   describe "#update" do
