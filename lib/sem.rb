@@ -1,23 +1,10 @@
-require "io/console"
 require "sem/version"
-require "terminal-table"
+require "thor"
+
+# Thor monkeypatchinging to support namespace:command
+require "sem/thor_ext/top_level_thor"
+require "sem/thor_ext/subcommand_thor"
 
 module Sem
-  module_function
-
-  require_relative "sem/ui"
-  require_relative "sem/commands"
-
-  def run(params)
-    command = params.shift
-
-    # TODO: automate me with magic <3
-    case command
-    when "help"       then Sem::Commands::Help.run(params)
-    when "login"      then Sem::Commands::Login.run(params)
-    when "teams"      then Sem::Commands::Teams.run(params)
-    when "teams:info" then Sem::Commands::Teams::Info.run(params)
-    end
-  end
-
+  require "sem/cli"
 end
