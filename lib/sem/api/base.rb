@@ -1,13 +1,17 @@
-class Sem::API::Base
-  CREDENTIALS_PATH = "~/.sem/credentials"
+module Sem
+  module API
+    class Base
+      CREDENTIALS_PATH = "~/.sem/credentials".freeze
 
-  protected
+      protected
 
-  def client
-    @client ||= begin
-      auth_token = File.read(CREDENTIALS_PATH)
+      def client
+        @client ||= begin
+          auth_token = File.read(CREDENTIALS_PATH)
 
-      SemaphoreClient.new(auth_token)
+          SemaphoreClient.new(auth_token)
+        end
+      end
     end
   end
 end
