@@ -50,7 +50,7 @@ module Sem
           :id => team.id,
           :name => team.name,
           :permission => team.permission,
-          :members => client.users.list_for_team(team.id).count,
+          :members => client.users.list_for_team(team.id).count.to_s,
           :created_at => team.created_at,
           :updated_at => team.updated_at
         }

@@ -251,7 +251,7 @@ describe Sem::API::Teams do
         :id => team_id,
         :name => team.name,
         :permission => team.permission,
-        :members => 2,
+        :members => "2",
         :created_at => team.created_at,
         :updated_at => team.updated_at
       )
