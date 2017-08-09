@@ -135,57 +135,108 @@ describe Sem::CLI::Teams do
     end
   end
 
-  describe "#members" do
-    it "lists team members" do
-      stdout, stderr = sem_run("teams:members renderedtext/developers")
+  describe Sem::CLI::Teams::Members do
+    describe "#list" do
+      it "lists team members" do
+        stdout, stderr = sem_run("teams:members:list renderedtext/cli")
+
+        msg = [
+          "ID                                    USERNAME",
+          "3bc7ed43-ac8a-487e-b488-c38bc757a034  ijovan",
+          "fe3624cf-0cea-4d87-9dde-cb9ddacfefc0  shiroyasha"
+        ]
+
+        expect(stderr).to eq("")
+        expect(stdout.strip).to eq(msg.join("\n"))
+      end
+    end
+
+    describe "#add" do
+      it "add a user to the team" do
+        stdout, stderr = sem_run("teams:members:add renderedtext/developers ijovan")
+
+        expect(stderr).to eq("")
+        expect(stdout.strip).to eq("User ijovan added to the team.")
+      end
+    end
+
+    describe "#remove" do
+      it "removes a user from the team" do
+        stdout, stderr = sem_run("teams:members:remove renderedtext/developers ijovan")
+
+        expect(stderr).to eq("")
+        expect(stdout.strip).to eq("User ijovan removed from the team.")
+      end
     end
   end
 
-  describe "#add_member" do
-    it "add a user to the team" do
-      stdout, stderr = sem_run("teams:add-member renderedtext/developers ijovan")
+  describe Sem::CLI::Teams::Projects do
+    describe "#list" do
+      it "lists projects in the team" do
+        stdout, stderr = sem_run("teams:projects:list renderedtext/cli")
+
+        msg = [
+          "ID                                    NAME",
+          "3bc7ed43-ac8a-487e-b488-c38bc757a034  renderedtext/cli",
+          "fe3624cf-0cea-4d87-9dde-cb9ddacfefc0  renderedtext/api"
+        ]
+
+        expect(stderr).to eq("")
+        expect(stdout.strip).to eq(msg.join("\n"))
+      end
+    end
+
+    describe "#add" do
+      it "add a project to the team" do
+        stdout, stderr = sem_run("teams:projects:add renderedtext/developers renderedtext/cli")
+
+        expect(stderr).to eq("")
+        expect(stdout.strip).to eq("Project renderedtext/cli added to the team.")
+      end
+    end
+
+    describe "#remove" do
+      it "removes a project from the team" do
+        stdout, stderr = sem_run("teams:projects:remove renderedtext/developers renderedtext/api")
+
+        expect(stderr).to eq("")
+        expect(stdout.strip).to eq("Project renderedtext/api removed from the team.")
+      end
     end
   end
 
-  describe "#remove_member" do
-    it "removes a user from the team" do
-      stdout, stderr = sem_run("teams:remove-member renderedtext/developers ijovan")
-    end
-  end
+  describe Sem::CLI::Teams::Configs do
+    describe "#list" do
+      it "lists shared configurations in the team" do
+        stdout, stderr = sem_run("teams:configs:list renderedtext/aws-tokens")
 
-  describe "#projects" do
-    it "lists projects in the team" do
-      stdout, stderr = sem_run("teams:projets renderedtext/developers")
-    end
-  end
+        msg = [
+          "ID                                    NAME",
+          "3bc7ed43-ac8a-487e-b488-c38bc757a034  renderedtext/aws-tokens",
+          "fe3624cf-0cea-4d87-9dde-cb9ddacfefc0  renderedtext/gemfury"
+        ]
 
-  describe "#add_project" do
-    it "removes a project from the team" do
-      stdout, stderr = sem_run("teams:add-project renderedtext/developers renderedtext/cli")
+        expect(stderr).to eq("")
+        expect(stdout.strip).to eq(msg.join("\n"))
+      end
     end
-  end
 
-  describe "#remove_project" do
-    it "removes a project from the team" do
-      stdout, stderr = sem_run("teams:remove-project renderedtext/developers renderedtext/cli")
+    describe "#add" do
+      it "add a project to the team" do
+        stdout, stderr = sem_run("teams:config:add renderedtext/developers renderedtext/aws-tokens")
+
+        expect(stderr).to eq("")
+        expect(stdout.strip).to eq("Shared Configuration renderedtext/aws-tokens added to the team.")
+      end
     end
-  end
 
-  describe "#configs" do
-    it "lists shared configurations in the team" do
-      stdout, stderr = sem_run("teams:configs renderedtext/developers")
-    end
-  end
+    describe "#remove" do
+      it "removes a project from the team" do
+        stdout, stderr = sem_run("teams:config:remove renderedtext/developers renderedtext/aws-tokens")
 
-  describe "#add_config" do
-    it "add a shared configuration to the team" do
-      stdout, stderr = sem_run("teams:add-config renderedtext/developers renderedtext/aws-tokens")
-    end
-  end
-
-  describe "#remove_config" do
-    it "removes a shared configuration from the team" do
-      stdout, stderr = sem_run("teams:remove-config renderedtext/developers renderedtext/aws-tokens")
+        expect(stderr).to eq("")
+        expect(stdout.strip).to eq("Shared Configuration renderedtext/aws-tokens removed from the team.")
+      end
     end
   end
 

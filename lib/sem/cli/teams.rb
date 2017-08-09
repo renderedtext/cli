@@ -59,14 +59,14 @@ class Sem::CLI::Teams < Sem::ThorExt::SubcommandThor
     namespace "teams:members"
 
     desc "list", "lists members of the team"
-    def list
+    def list(_team_name)
       members = [
         ["ID", "USERNAME"],
         ["3bc7ed43-ac8a-487e-b488-c38bc757a034", "ijovan"],
         ["fe3624cf-0cea-4d87-9dde-cb9ddacfefc0", "shiroyasha"]
       ]
 
-      print_table(teams)
+      print_table(members)
     end
 
     desc "add", "add a user to the team"
@@ -84,24 +84,24 @@ class Sem::CLI::Teams < Sem::ThorExt::SubcommandThor
     namespace "teams:projects"
 
     desc "list", "lists projects in a team"
-    def list
-      members = [
+    def list(_team_name)
+      projects = [
         ["ID", "NAME"],
         ["3bc7ed43-ac8a-487e-b488-c38bc757a034", "renderedtext/cli"],
         ["fe3624cf-0cea-4d87-9dde-cb9ddacfefc0", "renderedtext/api"]
       ]
 
-      print_table(teams)
+      print_table(projects)
     end
 
     desc "add", "add a project to a team"
-    def add(name, project_name)
+    def add(_name, project_name)
       puts "Project #{project_name} added to the team."
     end
 
     desc "remove", "removes a project from the team"
-    def remove(name, project_name)
-      puts "Project #{project_name} added to the team."
+    def remove(_name, project_name)
+      puts "Project #{project_name} removed from the team."
     end
   end
 
@@ -109,14 +109,14 @@ class Sem::CLI::Teams < Sem::ThorExt::SubcommandThor
     namespace "teams:configs"
 
     desc "list", "list shared confgiurations in a team"
-    def list
-      members = [
+    def list(_team_name)
+      configs = [
         ["ID", "NAME"],
         ["3bc7ed43-ac8a-487e-b488-c38bc757a034", "renderedtext/aws-tokens"],
         ["fe3624cf-0cea-4d87-9dde-cb9ddacfefc0", "renderedtext/gemfury"]
       ]
 
-      print_table(teams)
+      print_table(configs)
     end
 
     desc "add", "add a shared configuration to a team"
@@ -125,7 +125,7 @@ class Sem::CLI::Teams < Sem::ThorExt::SubcommandThor
     end
 
     desc "remove", "removes a project from the team"
-    def remove(name, username)
+    def remove(_name, shared_config_name)
       puts "Shared Configuration #{shared_config_name} removed from the team."
     end
   end
