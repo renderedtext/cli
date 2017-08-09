@@ -135,4 +135,58 @@ describe Sem::CLI::Teams do
     end
   end
 
+  describe "#members" do
+    it "lists team members" do
+      stdout, stderr = sem_run("teams:members renderedtext/developers")
+    end
+  end
+
+  describe "#add_member" do
+    it "add a user to the team" do
+      stdout, stderr = sem_run("teams:add-member renderedtext/developers ijovan")
+    end
+  end
+
+  describe "#remove_member" do
+    it "removes a user from the team" do
+      stdout, stderr = sem_run("teams:remove-member renderedtext/developers ijovan")
+    end
+  end
+
+  describe "#projects" do
+    it "lists projects in the team" do
+      stdout, stderr = sem_run("teams:projets renderedtext/developers")
+    end
+  end
+
+  describe "#add_project" do
+    it "removes a project from the team" do
+      stdout, stderr = sem_run("teams:add-project renderedtext/developers renderedtext/cli")
+    end
+  end
+
+  describe "#remove_project" do
+    it "removes a project from the team" do
+      stdout, stderr = sem_run("teams:remove-project renderedtext/developers renderedtext/cli")
+    end
+  end
+
+  describe "#configs" do
+    it "lists shared configurations in the team" do
+      stdout, stderr = sem_run("teams:configs renderedtext/developers")
+    end
+  end
+
+  describe "#add_config" do
+    it "add a shared configuration to the team" do
+      stdout, stderr = sem_run("teams:add-config renderedtext/developers renderedtext/aws-tokens")
+    end
+  end
+
+  describe "#remove_config" do
+    it "removes a shared configuration from the team" do
+      stdout, stderr = sem_run("teams:remove-config renderedtext/developers renderedtext/aws-tokens")
+    end
+  end
+
 end
