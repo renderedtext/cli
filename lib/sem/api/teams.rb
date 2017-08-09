@@ -20,7 +20,7 @@ module Sem
       def list
         orgs = client.orgs.list
 
-        teams = orgs.map { |org| client.teams.list_for_org(org.id) }.flatten
+        teams = orgs.map { |org| client.teams.list_for_org(org.username) }.flatten
 
         teams.map { |team| team_hash(team) }
       end
@@ -28,7 +28,7 @@ module Sem
       def info(path)
         org_name, team_name = path.split("/")
 
-        list(org_name).find { |team| team[:name] == team_name }
+        list.find { |team| team[:name] == team_name }
       end
 
       def create(org_name, args)
@@ -38,7 +38,7 @@ module Sem
       end
 
       def delete(path)
-        id = info(path).id
+        id = info(path)[:id]
 
         client.teams.delete(id)
       end

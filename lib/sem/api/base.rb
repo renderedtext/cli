@@ -7,7 +7,9 @@ module Sem
 
       def client
         @client ||= begin
-          auth_token = File.read(CREDENTIALS_PATH)
+          path = File.expand_path(CREDENTIALS_PATH)
+
+          auth_token = File.read(path).delete("\n")
 
           SemaphoreClient.new(auth_token)
         end

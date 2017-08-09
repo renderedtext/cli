@@ -112,8 +112,8 @@ describe Sem::API::Teams do
     end
 
     describe "#list" do
-      let(:org_id) { 0 }
-      let(:org) { instance_double(SemaphoreClient::Model::Org, :id => org_id) }
+      let(:org_username) { "org" }
+      let(:org) { instance_double(SemaphoreClient::Model::Org, :username => org_username) }
       let(:orgs_api) { instance_double(SemaphoreClient::Api::Org, :list => [org]) }
 
       before do
@@ -128,7 +128,7 @@ describe Sem::API::Teams do
       end
 
       it "calls list_for_org on the teams_api" do
-        expect(teams_api).to receive(:list_for_org).with(org_id)
+        expect(teams_api).to receive(:list_for_org).with(org_username)
 
         sem_api_teams.list
       end
@@ -153,7 +153,7 @@ describe Sem::API::Teams do
       before { allow(sem_api_teams).to receive(:list).and_return([team_hash_0, team_hash_1]) }
 
       it "calls list on the subject" do
-        expect(sem_api_teams).to receive(:list).with(org_name)
+        expect(sem_api_teams).to receive(:list)
 
         sem_api_teams.info(path)
       end
@@ -191,7 +191,7 @@ describe Sem::API::Teams do
 
     describe "#delete" do
       before do
-        allow(sem_api_teams).to receive(:info).and_return(team)
+        allow(sem_api_teams).to receive(:info).and_return(team_hash)
         allow(teams_api).to receive(:delete)
       end
 

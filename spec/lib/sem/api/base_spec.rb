@@ -4,6 +4,7 @@ describe Sem::API::Base do
   let(:sem_api_base) { subject }
 
   describe "#client" do
+    let(:path) { File.expand_path(Sem::API::Base::CREDENTIALS_PATH) }
     let(:auth_token) { "auth_token" }
     let(:client) { instance_double(SemaphoreClient) }
 
@@ -13,7 +14,7 @@ describe Sem::API::Base do
     end
 
     it "reads the credentials file" do
-      expect(File).to receive(:read).with(Sem::API::Base::CREDENTIALS_PATH)
+      expect(File).to receive(:read).with(path)
 
       sem_api_base.send(:client)
     end
