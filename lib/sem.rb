@@ -5,6 +5,9 @@ require "thor"
 require "sem/thor_ext/top_level_thor"
 require "sem/thor_ext/subcommand_thor"
 
+require "semaphore_client"
+
 module Sem
   require "sem/cli"
+  require "sem/api"
 end
