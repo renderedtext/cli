@@ -171,24 +171,22 @@ describe Sem::API::Projects do
   end
 
   describe "#list_for_org" do
-    let(:org_username) { "org" }
-
     before { allow(projects_api).to receive(:list_for_org).and_return([project]) }
 
     it "calls list_for_org on the projects_api" do
-      expect(projects_api).to receive(:list_for_org).with(org_username)
+      expect(projects_api).to receive(:list_for_org).with(org_name)
 
-      sem_api_projects.list_for_org(org_username)
+      sem_api_projects.list_for_org(org_name)
     end
 
     it "converts the projects to project hashes" do
       expect(sem_api_projects).to receive(:to_hash).with(project)
 
-      sem_api_projects.list_for_org(org_username)
+      sem_api_projects.list_for_org(org_name)
     end
 
     it "returns the project hashes" do
-      return_value = sem_api_projects.list_for_org(org_username)
+      return_value = sem_api_projects.list_for_org(org_name)
 
       expect(return_value).to eql([project_hash])
     end
