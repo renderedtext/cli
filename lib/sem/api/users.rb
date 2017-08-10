@@ -13,6 +13,14 @@ module Sem
         new.info(name)
       end
 
+      def self.add_to_team(team_path, user_name)
+        new.add_to_team(team_path, user_name)
+      end
+
+      def self.remove_from_team(team_path, user_name)
+        new.remove_from_team(team_path, user_name)
+      end
+
       def list
         org_names = client.orgs.list.map(&:username)
 
@@ -31,6 +39,20 @@ module Sem
 
       def info(name)
         list.find { |user| user[:username] == name }
+      end
+
+      def add_to_team(team_path, user_name)
+        user = info(user_name)
+        team = Teams.info(team_path)
+
+        client.users.attach_to_team(user[:id], team[:id])
+      end
+
+      def remove_from_team(team_path, user_name)
+        user = info(user_name)
+        team = Teams.info(team_path)
+
+        client.users.detach_from_team(user[:id], team[:id])
       end
 
       private

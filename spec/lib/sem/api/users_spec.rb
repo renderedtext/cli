@@ -87,6 +87,38 @@ describe Sem::API::Users do
     end
   end
 
+  describe ".add_to_team" do
+    before { allow(sem_api_users).to receive(:add_to_team) }
+
+    it "creates an instance" do
+      expect(described_class).to receive(:new)
+
+      described_class.add_to_team(team_path, user_name)
+    end
+
+    it "passes the call to the instance" do
+      expect(sem_api_users).to receive(:add_to_team).with(team_path, user_name)
+
+      described_class.add_to_team(team_path, user_name)
+    end
+  end
+
+  describe ".remove_from_team" do
+    before { allow(sem_api_users).to receive(:remove_from_team) }
+
+    it "creates an instance" do
+      expect(described_class).to receive(:new)
+
+      described_class.remove_from_team(team_path, user_name)
+    end
+
+    it "passes the call to the instance" do
+      expect(sem_api_users).to receive(:remove_from_team).with(team_path, user_name)
+
+      described_class.remove_from_team(team_path, user_name)
+    end
+  end
+
   describe "#list" do
     let(:org_username) { "org" }
     let(:org) { instance_double(SemaphoreClient::Model::Org, :username => org_username) }
@@ -132,7 +164,7 @@ describe Sem::API::Users do
       allow(users_api).to receive(:list_for_team).and_return([user])
     end
 
-    it "gets the team" do
+    it "calls info on sem_api_teams" do
       expect(Sem::API::Teams).to receive(:info).with(team_path)
 
       sem_api_users.list_for_team(team_path)
@@ -173,6 +205,64 @@ describe Sem::API::Users do
       return_value = sem_api_users.info(user_name)
 
       expect(return_value).to eql(user_hash_0)
+    end
+  end
+
+  describe "#add_to_team" do
+    let(:team_id) { 0 }
+    let(:team) { { :id => team_id } }
+
+    before do
+      allow(sem_api_users).to receive(:info).and_return(user_hash)
+      allow(Sem::API::Teams).to receive(:info).and_return(team)
+      allow(users_api).to receive(:attach_to_team)
+    end
+
+    it "calls info on the subject" do
+      expect(sem_api_users).to receive(:info).with(user_name)
+
+      sem_api_users.add_to_team(team_path, user_name)
+    end
+
+    it "calls info on sem_api_teams" do
+      expect(Sem::API::Teams).to receive(:info).with(team_path)
+
+      sem_api_users.add_to_team(team_path, user_name)
+    end
+
+    it "calls attach_to_team on the users_api" do
+      expect(users_api).to receive(:attach_to_team).with(user_id, team_id)
+
+      sem_api_users.add_to_team(team_path, user_name)
+    end
+  end
+
+  describe "#remove_from_team" do
+    let(:team_id) { 0 }
+    let(:team) { { :id => team_id } }
+
+    before do
+      allow(sem_api_users).to receive(:info).and_return(user_hash)
+      allow(Sem::API::Teams).to receive(:info).and_return(team)
+      allow(users_api).to receive(:detach_from_team)
+    end
+
+    it "calls info on the subject" do
+      expect(sem_api_users).to receive(:info).with(user_name)
+
+      sem_api_users.remove_from_team(team_path, user_name)
+    end
+
+    it "calls info on sem_api_teams" do
+      expect(Sem::API::Teams).to receive(:info).with(team_path)
+
+      sem_api_users.remove_from_team(team_path, user_name)
+    end
+
+    it "calls detach_from_team on the users_api" do
+      expect(users_api).to receive(:detach_from_team).with(user_id, team_id)
+
+      sem_api_users.remove_from_team(team_path, user_name)
     end
   end
 
