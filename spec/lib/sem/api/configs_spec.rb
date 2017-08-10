@@ -7,6 +7,7 @@ describe Sem::API::Configs do
   let(:client) { instance_double(SemaphoreClient, :shared_configs => configs_api) }
 
   let(:org_name) { "org" }
+  let(:team_path) { "#{org_name}/team" }
 
   let(:config_id) { 0 }
   let(:config_name) { "config" }
@@ -64,6 +65,28 @@ describe Sem::API::Configs do
     end
   end
 
+  describe ".list_for_team" do
+    before { allow(sem_api_configs).to receive(:list_for_team).and_return([config_hash]) }
+
+    it "creates an instance" do
+      expect(described_class).to receive(:new)
+
+      described_class.list_for_team(team_path)
+    end
+
+    it "passes the call to the instance" do
+      expect(sem_api_configs).to receive(:list_for_team).with(team_path)
+
+      described_class.list_for_team(team_path)
+    end
+
+    it "returns the result" do
+      return_value = described_class.list_for_team(team_path)
+
+      expect(return_value).to eql([config_hash])
+    end
+  end
+
   describe "#list" do
     let(:org_username) { "org" }
     let(:org) { { :username => org_username } }
@@ -92,7 +115,7 @@ describe Sem::API::Configs do
     end
   end
 
-  describe "#list_for_project" do
+  describe "#list_for_org" do
     before { allow(configs_api).to receive(:list_for_org).and_return([config]) }
 
     it "calls list_for_org on the configs_api" do
