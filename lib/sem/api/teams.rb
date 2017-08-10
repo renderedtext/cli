@@ -22,13 +22,13 @@ module Sem
       end
 
       def list
-        org_names = client.orgs.list.map(&:username)
+        org_names = Sem::API::Orgs.list.map { |org| org[:username] }
 
         org_names.map { |name| list_for_org(name) }.flatten
       end
 
       def list_for_org(org_name)
-        teams = client.teams.list_for_org(org_name)
+        teams = api.list_for_org(org_name)
 
         teams.map { |team| to_hash(team) }
       end
@@ -40,7 +40,7 @@ module Sem
       end
 
       def create(org_name, args)
-        team = client.teams.create_for_org(org_name, args)
+        team = api.create_for_org(org_name, args)
 
         to_hash(team)
       end
@@ -48,10 +48,14 @@ module Sem
       def delete(path)
         id = info(path)[:id]
 
-        client.teams.delete(id)
+        api.delete(id)
       end
 
       private
+
+      def api
+        client.teams
+      end
 
       def to_hash(team)
         {

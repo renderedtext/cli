@@ -4,7 +4,6 @@ describe Sem::API::Teams do
   let(:sem_api_teams) { subject }
 
   let(:teams_api) { instance_double(SemaphoreClient::Api::Team) }
-
   let(:client) { instance_double(SemaphoreClient, :teams => teams_api) }
 
   let(:org_name) { "org_0" }
@@ -137,16 +136,15 @@ describe Sem::API::Teams do
 
   describe "#list" do
     let(:org_username) { "org" }
-    let(:org) { instance_double(SemaphoreClient::Model::Org, :username => org_username) }
-    let(:orgs_api) { instance_double(SemaphoreClient::Api::Org, :list => [org]) }
+    let(:org) { { :username => org_username } }
 
     before do
-      allow(client).to receive(:orgs).and_return(orgs_api)
+      allow(Sem::API::Orgs).to receive(:list).and_return([org])
       allow(sem_api_teams).to receive(:list_for_org).and_return([team_hash])
     end
 
-    it "calls list on the orgs_api" do
-      expect(orgs_api).to receive(:list)
+    it "calls list on the sem_api_orgs" do
+      expect(Sem::API::Orgs).to receive(:list)
 
       sem_api_teams.list
     end

@@ -22,9 +22,9 @@ module Sem
       end
 
       def list
-        org_names = client.orgs.list.map(&:username)
+        org_names = Orgs.list.map { |org| org[:username] }
 
-        users = org_names.map { |name| client.users.list_for_org(name) }.flatten
+        users = org_names.map { |name| api.list_for_org(name) }.flatten
 
         users.map { |user| to_hash(user) }
       end
@@ -32,7 +32,7 @@ module Sem
       def list_for_team(team_path)
         team = Teams.info(team_path)
 
-        users = client.users.list_for_team(team[:id])
+        users = api.list_for_team(team[:id])
 
         users.map { |user| to_hash(user) }
       end
@@ -45,17 +45,21 @@ module Sem
         user = info(user_name)
         team = Teams.info(team_path)
 
-        client.users.attach_to_team(user[:id], team[:id])
+        api.attach_to_team(user[:id], team[:id])
       end
 
       def remove_from_team(team_path, user_name)
         user = info(user_name)
         team = Teams.info(team_path)
 
-        client.users.detach_from_team(user[:id], team[:id])
+        api.detach_from_team(user[:id], team[:id])
       end
 
       private
+
+      def api
+        client.users
+      end
 
       def to_hash(user)
         {
