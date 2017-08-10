@@ -6,12 +6,15 @@ describe Sem::API::Projects do
   let(:projects_api) { instance_double(SemaphoreClient::Api::Project) }
   let(:client) { instance_double(SemaphoreClient, :projects => projects_api) }
 
-  let(:team_path) { "org/team" }
+  let(:org_name) { "org" }
+  let(:project_path) { "#{org_name}/project" }
+  let(:team_path) { "#{org_name}/team" }
 
   let(:project_id) { 0 }
+  let(:project_name) { "project" }
   let(:project_hash) { { :id => project_id } }
 
-  let(:project) { instance_double(SemaphoreClient::Model::Project, :id => 0, :name => "name") }
+  let(:project) { instance_double(SemaphoreClient::Model::Project, :id => project_id, :name => project_name) }
 
   before do
     allow(sem_api_projects).to receive(:client).and_return(client)
@@ -42,8 +45,6 @@ describe Sem::API::Projects do
   end
 
   describe ".list_for_org" do
-    let(:org_name) { "org" }
-
     before { allow(sem_api_projects).to receive(:list_for_org).and_return([project_hash]) }
 
     it "creates an instance" do
@@ -84,6 +85,28 @@ describe Sem::API::Projects do
       return_value = described_class.list_for_team(team_path)
 
       expect(return_value).to eql([project_hash])
+    end
+  end
+
+  describe ".info" do
+    before { allow(sem_api_projects).to receive(:info).and_return(project_hash) }
+
+    it "creates an instance" do
+      expect(described_class).to receive(:new)
+
+      described_class.info(project_path)
+    end
+
+    it "passes the call to the instance" do
+      expect(sem_api_projects).to receive(:info).with(project_path)
+
+      described_class.info(project_path)
+    end
+
+    it "returns the result" do
+      return_value = described_class.info(project_path)
+
+      expect(return_value).to eql(project_hash)
     end
   end
 
@@ -139,16 +162,6 @@ describe Sem::API::Projects do
     end
   end
 
-  describe "#to_hash" do
-    before { allow(sem_api_projects).to receive(:to_hash).and_call_original }
-
-    it "returns the hash" do
-      return_value = sem_api_projects.send(:to_hash, project)
-
-      expect(return_value).to eql(:id => 0, :name => "name")
-    end
-  end
-
   describe "#list_for_team" do
     let(:team_id) { 0 }
     let(:team) { { :id => team_id } }
@@ -180,6 +193,35 @@ describe Sem::API::Projects do
       return_value = sem_api_projects.list_for_team(team_path)
 
       expect(return_value).to eql([project_hash])
+    end
+  end
+
+  describe "#info" do
+    let(:project_hash_0) { { :name => project_name } }
+    let(:project_hash_1) { { :name => "project_1" } }
+
+    before { allow(sem_api_projects).to receive(:list_for_org).and_return([project_hash_0, project_hash_1]) }
+
+    it "calls list_for_org on the subject" do
+      expect(sem_api_projects).to receive(:list_for_org).with(org_name)
+
+      sem_api_projects.info(project_path)
+    end
+
+    it "returns the selected project" do
+      return_value = sem_api_projects.info(project_path)
+
+      expect(return_value).to eql(project_hash_0)
+    end
+  end
+
+  describe "#to_hash" do
+    before { allow(sem_api_projects).to receive(:to_hash).and_call_original }
+
+    it "returns the hash" do
+      return_value = sem_api_projects.send(:to_hash, project)
+
+      expect(return_value).to eql(:id => 0, :name => "project")
     end
   end
 end
