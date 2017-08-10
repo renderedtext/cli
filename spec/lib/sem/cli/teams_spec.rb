@@ -252,7 +252,7 @@ describe Sem::CLI::Teams do
 
       before { allow(Sem::API::Projects).to receive(:list_for_team).and_return([project_0, project_1]) }
 
-      it "calls the users API" do
+      it "calls the projects API" do
         expect(Sem::API::Projects).to receive(:list_for_team).with("renderedtext/cli")
 
         sem_run("teams:projects:list renderedtext/cli")
@@ -309,6 +309,17 @@ describe Sem::CLI::Teams do
 
   describe Sem::CLI::Teams::Configs do
     describe "#list" do
+      let(:config_0) { { :id => "3bc7ed43-ac8a-487e-b488-c38bc757a034", :name => "renderedtext/aws-tokens" } }
+      let(:config_1) { { :id => "fe3624cf-0cea-4d87-9dde-cb9ddacfefc0", :name => "renderedtext/gemfury" } }
+
+      before { allow(Sem::API::Configs).to receive(:list_for_team).and_return([config_0, config_1]) }
+
+      it "calls the configs API" do
+        expect(Sem::API::Configs).to receive(:list_for_team).with("renderedtext/aws-tokens")
+
+        sem_run("teams:configs:list renderedtext/aws-tokens")
+      end
+
       it "lists shared configurations in the team" do
         stdout, stderr = sem_run("teams:configs:list renderedtext/aws-tokens")
 

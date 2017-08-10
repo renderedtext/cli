@@ -139,14 +139,10 @@ class Sem::CLI::Teams < Sem::ThorExt::SubcommandThor
     namespace "teams:configs"
 
     desc "list", "list shared confgiurations in a team"
-    def list(_team_name)
-      configs = [
-        ["ID", "NAME"],
-        ["3bc7ed43-ac8a-487e-b488-c38bc757a034", "renderedtext/aws-tokens"],
-        ["fe3624cf-0cea-4d87-9dde-cb9ddacfefc0", "renderedtext/gemfury"]
-      ]
+    def list(team_name)
+      configs = Sem::API::Configs.list_for_team(team_name)
 
-      print_table(configs)
+      print_table(Sem::CLI::Configs.configs_table(configs))
     end
 
     desc "add", "add a shared configuration to a team"
