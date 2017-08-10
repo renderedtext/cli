@@ -20,6 +20,28 @@ describe Sem::API::Configs do
     allow(described_class).to receive(:new).and_return(sem_api_configs)
   end
 
+  describe ".list" do
+    before { allow(sem_api_configs).to receive(:list).and_return([config_hash]) }
+
+    it "creates an instance" do
+      expect(described_class).to receive(:new)
+
+      described_class.list
+    end
+
+    it "passes the call to the instance" do
+      expect(sem_api_configs).to receive(:list)
+
+      described_class.list
+    end
+
+    it "returns the result" do
+      return_value = described_class.list
+
+      expect(return_value).to eql([config_hash])
+    end
+  end
+
   describe ".list_for_org" do
     before { allow(sem_api_configs).to receive(:list_for_org).and_return([config_hash]) }
 
@@ -37,6 +59,34 @@ describe Sem::API::Configs do
 
     it "returns the result" do
       return_value = described_class.list_for_org(org_name)
+
+      expect(return_value).to eql([config_hash])
+    end
+  end
+
+  describe "#list" do
+    let(:org_username) { "org" }
+    let(:org) { { :username => org_username } }
+
+    before do
+      allow(Sem::API::Orgs).to receive(:list).and_return([org])
+      allow(sem_api_configs).to receive(:list_for_org).and_return([config_hash])
+    end
+
+    it "calls list on the sem_api_orgs" do
+      expect(Sem::API::Orgs).to receive(:list)
+
+      sem_api_configs.list
+    end
+
+    it "calls list_for_org on the subject" do
+      expect(sem_api_configs).to receive(:list_for_org).with(org_username)
+
+      sem_api_configs.list
+    end
+
+    it "returns the config hashes" do
+      return_value = sem_api_configs.list
 
       expect(return_value).to eql([config_hash])
     end
