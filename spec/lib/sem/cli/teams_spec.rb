@@ -335,6 +335,14 @@ describe Sem::CLI::Teams do
     end
 
     describe "#add" do
+      before { allow(Sem::API::Configs).to receive(:add_to_team) }
+
+      it "calls the projects API" do
+        expect(Sem::API::Configs).to receive(:add_to_team).with("renderedtext/developers", "renderedtext/aws-tokens")
+
+        sem_run("teams:config:add renderedtext/developers renderedtext/aws-tokens")
+      end
+
       it "add a project to the team" do
         stdout, stderr = sem_run("teams:config:add renderedtext/developers renderedtext/aws-tokens")
 
@@ -344,6 +352,14 @@ describe Sem::CLI::Teams do
     end
 
     describe "#remove" do
+      before { allow(Sem::API::Configs).to receive(:remove_from_team) }
+
+      it "calls the projects API" do
+        expect(Sem::API::Configs).to receive(:remove_from_team).with("renderedtext/developers", "renderedtext/tokens")
+
+        sem_run("teams:config:remove renderedtext/developers renderedtext/tokens")
+      end
+
       it "removes a project from the team" do
         stdout, stderr = sem_run("teams:config:remove renderedtext/developers renderedtext/aws-tokens")
 

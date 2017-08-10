@@ -146,12 +146,16 @@ class Sem::CLI::Teams < Sem::ThorExt::SubcommandThor
     end
 
     desc "add", "add a shared configuration to a team"
-    def add(_name, shared_config_name)
+    def add(team_name, shared_config_name)
+      Sem::API::Configs.add_to_team(team_name, shared_config_name)
+
       puts "Shared Configuration #{shared_config_name} added to the team."
     end
 
     desc "remove", "removes a project from the team"
-    def remove(_name, shared_config_name)
+    def remove(team_name, shared_config_name)
+      Sem::API::Configs.remove_from_team(team_name, shared_config_name)
+
       puts "Shared Configuration #{shared_config_name} removed from the team."
     end
   end
