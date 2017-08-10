@@ -110,6 +110,38 @@ describe Sem::API::Configs do
     end
   end
 
+  describe ".add_to_team" do
+    before { allow(sem_api_configs).to receive(:add_to_team) }
+
+    it "creates an instance" do
+      expect(described_class).to receive(:new)
+
+      described_class.add_to_team(team_path, config_path)
+    end
+
+    it "passes the call to the instance" do
+      expect(sem_api_configs).to receive(:add_to_team).with(team_path, config_path)
+
+      described_class.add_to_team(team_path, config_path)
+    end
+  end
+
+  describe ".remove_from_team" do
+    before { allow(sem_api_configs).to receive(:remove_from_team) }
+
+    it "creates an instance" do
+      expect(described_class).to receive(:new)
+
+      described_class.remove_from_team(team_path, config_path)
+    end
+
+    it "passes the call to the instance" do
+      expect(sem_api_configs).to receive(:remove_from_team).with(team_path, config_path)
+
+      described_class.remove_from_team(team_path, config_path)
+    end
+  end
+
   describe "#list" do
     let(:org_username) { "org" }
     let(:org) { { :username => org_username } }
@@ -176,6 +208,64 @@ describe Sem::API::Configs do
       return_value = sem_api_configs.info(config_path)
 
       expect(return_value).to eql(config_hash_0)
+    end
+  end
+
+  describe "#add_to_team" do
+    let(:team_id) { 0 }
+    let(:team) { { :id => team_id } }
+
+    before do
+      allow(sem_api_configs).to receive(:info).and_return(config_hash)
+      allow(Sem::API::Teams).to receive(:info).and_return(team)
+      allow(configs_api).to receive(:attach_to_team)
+    end
+
+    it "calls info on the subject" do
+      expect(sem_api_configs).to receive(:info).with(config_path)
+
+      sem_api_configs.add_to_team(team_path, config_path)
+    end
+
+    it "calls info on sem_api_teams" do
+      expect(Sem::API::Teams).to receive(:info).with(team_path)
+
+      sem_api_configs.add_to_team(team_path, config_path)
+    end
+
+    it "calls attach_to_team on the configs_api" do
+      expect(configs_api).to receive(:attach_to_team).with(config_id, team_id)
+
+      sem_api_configs.add_to_team(team_path, config_path)
+    end
+  end
+
+  describe "#remove_from_team" do
+    let(:team_id) { 0 }
+    let(:team) { { :id => team_id } }
+
+    before do
+      allow(sem_api_configs).to receive(:info).and_return(config_hash)
+      allow(Sem::API::Teams).to receive(:info).and_return(team)
+      allow(configs_api).to receive(:detach_from_team)
+    end
+
+    it "calls info on the subject" do
+      expect(sem_api_configs).to receive(:info).with(config_path)
+
+      sem_api_configs.remove_from_team(team_path, config_path)
+    end
+
+    it "calls info on sem_api_teams" do
+      expect(Sem::API::Teams).to receive(:info).with(team_path)
+
+      sem_api_configs.remove_from_team(team_path, config_path)
+    end
+
+    it "calls detach_from_team on the projects_api" do
+      expect(configs_api).to receive(:detach_from_team).with(config_id, team_id)
+
+      sem_api_configs.remove_from_team(team_path, config_path)
     end
   end
 

@@ -261,7 +261,7 @@ describe Sem::API::Projects do
       sem_api_projects.add_to_team(team_path, project_path)
     end
 
-    it "calls info on sem_api_projects" do
+    it "calls info on sem_api_teams" do
       expect(Sem::API::Teams).to receive(:info).with(team_path)
 
       sem_api_projects.add_to_team(team_path, project_path)
