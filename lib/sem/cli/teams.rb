@@ -29,12 +29,26 @@ class Sem::CLI::Teams < Sem::ThorExt::SubcommandThor
     print_table(team_table(team))
   end
 
-  desc "rename", "change the teams name"
+  desc "rename", "change the name of the team"
   def rename(_old_name, new_name)
     info = [
       ["ID", "3bc7ed43-ac8a-487e-b488-c38bc757a034"],
       ["Name", new_name],
       ["Permission", "admin"],
+      ["Members", "4 members"],
+      ["Created", "2017-08-01 13:14:40 +0200"],
+      ["Updated", "2017-08-02 13:14:40 +0200"]
+    ]
+
+    print_table(info)
+  end
+
+  desc "set-permission", "set the permission level of the team"
+  def set_permission(team_name, permission)
+    info = [
+      ["ID", "3bc7ed43-ac8a-487e-b488-c38bc757a034"],
+      ["Name", team_name],
+      ["Permission", permission],
       ["Members", "4 members"],
       ["Created", "2017-08-01 13:14:40 +0200"],
       ["Updated", "2017-08-02 13:14:40 +0200"]
