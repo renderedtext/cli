@@ -114,14 +114,10 @@ class Sem::CLI::Teams < Sem::ThorExt::SubcommandThor
     namespace "teams:projects"
 
     desc "list", "lists projects in a team"
-    def list(_team_name)
-      projects = [
-        ["ID", "NAME"],
-        ["3bc7ed43-ac8a-487e-b488-c38bc757a034", "renderedtext/cli"],
-        ["fe3624cf-0cea-4d87-9dde-cb9ddacfefc0", "renderedtext/api"]
-      ]
+    def list(team_name)
+      projects = Sem::API::Projects.list_for_team(team_name)
 
-      print_table(projects)
+      print_table(Sem::CLI::Projects.projects_table(projects))
     end
 
     desc "add", "add a project to a team"

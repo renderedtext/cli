@@ -247,6 +247,17 @@ describe Sem::CLI::Teams do
 
   describe Sem::CLI::Teams::Projects do
     describe "#list" do
+      let(:project_0) { { :id => "3bc7ed43-ac8a-487e-b488-c38bc757a034", :name => "renderedtext/cli" } }
+      let(:project_1) { { :id => "fe3624cf-0cea-4d87-9dde-cb9ddacfefc0", :name => "renderedtext/api" } }
+
+      before { allow(Sem::API::Projects).to receive(:list_for_team).and_return([project_0, project_1]) }
+
+      it "calls the users API" do
+        expect(Sem::API::Projects).to receive(:list_for_team).with("renderedtext/cli")
+
+        sem_run("teams:projects:list renderedtext/cli")
+      end
+
       it "lists projects in the team" do
         stdout, stderr = sem_run("teams:projects:list renderedtext/cli")
 
