@@ -121,12 +121,16 @@ class Sem::CLI::Teams < Sem::ThorExt::SubcommandThor
     end
 
     desc "add", "add a project to a team"
-    def add(_name, project_name)
+    def add(team_name, project_name)
+      Sem::API::Projects.add_to_team(team_name, project_name)
+
       puts "Project #{project_name} added to the team."
     end
 
     desc "remove", "removes a project from the team"
-    def remove(_name, project_name)
+    def remove(team_name, project_name)
+      Sem::API::Projects.remove_from_team(team_name, project_name)
+
       puts "Project #{project_name} removed from the team."
     end
   end

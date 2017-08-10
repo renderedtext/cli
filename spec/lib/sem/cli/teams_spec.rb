@@ -1,8 +1,7 @@
 require "spec_helper"
 
 describe Sem::CLI::Teams do
-  let(:team) do
-    {
+  let(:team) do {
       :id => "3bc7ed43-ac8a-487e-b488-c38bc757a034",
       :name => "renderedtext/developers",
       :permission => "write",
@@ -273,6 +272,14 @@ describe Sem::CLI::Teams do
     end
 
     describe "#add" do
+      before { allow(Sem::API::Projects).to receive(:add_to_team) }
+
+      it "calls the projects API" do
+        expect(Sem::API::Projects).to receive(:add_to_team).with("renderedtext/developers", "renderedtext/cli")
+
+        sem_run("teams:projects:add renderedtext/developers renderedtext/cli")
+      end
+
       it "add a project to the team" do
         stdout, stderr = sem_run("teams:projects:add renderedtext/developers renderedtext/cli")
 
@@ -282,6 +289,14 @@ describe Sem::CLI::Teams do
     end
 
     describe "#remove" do
+      before { allow(Sem::API::Projects).to receive(:remove_from_team) }
+
+      it "calls the projects API" do
+        expect(Sem::API::Projects).to receive(:remove_from_team).with("renderedtext/developers", "renderedtext/api")
+
+        sem_run("teams:projects:remove renderedtext/developers renderedtext/api")
+      end
+
       it "removes a project from the team" do
         stdout, stderr = sem_run("teams:projects:remove renderedtext/developers renderedtext/api")
 
