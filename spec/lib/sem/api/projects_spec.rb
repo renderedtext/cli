@@ -39,35 +39,77 @@ describe Sem::API::Projects do
     end
   end
 
+  describe ".list_for_org" do
+    let(:org_name) { "org" }
+
+    before { allow(sem_api_projects).to receive(:list_for_org).and_return([project_hash]) }
+
+    it "creates an instance" do
+      expect(described_class).to receive(:new)
+
+      described_class.list_for_org(org_name)
+    end
+
+    it "passes the call to the instance" do
+      expect(sem_api_projects).to receive(:list_for_org).with(org_name)
+
+      described_class.list_for_org(org_name)
+    end
+
+    it "returns the result" do
+      return_value = described_class.list_for_org(org_name)
+
+      expect(return_value).to eql([project_hash])
+    end
+  end
+
   describe "#list" do
     let(:org_username) { "org" }
     let(:org) { { :username => org_username } }
 
     before do
       allow(Sem::API::Orgs).to receive(:list).and_return([org])
-      allow(projects_api).to receive(:list_for_org).and_return([project])
+      allow(sem_api_projects).to receive(:list_for_org).and_return([project_hash])
     end
 
-    it "calls list on the orgs_api" do
+    it "calls list on the sem_api_orgs" do
       expect(Sem::API::Orgs).to receive(:list)
 
       sem_api_projects.list
     end
 
-    it "calls list_for_org on the projects_api" do
-      expect(projects_api).to receive(:list_for_org).with(org_username)
-
-      sem_api_projects.list
-    end
-
-    it "converts the projects to project hashes" do
-      expect(sem_api_projects).to receive(:to_hash).with(project)
+    it "calls list_for_org on the subject" do
+      expect(sem_api_projects).to receive(:list_for_org).with(org_username)
 
       sem_api_projects.list
     end
 
     it "returns the project hashes" do
       return_value = sem_api_projects.list
+
+      expect(return_value).to eql([project_hash])
+    end
+  end
+
+  describe "#list_for_org" do
+    let(:org_username) { "org" }
+
+    before { allow(projects_api).to receive(:list_for_org).and_return([project]) }
+
+    it "calls list_for_org on the projects_api" do
+      expect(projects_api).to receive(:list_for_org).with(org_username)
+
+      sem_api_projects.list_for_org(org_username)
+    end
+
+    it "converts the projects to project hashes" do
+      expect(sem_api_projects).to receive(:to_hash).with(project)
+
+      sem_api_projects.list_for_org(org_username)
+    end
+
+    it "returns the project hashes" do
+      return_value = sem_api_projects.list_for_org(org_username)
 
       expect(return_value).to eql([project_hash])
     end
