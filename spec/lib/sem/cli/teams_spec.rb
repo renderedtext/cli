@@ -1,7 +1,8 @@
 require "spec_helper"
 
 describe Sem::CLI::Teams do
-  let(:team) do {
+  let(:team) do
+    {
       :id => "3bc7ed43-ac8a-487e-b488-c38bc757a034",
       :name => "renderedtext/developers",
       :permission => "write",
