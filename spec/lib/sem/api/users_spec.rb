@@ -42,6 +42,30 @@ describe Sem::API::Users do
     end
   end
 
+  describe ".list_for_org" do
+    let(:org_name) { "org" }
+
+    before { allow(sem_api_users).to receive(:list_for_org).and_return([user_hash]) }
+
+    it "creates an instance" do
+      expect(described_class).to receive(:new)
+
+      described_class.list_for_org(org_name)
+    end
+
+    it "passes the call to the instance" do
+      expect(sem_api_users).to receive(:list_for_org).with(org_name)
+
+      described_class.list_for_org(org_name)
+    end
+
+    it "returns the result" do
+      return_value = described_class.list_for_org(org_name)
+
+      expect(return_value).to eql([user_hash])
+    end
+  end
+
   describe ".list_for_team" do
     before { allow(sem_api_users).to receive(:list_for_team).and_return([user_hash]) }
 
@@ -124,29 +148,47 @@ describe Sem::API::Users do
 
     before do
       allow(Sem::API::Orgs).to receive(:list).and_return([org])
-      allow(users_api).to receive(:list_for_org).and_return([user])
+      allow(sem_api_users).to receive(:list_for_org).and_return([user_hash])
     end
 
-    it "calls list on the orgs_api" do
+    it "calls list on the sem_api_orgs" do
       expect(Sem::API::Orgs).to receive(:list)
 
       sem_api_users.list
     end
 
-    it "calls list_for_org on the users_api" do
-      expect(users_api).to receive(:list_for_org).with(org_username)
-
-      sem_api_users.list
-    end
-
-    it "converts the users to user hashes" do
-      expect(sem_api_users).to receive(:to_hash).with(user)
+    it "calls list_for_org on the subject" do
+      expect(sem_api_users).to receive(:list_for_org).with(org_username)
 
       sem_api_users.list
     end
 
     it "returns the user hashes" do
       return_value = sem_api_users.list
+
+      expect(return_value).to eql([user_hash])
+    end
+  end
+
+  describe "#list_for_org" do
+    let(:org_username) { "org" }
+
+    before { allow(users_api).to receive(:list_for_org).and_return([user]) }
+
+    it "calls list_for_org on the users_api" do
+      expect(users_api).to receive(:list_for_org).with(org_username)
+
+      sem_api_users.list_for_org(org_username)
+    end
+
+    it "converts the users to user hashes" do
+      expect(sem_api_users).to receive(:to_hash).with(user)
+
+      sem_api_users.list_for_org(org_username)
+    end
+
+    it "returns the user hashes" do
+      return_value = sem_api_users.list_for_org(org_username)
 
       expect(return_value).to eql([user_hash])
     end

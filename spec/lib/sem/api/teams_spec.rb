@@ -135,8 +135,7 @@ describe Sem::API::Teams do
   end
 
   describe "#list" do
-    let(:org_username) { "org" }
-    let(:org) { { :username => org_username } }
+    let(:org) { { :username => org_name } }
 
     before do
       allow(Sem::API::Orgs).to receive(:list).and_return([org])
@@ -150,7 +149,7 @@ describe Sem::API::Teams do
     end
 
     it "calls list_for_org on the subject" do
-      expect(sem_api_teams).to receive(:list_for_org).with(org_username)
+      expect(sem_api_teams).to receive(:list_for_org).with(org_name)
 
       sem_api_teams.list
     end
@@ -163,24 +162,24 @@ describe Sem::API::Teams do
   end
 
   describe "#list_for_org" do
-    let(:org_username) { "org" }
+    let(:org_name) { "org" }
 
     before { allow(teams_api).to receive(:list_for_org).and_return([team]) }
 
     it "calls list_for_org on the teams_api" do
-      expect(teams_api).to receive(:list_for_org).with(org_username)
+      expect(teams_api).to receive(:list_for_org).with(org_name)
 
-      sem_api_teams.list_for_org(org_username)
+      sem_api_teams.list_for_org(org_name)
     end
 
     it "converts the teams to team hashes" do
       expect(sem_api_teams).to receive(:to_hash).with(team)
 
-      sem_api_teams.list_for_org(org_username)
+      sem_api_teams.list_for_org(org_name)
     end
 
     it "returns the team hashes" do
-      return_value = sem_api_teams.list_for_org(org_username)
+      return_value = sem_api_teams.list_for_org(org_name)
 
       expect(return_value).to eql([team_hash])
     end

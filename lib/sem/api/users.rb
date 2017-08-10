@@ -5,6 +5,10 @@ module Sem
         new.list
       end
 
+      def self.list_for_org(org_name)
+        new.list_for_org(org_name)
+      end
+
       def self.list_for_team(team_path)
         new.list_for_team(team_path)
       end
@@ -24,7 +28,11 @@ module Sem
       def list
         org_names = Orgs.list.map { |org| org[:username] }
 
-        users = org_names.map { |name| api.list_for_org(name) }.flatten
+        org_names.map { |name| list_for_org(name) }.flatten
+      end
+
+      def list_for_org(org_name)
+        users = api.list_for_org(org_name)
 
         users.map { |user| to_hash(user) }
       end
