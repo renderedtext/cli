@@ -13,6 +13,10 @@ module Sem
         new.list_for_team(team_path)
       end
 
+      def self.info(name)
+        new.info(name)
+      end
+
       def list
         org_names = Orgs.list.map { |org| org[:username] }
 
@@ -31,6 +35,12 @@ module Sem
         configs = api.list_for_team(team[:id])
 
         configs.map { |config| to_hash(config) }
+      end
+
+      def info(path)
+        org_name, config_name = path.split("/")
+
+        list_for_org(org_name).find { |config| config[:name] == config_name }
       end
 
       private
