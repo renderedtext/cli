@@ -1,5 +1,6 @@
 module Sem
   class CLI < Sem::ThorExt::TopLevelThor
+    require_relative "cli/users"
     require_relative "cli/teams"
 
     desc "login", "log in to semaphore from the command line"

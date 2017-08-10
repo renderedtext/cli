@@ -12,6 +12,36 @@ describe Sem::CLI::Teams do
     }
   end
 
+  describe ".teams_table" do
+    it "returns the teams in table format" do
+      return_value = described_class.teams_table([team])
+
+      expected_value = [
+        ["ID", "NAME", "PERMISSION", "MEMBERS"],
+        ["3bc7ed43-ac8a-487e-b488-c38bc757a034", "renderedtext/developers", "write", "72 members"]
+      ]
+
+      expect(return_value).to eql(expected_value)
+    end
+  end
+
+  describe ".team_table" do
+    it "returns the team in table format" do
+      return_value = described_class.team_table(team)
+
+      expected_value = [
+        ["ID", "3bc7ed43-ac8a-487e-b488-c38bc757a034"],
+        ["Name", "renderedtext/developers"],
+        ["Permission", "write"],
+        ["Members", "72 members"],
+        ["Created", "2017-08-01 13:14:40 +0200"],
+        ["Updated", "2017-08-02 13:14:40 +0200"]
+      ]
+
+      expect(return_value).to eql(expected_value)
+    end
+  end
+
   describe "#list" do
     let(:another_team) do
       {
@@ -155,6 +185,17 @@ describe Sem::CLI::Teams do
 
   describe Sem::CLI::Teams::Members do
     describe "#list" do
+      let(:user_0) { { :id => "3bc7ed43-ac8a-487e-b488-c38bc757a034", :username => "ijovan" } }
+      let(:user_1) { { :id => "fe3624cf-0cea-4d87-9dde-cb9ddacfefc0", :username => "shiroyasha" } }
+
+      before { allow(Sem::API::Users).to receive(:list_for_team).and_return([user_0, user_1]) }
+
+      it "calls the users API" do
+        expect(Sem::API::Users).to receive(:list_for_team).with("renderedtext/cli")
+
+        sem_run("teams:members:list renderedtext/cli")
+      end
+
       it "lists team members" do
         stdout, stderr = sem_run("teams:members:list renderedtext/cli")
 
@@ -170,6 +211,14 @@ describe Sem::CLI::Teams do
     end
 
     describe "#add" do
+      before { allow(Sem::API::Users).to receive(:add_to_team) }
+
+      it "calls the users API" do
+        expect(Sem::API::Users).to receive(:add_to_team).with("renderedtext/developers", "ijovan")
+
+        sem_run("teams:members:add renderedtext/developers ijovan")
+      end
+
       it "add a user to the team" do
         stdout, stderr = sem_run("teams:members:add renderedtext/developers ijovan")
 
@@ -179,6 +228,14 @@ describe Sem::CLI::Teams do
     end
 
     describe "#remove" do
+      before { allow(Sem::API::Users).to receive(:remove_from_team) }
+
+      it "calls the users API" do
+        expect(Sem::API::Users).to receive(:remove_from_team).with("renderedtext/developers", "ijovan")
+
+        sem_run("teams:members:remove renderedtext/developers ijovan")
+      end
+
       it "removes a user from the team" do
         stdout, stderr = sem_run("teams:members:remove renderedtext/developers ijovan")
 
@@ -257,5 +314,4 @@ describe Sem::CLI::Teams do
       end
     end
   end
-
 end
