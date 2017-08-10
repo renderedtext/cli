@@ -135,4 +135,109 @@ describe Sem::CLI::Teams do
     end
   end
 
+  describe Sem::CLI::Teams::Members do
+    describe "#list" do
+      it "lists team members" do
+        stdout, stderr = sem_run("teams:members:list renderedtext/cli")
+
+        msg = [
+          "ID                                    USERNAME",
+          "3bc7ed43-ac8a-487e-b488-c38bc757a034  ijovan",
+          "fe3624cf-0cea-4d87-9dde-cb9ddacfefc0  shiroyasha"
+        ]
+
+        expect(stderr).to eq("")
+        expect(stdout.strip).to eq(msg.join("\n"))
+      end
+    end
+
+    describe "#add" do
+      it "add a user to the team" do
+        stdout, stderr = sem_run("teams:members:add renderedtext/developers ijovan")
+
+        expect(stderr).to eq("")
+        expect(stdout.strip).to eq("User ijovan added to the team.")
+      end
+    end
+
+    describe "#remove" do
+      it "removes a user from the team" do
+        stdout, stderr = sem_run("teams:members:remove renderedtext/developers ijovan")
+
+        expect(stderr).to eq("")
+        expect(stdout.strip).to eq("User ijovan removed from the team.")
+      end
+    end
+  end
+
+  describe Sem::CLI::Teams::Projects do
+    describe "#list" do
+      it "lists projects in the team" do
+        stdout, stderr = sem_run("teams:projects:list renderedtext/cli")
+
+        msg = [
+          "ID                                    NAME",
+          "3bc7ed43-ac8a-487e-b488-c38bc757a034  renderedtext/cli",
+          "fe3624cf-0cea-4d87-9dde-cb9ddacfefc0  renderedtext/api"
+        ]
+
+        expect(stderr).to eq("")
+        expect(stdout.strip).to eq(msg.join("\n"))
+      end
+    end
+
+    describe "#add" do
+      it "add a project to the team" do
+        stdout, stderr = sem_run("teams:projects:add renderedtext/developers renderedtext/cli")
+
+        expect(stderr).to eq("")
+        expect(stdout.strip).to eq("Project renderedtext/cli added to the team.")
+      end
+    end
+
+    describe "#remove" do
+      it "removes a project from the team" do
+        stdout, stderr = sem_run("teams:projects:remove renderedtext/developers renderedtext/api")
+
+        expect(stderr).to eq("")
+        expect(stdout.strip).to eq("Project renderedtext/api removed from the team.")
+      end
+    end
+  end
+
+  describe Sem::CLI::Teams::Configs do
+    describe "#list" do
+      it "lists shared configurations in the team" do
+        stdout, stderr = sem_run("teams:configs:list renderedtext/aws-tokens")
+
+        msg = [
+          "ID                                    NAME",
+          "3bc7ed43-ac8a-487e-b488-c38bc757a034  renderedtext/aws-tokens",
+          "fe3624cf-0cea-4d87-9dde-cb9ddacfefc0  renderedtext/gemfury"
+        ]
+
+        expect(stderr).to eq("")
+        expect(stdout.strip).to eq(msg.join("\n"))
+      end
+    end
+
+    describe "#add" do
+      it "add a project to the team" do
+        stdout, stderr = sem_run("teams:config:add renderedtext/developers renderedtext/aws-tokens")
+
+        expect(stderr).to eq("")
+        expect(stdout.strip).to eq("Shared Configuration renderedtext/aws-tokens added to the team.")
+      end
+    end
+
+    describe "#remove" do
+      it "removes a project from the team" do
+        stdout, stderr = sem_run("teams:config:remove renderedtext/developers renderedtext/aws-tokens")
+
+        expect(stderr).to eq("")
+        expect(stdout.strip).to eq("Shared Configuration renderedtext/aws-tokens removed from the team.")
+      end
+    end
+  end
+
 end

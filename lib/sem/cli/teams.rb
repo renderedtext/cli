@@ -1,21 +1,21 @@
 class Sem::CLI::Teams < Sem::ThorExt::SubcommandThor
   namespace "teams"
 
-  desc "list", "list information about a team"
+  desc "list", "list teams"
   def list
     teams = Sem::API::Teams.list
 
     print_table(teams_table(teams))
   end
 
-  desc "info [NAME]", "show information about a team"
+  desc "info", "show information about a team"
   def info(name)
     team = Sem::API::Teams.info(name)
 
     print_table(team_table(team))
   end
 
-  desc "create [NAME]", "create a new team"
+  desc "create", "create a new team"
   method_option :permission, :default => "read",
                              :aliases => "-p",
                              :desc => "Permission level of the team in the organization"
@@ -29,7 +29,7 @@ class Sem::CLI::Teams < Sem::ThorExt::SubcommandThor
     print_table(team_table(team))
   end
 
-  desc "update [NAME]", "update a team"
+  desc "update", "update a team"
   method_option :permission, :aliases => "-p", :desc => "Permission level of the team in the organization"
   method_option :name, :aliases => "-n", :desc => "Name of the team"
   def update(_name)
@@ -48,12 +48,96 @@ class Sem::CLI::Teams < Sem::ThorExt::SubcommandThor
     print_table(info)
   end
 
-  desc "delete [NAME]", "removes a team from your organization"
+  desc "delete", "removes a team from your organization"
   def delete(name)
     Sem::API::Teams.delete(name)
 
     puts "Deleted team #{name}"
   end
+
+  class Members < Sem::ThorExt::SubcommandThor
+    namespace "teams:members"
+
+    desc "list", "lists members of the team"
+    def list(_team_name)
+      members = [
+        ["ID", "USERNAME"],
+        ["3bc7ed43-ac8a-487e-b488-c38bc757a034", "ijovan"],
+        ["fe3624cf-0cea-4d87-9dde-cb9ddacfefc0", "shiroyasha"]
+      ]
+
+      print_table(members)
+    end
+
+    desc "add", "add a user to the team"
+    def add(_name, username)
+      puts "User #{username} added to the team."
+    end
+
+    desc "remove", "removes a user from the team"
+    def remove(_name, username)
+      puts "User #{username} removed from the team."
+    end
+  end
+
+  class Projects < Sem::ThorExt::SubcommandThor
+    namespace "teams:projects"
+
+    desc "list", "lists projects in a team"
+    def list(_team_name)
+      projects = [
+        ["ID", "NAME"],
+        ["3bc7ed43-ac8a-487e-b488-c38bc757a034", "renderedtext/cli"],
+        ["fe3624cf-0cea-4d87-9dde-cb9ddacfefc0", "renderedtext/api"]
+      ]
+
+      print_table(projects)
+    end
+
+    desc "add", "add a project to a team"
+    def add(_name, project_name)
+      puts "Project #{project_name} added to the team."
+    end
+
+    desc "remove", "removes a project from the team"
+    def remove(_name, project_name)
+      puts "Project #{project_name} removed from the team."
+    end
+  end
+
+  class Configs < Sem::ThorExt::SubcommandThor
+    namespace "teams:configs"
+
+    desc "list", "list shared confgiurations in a team"
+    def list(_team_name)
+      configs = [
+        ["ID", "NAME"],
+        ["3bc7ed43-ac8a-487e-b488-c38bc757a034", "renderedtext/aws-tokens"],
+        ["fe3624cf-0cea-4d87-9dde-cb9ddacfefc0", "renderedtext/gemfury"]
+      ]
+
+      print_table(configs)
+    end
+
+    desc "add", "add a shared configuration to a team"
+    def add(_name, shared_config_name)
+      puts "Shared Configuration #{shared_config_name} added to the team."
+    end
+
+    desc "remove", "removes a project from the team"
+    def remove(_name, shared_config_name)
+      puts "Shared Configuration #{shared_config_name} removed from the team."
+    end
+  end
+
+  desc "members", "manage team members", :hide => true
+  subcommand "members", Members
+
+  desc "projects", "manage team members", :hide => true
+  subcommand "projects", Projects
+
+  desc "configs", "manage shared configurations", :hide => true
+  subcommand "configs", Configs
 
   private
 
@@ -77,5 +161,4 @@ class Sem::CLI::Teams < Sem::ThorExt::SubcommandThor
       ["Updated", team[:updated_at]]
     ]
   end
-
 end
