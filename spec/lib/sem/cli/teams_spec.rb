@@ -96,9 +96,9 @@ describe Sem::CLI::Teams do
     end
   end
 
-  describe "#update" do
-    it "updates the team" do
-      stdout, stderr = sem_run("teams:update renderedtext/developers --name renderedtext/admins --permission admin")
+  describe "#rename" do
+    it "changes the team name" do
+      stdout, stderr = sem_run("teams:rename renderedtext/developers renderedtext/admins")
 
       msg = [
         "ID          3bc7ed43-ac8a-487e-b488-c38bc757a034",
