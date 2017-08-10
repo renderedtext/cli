@@ -17,6 +17,14 @@ module Sem
         new.info(name)
       end
 
+      def self.add_to_team(team_path, project_path)
+        new.add_to_team(team_path, project_path)
+      end
+
+      def self.remove_from_team(team_path, project_path)
+        new.remove_from_team(team_path, project_path)
+      end
+
       def list
         org_names = Orgs.list.map { |org| org[:username] }
 
@@ -41,6 +49,20 @@ module Sem
         org_name, project_name = path.split("/")
 
         list_for_org(org_name).find { |project| project[:name] == project_name }
+      end
+
+      def add_to_team(team_path, project_path)
+        project = info(project_path)
+        team = Teams.info(team_path)
+
+        api.attach_to_team(project[:id], team[:id])
+      end
+
+      def remove_from_team(team_path, project_path)
+        project = info(project_path)
+        team = Teams.info(team_path)
+
+        api.detach_from_team(project[:id], team[:id])
       end
 
       private
