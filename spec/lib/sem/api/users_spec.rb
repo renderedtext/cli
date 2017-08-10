@@ -7,7 +7,7 @@ describe Sem::API::Users do
   let(:client) { instance_double(SemaphoreClient, :users => users_api) }
 
   let(:user_name) { "user" }
-  let(:team_path) { "team/#{user_name}" }
+  let(:team_path) { "org/team" }
 
   let(:user_id) { 0 }
   let(:user_hash) { { :id => user_id } }
@@ -195,7 +195,6 @@ describe Sem::API::Users do
   end
 
   describe "#list_for_team" do
-    let(:team_path) { "org/team" }
     let(:team_id) { 0 }
     let(:team) { { :id => team_id } }
 

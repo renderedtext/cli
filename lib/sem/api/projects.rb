@@ -9,6 +9,10 @@ module Sem
         new.list_for_org(org_name)
       end
 
+      def self.list_for_team(team_path)
+        new.list_for_team(team_path)
+      end
+
       def list
         org_names = Orgs.list.map { |org| org[:username] }
 
@@ -17,6 +21,14 @@ module Sem
 
       def list_for_org(org_name)
         projects = api.list_for_org(org_name)
+
+        projects.map { |project| to_hash(project) }
+      end
+
+      def list_for_team(team_path)
+        team = Teams.info(team_path)
+
+        projects = api.list_for_team(team[:id])
 
         projects.map { |project| to_hash(project) }
       end
