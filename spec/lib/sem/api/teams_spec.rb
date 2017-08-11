@@ -99,6 +99,33 @@ describe Sem::API::Teams do
     end
   end
 
+  describe ".update" do
+    let(:args) { { "name" => instance_name } }
+
+    before do
+      allow(described_class).to receive(:info).and_return(instance_hash)
+      allow(class_api).to receive(:update)
+    end
+
+    it "calls info on the described class" do
+      expect(described_class).to receive(:info).with(path)
+
+      described_class.update(path, args)
+    end
+
+    it "calls delete on the class_api" do
+      expect(class_api).to receive(:update).with(instance_id, args)
+
+      described_class.update(path, args)
+    end
+
+    it "returns the instance hash" do
+      return_value = described_class.update(path, args)
+
+      expect(return_value).to eql(instance_hash)
+    end
+  end
+
   describe ".delete" do
     before do
       allow(described_class).to receive(:info).and_return(instance_hash)

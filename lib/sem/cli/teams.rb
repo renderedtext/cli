@@ -51,31 +51,19 @@ class Sem::CLI::Teams < Sem::ThorExt::SubcommandThor
   end
 
   desc "rename", "change the name of the team"
-  def rename(_old_name, new_name)
-    info = [
-      ["ID", "3bc7ed43-ac8a-487e-b488-c38bc757a034"],
-      ["Name", new_name],
-      ["Permission", "admin"],
-      ["Members", "4 members"],
-      ["Created", "2017-08-01 13:14:40 +0200"],
-      ["Updated", "2017-08-02 13:14:40 +0200"]
-    ]
+  def rename(old_name, new_name)
+    _, name = new_name.split("/")
 
-    print_table(info)
+    team = Sem::API::Teams.update(old_name, :name => name)
+
+    print_table(Sem::CLI::Teams.instance_table(team))
   end
 
   desc "set-permission", "set the permission level of the team"
   def set_permission(team_name, permission)
-    info = [
-      ["ID", "3bc7ed43-ac8a-487e-b488-c38bc757a034"],
-      ["Name", team_name],
-      ["Permission", permission],
-      ["Members", "4 members"],
-      ["Created", "2017-08-01 13:14:40 +0200"],
-      ["Updated", "2017-08-02 13:14:40 +0200"]
-    ]
+    team = Sem::API::Teams.update(team_name, :permission => permission)
 
-    print_table(info)
+    print_table(Sem::CLI::Teams.instance_table(team))
   end
 
   desc "delete", "removes a team from your organization"

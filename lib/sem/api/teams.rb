@@ -21,6 +21,14 @@ module Sem
         to_hash(team)
       end
 
+      def self.update(path, args)
+        team = info(path)
+
+        team = api.update(team[:id], args)
+
+        to_hash(team)
+      end
+
       def self.delete(path)
         id = info(path)[:id]
 

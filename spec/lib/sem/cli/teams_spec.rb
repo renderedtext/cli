@@ -127,14 +127,22 @@ describe Sem::CLI::Teams do
   end
 
   describe "#rename" do
+    before { allow(Sem::API::Teams).to receive(:update).and_return(team) }
+
+    it "calls the API" do
+      expect(Sem::API::Teams).to receive(:update).with("renderedtext/admins", :name => "developers")
+
+      sem_run("teams:rename renderedtext/admins renderedtext/developers")
+    end
+
     it "changes the team name" do
       stdout, stderr = sem_run("teams:rename renderedtext/developers renderedtext/admins")
 
       msg = [
         "ID          3bc7ed43-ac8a-487e-b488-c38bc757a034",
-        "Name        renderedtext/admins",
-        "Permission  admin",
-        "Members     4 members",
+        "Name        renderedtext/developers",
+        "Permission  write",
+        "Members     72 members",
         "Created     2017-08-01 13:14:40 +0200",
         "Updated     2017-08-02 13:14:40 +0200"
       ]
@@ -145,14 +153,22 @@ describe Sem::CLI::Teams do
   end
 
   describe "#set-permission" do
+    before { allow(Sem::API::Teams).to receive(:update).and_return(team) }
+
+    it "calls the API" do
+      expect(Sem::API::Teams).to receive(:update).with("renderedtext/developers", :permission => "admin")
+
+      sem_run("teams:set-permission renderedtext/developers admin")
+    end
+
     it "sets the permisssion level of the team" do
-      stdout, stderr = sem_run("teams:set-permission renderedtext/developers admin")
+      stdout, stderr = sem_run("teams:set-permission renderedtext/developers write")
 
       msg = [
         "ID          3bc7ed43-ac8a-487e-b488-c38bc757a034",
         "Name        renderedtext/developers",
-        "Permission  admin",
-        "Members     4 members",
+        "Permission  write",
+        "Members     72 members",
         "Created     2017-08-01 13:14:40 +0200",
         "Updated     2017-08-02 13:14:40 +0200"
       ]
