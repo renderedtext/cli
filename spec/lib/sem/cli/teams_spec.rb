@@ -185,8 +185,8 @@ describe Sem::CLI::Teams do
 
   describe Sem::CLI::Teams::Members do
     describe "#list" do
-      let(:user_0) { { :id => "3bc7ed43-ac8a-487e-b488-c38bc757a034", :username => "ijovan" } }
-      let(:user_1) { { :id => "fe3624cf-0cea-4d87-9dde-cb9ddacfefc0", :username => "shiroyasha" } }
+      let(:user_0) { { :id => "ijovan" } }
+      let(:user_1) { { :id => "shiroyasha" } }
 
       before { allow(Sem::API::Users).to receive(:list_for_team).and_return([user_0, user_1]) }
 
@@ -200,9 +200,9 @@ describe Sem::CLI::Teams do
         stdout, stderr = sem_run("teams:members:list renderedtext/cli")
 
         msg = [
-          "ID                                    USERNAME",
-          "3bc7ed43-ac8a-487e-b488-c38bc757a034  ijovan",
-          "fe3624cf-0cea-4d87-9dde-cb9ddacfefc0  shiroyasha"
+          "USERNAME",
+          "ijovan",
+          "shiroyasha"
         ]
 
         expect(stderr).to eq("")

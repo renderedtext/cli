@@ -11,7 +11,7 @@ module Sem
       end
 
       def self.info(name)
-        list.find { |user| user[:username] == name }
+        list.find { |user| user[:id] == name }
       end
 
       def self.api
@@ -19,10 +19,7 @@ module Sem
       end
 
       def self.to_hash(user)
-        {
-          :id => user.uid,
-          :username => user.username
-        }
+        { :id => user.username }
       end
     end
   end

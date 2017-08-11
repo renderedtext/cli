@@ -14,7 +14,7 @@ describe Sem::API::Users do
   let(:instance_id) { 0 }
   let(:instance_hash) { { :id => instance_id } }
 
-  let(:instance) { instance_double(SemaphoreClient::Model::User, :uid => 0, :username => "name") }
+  let(:instance) { instance_double(SemaphoreClient::Model::User, :username => "name") }
 
   before do
     allow(described_class).to receive(:client).and_return(client)
@@ -52,8 +52,8 @@ describe Sem::API::Users do
   end
 
   describe ".info" do
-    let(:instance_hash_0) { { :username => instance_path } }
-    let(:instance_hash_1) { { :username => "user_1" } }
+    let(:instance_hash_0) { { :id => instance_path } }
+    let(:instance_hash_1) { { :id => "user_1" } }
 
     before { allow(described_class).to receive(:list).and_return([instance_hash_0, instance_hash_1]) }
 
@@ -84,7 +84,7 @@ describe Sem::API::Users do
     it "returns the hash" do
       return_value = described_class.to_hash(instance)
 
-      expect(return_value).to eql(:id => 0, :username => "name")
+      expect(return_value).to eql(:id => "name")
     end
   end
 end
