@@ -5,7 +5,7 @@ shared_examples "belonging_to_team" do
     end
 
     it "has .api method" do
-      expect(described_class).to respond_to(:to_hash)
+      expect(described_class).to respond_to(:api)
     end
 
     it "has .to_hash method" do

@@ -1,18 +1,13 @@
 module Sem
   module API
     class Projects < Base
+      include Traits::BelongingToOrg
       include Traits::BelongingToTeam
 
       def self.list
         org_names = Orgs.list.map { |org| org[:username] }
 
         org_names.map { |name| list_for_org(name) }.flatten
-      end
-
-      def self.list_for_org(org_name)
-        projects = api.list_for_org(org_name)
-
-        projects.map { |project| to_hash(project) }
       end
 
       def self.info(path)

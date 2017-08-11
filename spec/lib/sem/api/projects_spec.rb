@@ -1,5 +1,6 @@
 require "spec_helper"
 
+require_relative "traits/belonging_to_org_spec"
 require_relative "traits/belonging_to_team_spec"
 
 describe Sem::API::Projects do
@@ -21,6 +22,7 @@ describe Sem::API::Projects do
     allow(described_class).to receive(:to_hash).and_return(instance_hash)
   end
 
+  it_behaves_like "belonging_to_org"
   it_behaves_like "belonging_to_team"
 
   describe ".list" do
@@ -46,28 +48,6 @@ describe Sem::API::Projects do
 
     it "returns the instance hashes" do
       return_value = described_class.list
-
-      expect(return_value).to eql([instance_hash])
-    end
-  end
-
-  describe ".list_for_org" do
-    before { allow(class_api).to receive(:list_for_org).and_return([instance]) }
-
-    it "calls list_for_org on the class_api" do
-      expect(class_api).to receive(:list_for_org).with(org_name)
-
-      described_class.list_for_org(org_name)
-    end
-
-    it "converts the instances to instance hashes" do
-      expect(described_class).to receive(:to_hash).with(instance)
-
-      described_class.list_for_org(org_name)
-    end
-
-    it "returns the instance hashes" do
-      return_value = described_class.list_for_org(org_name)
 
       expect(return_value).to eql([instance_hash])
     end

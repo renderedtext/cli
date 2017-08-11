@@ -1,16 +1,12 @@
 module Sem
   module API
     class Teams < Base
+      include Traits::BelongingToOrg
+
       def self.list
         org_names = Sem::API::Orgs.list.map { |org| org[:username] }
 
         org_names.map { |name| list_for_org(name) }.flatten
-      end
-
-      def self.list_for_org(org_name)
-        teams = api.list_for_org(org_name)
-
-        teams.map { |team| to_hash(team) }
       end
 
       def self.info(path)

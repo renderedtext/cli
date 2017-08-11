@@ -1,5 +1,6 @@
 require "spec_helper"
 
+require_relative "traits/belonging_to_org_spec"
 require_relative "traits/belonging_to_team_spec"
 
 describe Sem::API::Users do
@@ -7,6 +8,7 @@ describe Sem::API::Users do
   let(:client) { instance_double(SemaphoreClient, :users => class_api) }
 
   let(:instance_path) { "user" }
+  let(:org_name) { "org" }
   let(:team_path) { "org/team" }
 
   let(:instance_id) { 0 }
@@ -19,11 +21,11 @@ describe Sem::API::Users do
     allow(described_class).to receive(:to_hash).and_return(instance_hash)
   end
 
+  it_behaves_like "belonging_to_org"
   it_behaves_like "belonging_to_team"
 
   describe ".list" do
-    let(:org_username) { "org" }
-    let(:org) { { :username => org_username } }
+    let(:org) { { :username => org_name } }
 
     before do
       allow(Sem::API::Orgs).to receive(:list).and_return([org])
@@ -37,37 +39,13 @@ describe Sem::API::Users do
     end
 
     it "calls list_for_org on the described class" do
-      expect(described_class).to receive(:list_for_org).with(org_username)
+      expect(described_class).to receive(:list_for_org).with(org_name)
 
       described_class.list
     end
 
     it "returns the instance hashes" do
       return_value = described_class.list
-
-      expect(return_value).to eql([instance_hash])
-    end
-  end
-
-  describe ".list_for_org" do
-    let(:org_username) { "org" }
-
-    before { allow(class_api).to receive(:list_for_org).and_return([instance]) }
-
-    it "calls list_for_org on the class_api" do
-      expect(class_api).to receive(:list_for_org).with(org_username)
-
-      described_class.list_for_org(org_username)
-    end
-
-    it "converts the instances to instance hashes" do
-      expect(described_class).to receive(:to_hash).with(instance)
-
-      described_class.list_for_org(org_username)
-    end
-
-    it "returns the instance hashes" do
-      return_value = described_class.list_for_org(org_username)
 
       expect(return_value).to eql([instance_hash])
     end
