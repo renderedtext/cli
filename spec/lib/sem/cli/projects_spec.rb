@@ -3,9 +3,9 @@ require "spec_helper"
 describe Sem::CLI::Projects do
   let(:project) { { :id => "3bc7ed43-ac8a-487e-b488-c38bc757a034", :name => "renderedtext/cli" } }
 
-  describe ".projects_table" do
+  describe ".instances_table" do
     it "returns the projects in table format" do
-      return_value = described_class.projects_table([project])
+      return_value = described_class.instances_table([project])
 
       expected_value = [
         ["ID", "NAME"],

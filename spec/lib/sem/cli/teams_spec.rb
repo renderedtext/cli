@@ -12,9 +12,9 @@ describe Sem::CLI::Teams do
     }
   end
 
-  describe ".teams_table" do
+  describe ".instances_table" do
     it "returns the teams in table format" do
-      return_value = described_class.teams_table([team])
+      return_value = described_class.instances_table([team])
 
       expected_value = [
         ["ID", "NAME", "PERMISSION", "MEMBERS"],
@@ -25,9 +25,9 @@ describe Sem::CLI::Teams do
     end
   end
 
-  describe ".team_table" do
+  describe ".instance_table" do
     it "returns the team in table format" do
-      return_value = described_class.team_table(team)
+      return_value = described_class.instance_table(team)
 
       expected_value = [
         ["ID", "3bc7ed43-ac8a-487e-b488-c38bc757a034"],

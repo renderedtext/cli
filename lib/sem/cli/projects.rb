@@ -1,7 +1,7 @@
 class Sem::CLI::Projects < Sem::ThorExt::SubcommandThor
   namespace "projects"
 
-  def self.projects_table(projects)
+  def self.instances_table(projects)
     header = ["ID", "NAME"]
 
     body = projects.map do |project|
