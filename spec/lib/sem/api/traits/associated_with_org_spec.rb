@@ -1,4 +1,4 @@
-shared_examples "belonging_to_org" do
+shared_examples "associated_with_org" do
   describe "interface requirements" do
     it "has .api method" do
       expect(described_class).to respond_to(:api)

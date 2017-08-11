@@ -1,7 +1,7 @@
 require "spec_helper"
 
-require_relative "traits/belonging_to_org_spec"
-require_relative "traits/belonging_to_team_spec"
+require_relative "traits/associated_with_org_spec"
+require_relative "traits/associated_with_team_spec"
 
 describe Sem::API::Configs do
   let(:class_api) { instance_double(SemaphoreClient::Api::SharedConfig) }
@@ -22,8 +22,8 @@ describe Sem::API::Configs do
     allow(described_class).to receive(:to_hash).and_return(instance_hash)
   end
 
-  it_behaves_like "belonging_to_org"
-  it_behaves_like "belonging_to_team"
+  it_behaves_like "associated_with_org"
+  it_behaves_like "associated_with_team"
 
   describe ".list" do
     let(:org_username) { "org" }

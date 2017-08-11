@@ -1,7 +1,7 @@
 module Sem
   module API
     module Traits
-      module BelongingToOrg
+      module AssociatedWithOrg
         def self.included(base)
           base.extend(ClassMethods)
         end

@@ -1,4 +1,4 @@
-shared_examples "belonging_to_team" do
+shared_examples "associated_with_team" do
   describe "interface requirements" do
     it "has .info method" do
       expect(described_class).to respond_to(:info)

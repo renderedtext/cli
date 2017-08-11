@@ -1,7 +1,7 @@
 module Sem
   module API
     module Traits
-      module BelongingToTeam
+      module AssociatedWithTeam
         def self.included(base)
           base.extend(ClassMethods)
         end
