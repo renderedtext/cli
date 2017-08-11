@@ -1,4 +1,18 @@
 shared_examples "belonging_to_team" do
+  describe "interface requirements" do
+    it "has .info method" do
+      expect(described_class).to respond_to(:info)
+    end
+
+    it "has .api method" do
+      expect(described_class).to respond_to(:to_hash)
+    end
+
+    it "has .to_hash method" do
+      expect(described_class).to respond_to(:to_hash)
+    end
+  end
+
   describe ".list_for_team" do
     let(:team_id) { 0 }
     let(:team) { { :id => team_id } }
