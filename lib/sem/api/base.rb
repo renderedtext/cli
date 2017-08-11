@@ -3,9 +3,7 @@ module Sem
     class Base
       CREDENTIALS_PATH = "~/.sem/credentials".freeze
 
-      protected
-
-      def client
+      def self.client
         @client ||= begin
           path = File.expand_path(CREDENTIALS_PATH)
 

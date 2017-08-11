@@ -1,18 +1,39 @@
 class Sem::CLI::Teams < Sem::ThorExt::SubcommandThor
   namespace "teams"
 
+  def self.instances_table(teams)
+    header = ["ID", "NAME", "PERMISSION", "MEMBERS"]
+
+    body = teams.map do |team|
+      [team[:id], team[:name], team[:permission], "#{team[:members]} members"]
+    end
+
+    [header, *body]
+  end
+
+  def self.instance_table(team)
+    [
+      ["ID", team[:id]],
+      ["Name", team[:name]],
+      ["Permission", team[:permission]],
+      ["Members", "#{team[:members]} members"],
+      ["Created", team[:created_at]],
+      ["Updated", team[:updated_at]]
+    ]
+  end
+
   desc "list", "list teams"
   def list
     teams = Sem::API::Teams.list
 
-    print_table(teams_table(teams))
+    print_table(Sem::CLI::Teams.instances_table(teams))
   end
 
   desc "info", "show information about a team"
   def info(name)
     team = Sem::API::Teams.info(name)
 
-    print_table(team_table(team))
+    print_table(Sem::CLI::Teams.instance_table(team))
   end
 
   desc "create", "create a new team"
@@ -26,35 +47,23 @@ class Sem::CLI::Teams < Sem::ThorExt::SubcommandThor
                                   :name => team_name,
                                   :permission => options["permission"])
 
-    print_table(team_table(team))
+    print_table(Sem::CLI::Teams.instance_table(team))
   end
 
   desc "rename", "change the name of the team"
-  def rename(_old_name, new_name)
-    info = [
-      ["ID", "3bc7ed43-ac8a-487e-b488-c38bc757a034"],
-      ["Name", new_name],
-      ["Permission", "admin"],
-      ["Members", "4 members"],
-      ["Created", "2017-08-01 13:14:40 +0200"],
-      ["Updated", "2017-08-02 13:14:40 +0200"]
-    ]
+  def rename(old_name, new_name)
+    _, name = new_name.split("/")
 
-    print_table(info)
+    team = Sem::API::Teams.update(old_name, :name => name)
+
+    print_table(Sem::CLI::Teams.instance_table(team))
   end
 
   desc "set-permission", "set the permission level of the team"
   def set_permission(team_name, permission)
-    info = [
-      ["ID", "3bc7ed43-ac8a-487e-b488-c38bc757a034"],
-      ["Name", team_name],
-      ["Permission", permission],
-      ["Members", "4 members"],
-      ["Created", "2017-08-01 13:14:40 +0200"],
-      ["Updated", "2017-08-02 13:14:40 +0200"]
-    ]
+    team = Sem::API::Teams.update(team_name, :permission => permission)
 
-    print_table(info)
+    print_table(Sem::CLI::Teams.instance_table(team))
   end
 
   desc "delete", "removes a team from your organization"
@@ -68,23 +77,23 @@ class Sem::CLI::Teams < Sem::ThorExt::SubcommandThor
     namespace "teams:members"
 
     desc "list", "lists members of the team"
-    def list(_team_name)
-      members = [
-        ["ID", "USERNAME"],
-        ["3bc7ed43-ac8a-487e-b488-c38bc757a034", "ijovan"],
-        ["fe3624cf-0cea-4d87-9dde-cb9ddacfefc0", "shiroyasha"]
-      ]
+    def list(team_name)
+      members = Sem::API::Users.list_for_team(team_name)
 
-      print_table(members)
+      print_table(Sem::CLI::Users.instances_table(members))
     end
 
     desc "add", "add a user to the team"
-    def add(_name, username)
+    def add(team_name, username)
+      Sem::API::Users.add_to_team(team_name, username)
+
       puts "User #{username} added to the team."
     end
 
     desc "remove", "removes a user from the team"
-    def remove(_name, username)
+    def remove(team_name, username)
+      Sem::API::Users.remove_from_team(team_name, username)
+
       puts "User #{username} removed from the team."
     end
   end
@@ -93,23 +102,23 @@ class Sem::CLI::Teams < Sem::ThorExt::SubcommandThor
     namespace "teams:projects"
 
     desc "list", "lists projects in a team"
-    def list(_team_name)
-      projects = [
-        ["ID", "NAME"],
-        ["3bc7ed43-ac8a-487e-b488-c38bc757a034", "renderedtext/cli"],
-        ["fe3624cf-0cea-4d87-9dde-cb9ddacfefc0", "renderedtext/api"]
-      ]
+    def list(team_name)
+      projects = Sem::API::Projects.list_for_team(team_name)
 
-      print_table(projects)
+      print_table(Sem::CLI::Projects.instances_table(projects))
     end
 
     desc "add", "add a project to a team"
-    def add(_name, project_name)
+    def add(team_name, project_name)
+      Sem::API::Projects.add_to_team(team_name, project_name)
+
       puts "Project #{project_name} added to the team."
     end
 
     desc "remove", "removes a project from the team"
-    def remove(_name, project_name)
+    def remove(team_name, project_name)
+      Sem::API::Projects.remove_from_team(team_name, project_name)
+
       puts "Project #{project_name} removed from the team."
     end
   end
@@ -118,23 +127,23 @@ class Sem::CLI::Teams < Sem::ThorExt::SubcommandThor
     namespace "teams:configs"
 
     desc "list", "list shared confgiurations in a team"
-    def list(_team_name)
-      configs = [
-        ["ID", "NAME"],
-        ["3bc7ed43-ac8a-487e-b488-c38bc757a034", "renderedtext/aws-tokens"],
-        ["fe3624cf-0cea-4d87-9dde-cb9ddacfefc0", "renderedtext/gemfury"]
-      ]
+    def list(team_name)
+      configs = Sem::API::Configs.list_for_team(team_name)
 
-      print_table(configs)
+      print_table(Sem::CLI::Configs.instances_table(configs))
     end
 
     desc "add", "add a shared configuration to a team"
-    def add(_name, shared_config_name)
+    def add(team_name, shared_config_name)
+      Sem::API::Configs.add_to_team(team_name, shared_config_name)
+
       puts "Shared Configuration #{shared_config_name} added to the team."
     end
 
     desc "remove", "removes a project from the team"
-    def remove(_name, shared_config_name)
+    def remove(team_name, shared_config_name)
+      Sem::API::Configs.remove_from_team(team_name, shared_config_name)
+
       puts "Shared Configuration #{shared_config_name} removed from the team."
     end
   end
@@ -147,27 +156,4 @@ class Sem::CLI::Teams < Sem::ThorExt::SubcommandThor
 
   desc "configs", "manage shared configurations", :hide => true
   subcommand "configs", Configs
-
-  private
-
-  def teams_table(teams)
-    header = ["ID", "NAME", "PERMISSION", "MEMBERS"]
-
-    body = teams.map do |team|
-      [team[:id], team[:name], team[:permission], "#{team[:members]} members"]
-    end
-
-    [header, *body]
-  end
-
-  def team_table(team)
-    [
-      ["ID", team[:id]],
-      ["Name", team[:name]],
-      ["Permission", team[:permission]],
-      ["Members", "#{team[:members]} members"],
-      ["Created", team[:created_at]],
-      ["Updated", team[:updated_at]]
-    ]
-  end
 end

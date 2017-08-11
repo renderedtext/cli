@@ -1,259 +1,184 @@
 require "spec_helper"
 
+require_relative "traits/belonging_to_org_spec"
+
 describe Sem::API::Teams do
-  let(:sem_api_teams) { subject }
-
-  let(:teams_api) { instance_double(SemaphoreClient::Api::Team) }
-  let(:users_api) { instance_double(SemaphoreClient::Api::User) }
-
-  let(:client) { instance_double(SemaphoreClient, :teams => teams_api, :users => users_api) }
+  let(:class_api) { instance_double(SemaphoreClient::Api::Team) }
+  let(:client) { instance_double(SemaphoreClient, :teams => class_api) }
 
   let(:org_name) { "org_0" }
-  let(:team_name) { "team_0" }
-  let(:path) { "#{org_name}/#{team_name}" }
+  let(:instance_name) { "instance" }
+  let(:path) { "#{org_name}/#{instance_name}" }
 
-  let(:team_id) { 0 }
-  let(:team_hash) { { :id => team_id } }
+  let(:instance_id) { 0 }
+  let(:instance_hash) { { :id => instance_id } }
 
-  let(:team) { instance_double(SemaphoreClient::Model::Team, :id => team_id) }
-
-  before do
-    allow(sem_api_teams).to receive(:client).and_return(client)
-    allow(sem_api_teams).to receive(:team_hash).and_return(team_hash)
-    allow(described_class).to receive(:new).and_return(sem_api_teams)
+  let(:instance) do
+    instance_double(SemaphoreClient::Model::Team,
+                    :id => instance_id,
+                    :name => "team_0",
+                    :permission => "read",
+                    :created_at => 123,
+                    :updated_at => 456)
   end
 
+  before do
+    allow(described_class).to receive(:client).and_return(client)
+    allow(described_class).to receive(:to_hash).and_return(instance_hash)
+  end
+
+  it_behaves_like "belonging_to_org"
+
   describe ".list" do
-    before { allow(sem_api_teams).to receive(:list).and_return([team_hash]) }
+    let(:org) { { :username => org_name } }
 
-    it "creates an instance" do
-      expect(described_class).to receive(:new)
+    before do
+      allow(Sem::API::Orgs).to receive(:list).and_return([org])
+      allow(described_class).to receive(:list_for_org).and_return([instance_hash])
+    end
+
+    it "calls list on the sem_api_orgs" do
+      expect(Sem::API::Orgs).to receive(:list)
 
       described_class.list
     end
 
-    it "passes the call to the instance" do
-      expect(sem_api_teams).to receive(:list)
+    it "calls list_for_org on the described class" do
+      expect(described_class).to receive(:list_for_org).with(org_name)
 
       described_class.list
     end
 
-    it "returns the result" do
+    it "returns the instance hashes" do
       return_value = described_class.list
 
-      expect(return_value).to eql([team_hash])
+      expect(return_value).to eql([instance_hash])
     end
   end
 
   describe ".info" do
-    before { allow(sem_api_teams).to receive(:info).and_return(team_hash) }
+    let(:instance_hash_0) { { :name => instance_name } }
+    let(:instance_hash_1) { { :name => "team_1" } }
 
-    it "creates an instance" do
-      expect(described_class).to receive(:new)
+    before { allow(described_class).to receive(:list_for_org).and_return([instance_hash_0, instance_hash_1]) }
 
-      described_class.info(path)
-    end
-
-    it "passes the call to the instance" do
-      expect(sem_api_teams).to receive(:info).with(path)
+    it "calls list_for_org on the described class" do
+      expect(described_class).to receive(:list_for_org).with(org_name)
 
       described_class.info(path)
     end
 
-    it "returns the result" do
+    it "returns the selected instance" do
       return_value = described_class.info(path)
 
-      expect(return_value).to eql(team_hash)
+      expect(return_value).to eql(instance_hash_0)
     end
   end
 
   describe ".create" do
-    let(:args) { { :name => team_name } }
+    let(:args) { { :name => instance_name } }
 
-    before { allow(sem_api_teams).to receive(:create).and_return(team_hash) }
+    before { allow(class_api).to receive(:create_for_org).and_return(instance) }
 
-    it "creates an instance" do
-      expect(described_class).to receive(:new)
-
-      described_class.create(org_name, args)
-    end
-
-    it "passes the call to the instance" do
-      expect(sem_api_teams).to receive(:create).with(org_name, args)
+    it "calls create_for_org on the class_api" do
+      expect(class_api).to receive(:create_for_org).with(org_name, args)
 
       described_class.create(org_name, args)
     end
 
-    it "returns the result" do
+    it "converts the instance to instacen hash" do
+      expect(described_class).to receive(:to_hash).with(instance)
+
+      described_class.create(org_name, args)
+    end
+
+    it "returns the instance hash" do
       return_value = described_class.create(org_name, args)
 
-      expect(return_value).to eql(team_hash)
+      expect(return_value).to eql(instance_hash)
+    end
+  end
+
+  describe ".update" do
+    let(:args) { { "name" => instance_name } }
+
+    before do
+      allow(described_class).to receive(:info).and_return(instance_hash)
+      allow(class_api).to receive(:update)
+    end
+
+    it "calls info on the described class" do
+      expect(described_class).to receive(:info).with(path)
+
+      described_class.update(path, args)
+    end
+
+    it "calls delete on the class_api" do
+      expect(class_api).to receive(:update).with(instance_id, args)
+
+      described_class.update(path, args)
+    end
+
+    it "returns the instance hash" do
+      return_value = described_class.update(path, args)
+
+      expect(return_value).to eql(instance_hash)
     end
   end
 
   describe ".delete" do
-    before { allow(sem_api_teams).to receive(:delete) }
+    before do
+      allow(described_class).to receive(:info).and_return(instance_hash)
+      allow(class_api).to receive(:delete)
+    end
 
-    it "creates an instance" do
-      expect(described_class).to receive(:new)
+    it "calls info on the described class" do
+      expect(described_class).to receive(:info).with(path)
 
       described_class.delete(path)
     end
 
-    it "passes the call to the instance" do
-      expect(sem_api_teams).to receive(:delete).with(path)
+    it "calls delete on the class_api" do
+      expect(class_api).to receive(:delete).with(instance_id)
 
       described_class.delete(path)
     end
   end
 
-  describe "#list" do
-    let(:org_username) { "org" }
-    let(:org) { instance_double(SemaphoreClient::Model::Org, :username => org_username) }
-    let(:orgs_api) { instance_double(SemaphoreClient::Api::Org, :list => [org]) }
+  describe ".api" do
+    it "returns the API from the client" do
+      return_value = described_class.api
+
+      expect(return_value).to eql(class_api)
+    end
+  end
+
+  describe ".to_hash" do
+    let(:users_api) { instance_double(SemaphoreClient::Api::User) }
 
     before do
-      allow(teams_api).to receive(:list_for_org).and_return([team])
-      allow(client).to receive(:orgs).and_return(orgs_api)
-    end
-
-    context "org is not specified" do
-      it "calls list on the orgs_api" do
-        expect(orgs_api).to receive(:list)
-
-        sem_api_teams.list
-      end
-
-      it "calls list_for_org on the teams_api" do
-        expect(teams_api).to receive(:list_for_org).with(org_username)
-
-        sem_api_teams.list
-      end
-    end
-
-    context "org is specified" do
-      let(:org_username) { "another_org" }
-
-      it "doesn't call list on the orgs_api" do
-        expect(orgs_api).not_to receive(:list)
-
-        sem_api_teams.list(org_username)
-      end
-
-      it "calls list_for_org on the teams_api" do
-        expect(teams_api).to receive(:list_for_org).with(org_username)
-
-        sem_api_teams.list(org_username)
-      end
-    end
-
-    it "converts the teams to team hashes" do
-      expect(sem_api_teams).to receive(:team_hash).with(team)
-
-      sem_api_teams.list
-    end
-
-    it "returns the team hashes" do
-      return_value = sem_api_teams.list
-
-      expect(return_value).to eql([team_hash])
-    end
-  end
-
-  describe "#info" do
-    let(:team_hash_0) { { :name => team_name } }
-    let(:team_hash_1) { { :name => "team_1" } }
-
-    before { allow(sem_api_teams).to receive(:list).and_return([team_hash_0, team_hash_1]) }
-
-    it "calls list on the subject" do
-      expect(sem_api_teams).to receive(:list)
-
-      sem_api_teams.info(path)
-    end
-
-    it "returns the selected team" do
-      return_value = sem_api_teams.info(path)
-
-      expect(return_value).to eql(team_hash_0)
-    end
-  end
-
-  describe "#create" do
-    let(:args) { { :name => team_name } }
-
-    before { allow(teams_api).to receive(:create_for_org).and_return(team) }
-
-    it "calls create_for_org on the teams_api" do
-      expect(teams_api).to receive(:create_for_org).with(org_name, args)
-
-      sem_api_teams.create(org_name, args)
-    end
-
-    it "converts the team to team hash" do
-      expect(sem_api_teams).to receive(:team_hash).with(team)
-
-      sem_api_teams.create(org_name, args)
-    end
-
-    it "returns the team hash" do
-      return_value = sem_api_teams.create(org_name, args)
-
-      expect(return_value).to eql(team_hash)
-    end
-  end
-
-  describe "#delete" do
-    before do
-      allow(sem_api_teams).to receive(:info).and_return(team_hash)
-      allow(teams_api).to receive(:delete)
-    end
-
-    it "calls info on the subject" do
-      expect(sem_api_teams).to receive(:info).with(path)
-
-      sem_api_teams.delete(path)
-    end
-
-    it "calls delete on the teams_api" do
-      expect(teams_api).to receive(:delete).with(team_id)
-
-      sem_api_teams.delete(path)
-    end
-  end
-
-  describe "#team_hash" do
-    let(:team) do
-      instance_double(SemaphoreClient::Model::Team,
-                      :id => team_id,
-                      :name => "team_0",
-                      :permission => "read",
-                      :created_at => 123,
-                      :updated_at => 456)
-    end
-
-    before do
+      allow(client).to receive(:users).and_return(users_api)
       allow(users_api).to receive(:list_for_team).and_return(["user_0", "user_1"])
-      allow(sem_api_teams).to receive(:client).and_return(client)
-      allow(sem_api_teams).to receive(:team_hash).and_call_original
+      allow(described_class).to receive(:client).and_return(client)
+      allow(described_class).to receive(:to_hash).and_call_original
     end
 
     it "lists the users" do
-      expect(users_api).to receive(:list_for_team).with(team_id)
+      expect(users_api).to receive(:list_for_team).with(instance_id)
 
-      sem_api_teams.send(:team_hash, team)
+      described_class.to_hash(instance)
     end
 
     it "returns the hash" do
-      return_value = sem_api_teams.send(:team_hash, team)
+      return_value = described_class.to_hash(instance)
 
       expect(return_value).to eql(
-        :id => team_id,
-        :name => team.name,
-        :permission => team.permission,
+        :id => instance_id,
+        :name => instance.name,
+        :permission => instance.permission,
         :members => "2",
-        :created_at => team.created_at,
-        :updated_at => team.updated_at
+        :created_at => instance.created_at,
+        :updated_at => instance.updated_at
       )
     end
   end
