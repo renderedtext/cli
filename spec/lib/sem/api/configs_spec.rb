@@ -1,8 +1,6 @@
 require "spec_helper"
 
 describe Sem::API::Configs do
-  let(:sem_api_configs) { subject }
-
   let(:configs_api) { instance_double(SemaphoreClient::Api::SharedConfig) }
   let(:client) { instance_double(SemaphoreClient, :shared_configs => configs_api) }
 
@@ -17,27 +15,32 @@ describe Sem::API::Configs do
   let(:config) { instance_double(SemaphoreClient::Model::SharedConfig, :id => config_id, :name => config_name) }
 
   before do
-    allow(sem_api_configs).to receive(:client).and_return(client)
-    allow(sem_api_configs).to receive(:to_hash).and_return(config_hash)
-    allow(described_class).to receive(:new).and_return(sem_api_configs)
+    allow(described_class).to receive(:client).and_return(client)
+    allow(described_class).to receive(:to_hash).and_return(config_hash)
   end
 
   describe ".list" do
-    before { allow(sem_api_configs).to receive(:list).and_return([config_hash]) }
+    let(:org_username) { "org" }
+    let(:org) { { :username => org_username } }
 
-    it "creates an instance" do
-      expect(described_class).to receive(:new)
+    before do
+      allow(Sem::API::Orgs).to receive(:list).and_return([org])
+      allow(described_class).to receive(:list_for_org).and_return([config_hash])
+    end
+
+    it "calls list on the sem_api_orgs" do
+      expect(Sem::API::Orgs).to receive(:list)
 
       described_class.list
     end
 
-    it "passes the call to the instance" do
-      expect(sem_api_configs).to receive(:list)
+    it "calls list_for_org on the described class" do
+      expect(described_class).to receive(:list_for_org).with(org_username)
 
       described_class.list
     end
 
-    it "returns the result" do
+    it "returns the config hashes" do
       return_value = described_class.list
 
       expect(return_value).to eql([config_hash])
@@ -45,235 +48,117 @@ describe Sem::API::Configs do
   end
 
   describe ".list_for_org" do
-    before { allow(sem_api_configs).to receive(:list_for_org).and_return([config_hash]) }
+    before { allow(configs_api).to receive(:list_for_org).and_return([config]) }
 
-    it "creates an instance" do
-      expect(described_class).to receive(:new)
-
-      described_class.list_for_org(org_name)
-    end
-
-    it "passes the call to the instance" do
-      expect(sem_api_configs).to receive(:list_for_org).with(org_name)
+    it "calls list_for_org on the configs_api" do
+      expect(configs_api).to receive(:list_for_org).with(org_name)
 
       described_class.list_for_org(org_name)
     end
 
-    it "returns the result" do
+    it "converts the configs to config hashes" do
+      expect(described_class).to receive(:to_hash).with(config)
+
+      described_class.list_for_org(org_name)
+    end
+
+    it "returns the config hashes" do
       return_value = described_class.list_for_org(org_name)
 
       expect(return_value).to eql([config_hash])
     end
   end
 
-  describe ".list_for_team" do
-    before { allow(sem_api_configs).to receive(:list_for_team).and_return([config_hash]) }
-
-    it "creates an instance" do
-      expect(described_class).to receive(:new)
-
-      described_class.list_for_team(team_path)
-    end
-
-    it "passes the call to the instance" do
-      expect(sem_api_configs).to receive(:list_for_team).with(team_path)
-
-      described_class.list_for_team(team_path)
-    end
-
-    it "returns the result" do
-      return_value = described_class.list_for_team(team_path)
-
-      expect(return_value).to eql([config_hash])
-    end
-  end
-
   describe ".info" do
-    before { allow(sem_api_configs).to receive(:info).and_return(config_hash) }
+    let(:config_hash_0) { { :name => config_name } }
+    let(:config_hash_1) { { :name => "config_1" } }
 
-    it "creates an instance" do
-      expect(described_class).to receive(:new)
+    before { allow(described_class).to receive(:list_for_org).and_return([config_hash_0, config_hash_1]) }
 
-      described_class.info(config_path)
-    end
-
-    it "passes the call to the instance" do
-      expect(sem_api_configs).to receive(:info).with(config_path)
+    it "calls list_for_org on the described class" do
+      expect(described_class).to receive(:list_for_org).with(org_name)
 
       described_class.info(config_path)
     end
 
-    it "returns the result" do
+    it "returns the selected config" do
       return_value = described_class.info(config_path)
 
-      expect(return_value).to eql(config_hash)
+      expect(return_value).to eql(config_hash_0)
     end
   end
 
   describe ".add_to_team" do
-    before { allow(sem_api_configs).to receive(:add_to_team) }
+    let(:team_id) { 0 }
+    let(:team) { { :id => team_id } }
 
-    it "creates an instance" do
-      expect(described_class).to receive(:new)
+    before do
+      allow(described_class).to receive(:info).and_return(config_hash)
+      allow(Sem::API::Teams).to receive(:info).and_return(team)
+      allow(configs_api).to receive(:attach_to_team)
+    end
+
+    it "calls info on the described class" do
+      expect(described_class).to receive(:info).with(config_path)
 
       described_class.add_to_team(team_path, config_path)
     end
 
-    it "passes the call to the instance" do
-      expect(sem_api_configs).to receive(:add_to_team).with(team_path, config_path)
+    it "calls info on sem_api_teams" do
+      expect(Sem::API::Teams).to receive(:info).with(team_path)
+
+      described_class.add_to_team(team_path, config_path)
+    end
+
+    it "calls attach_to_team on the configs_api" do
+      expect(configs_api).to receive(:attach_to_team).with(config_id, team_id)
 
       described_class.add_to_team(team_path, config_path)
     end
   end
 
   describe ".remove_from_team" do
-    before { allow(sem_api_configs).to receive(:remove_from_team) }
-
-    it "creates an instance" do
-      expect(described_class).to receive(:new)
-
-      described_class.remove_from_team(team_path, config_path)
-    end
-
-    it "passes the call to the instance" do
-      expect(sem_api_configs).to receive(:remove_from_team).with(team_path, config_path)
-
-      described_class.remove_from_team(team_path, config_path)
-    end
-  end
-
-  describe "#list" do
-    let(:org_username) { "org" }
-    let(:org) { { :username => org_username } }
-
-    before do
-      allow(Sem::API::Orgs).to receive(:list).and_return([org])
-      allow(sem_api_configs).to receive(:list_for_org).and_return([config_hash])
-    end
-
-    it "calls list on the sem_api_orgs" do
-      expect(Sem::API::Orgs).to receive(:list)
-
-      sem_api_configs.list
-    end
-
-    it "calls list_for_org on the subject" do
-      expect(sem_api_configs).to receive(:list_for_org).with(org_username)
-
-      sem_api_configs.list
-    end
-
-    it "returns the config hashes" do
-      return_value = sem_api_configs.list
-
-      expect(return_value).to eql([config_hash])
-    end
-  end
-
-  describe "#list_for_org" do
-    before { allow(configs_api).to receive(:list_for_org).and_return([config]) }
-
-    it "calls list_for_org on the configs_api" do
-      expect(configs_api).to receive(:list_for_org).with(org_name)
-
-      sem_api_configs.list_for_org(org_name)
-    end
-
-    it "converts the configs to config hashes" do
-      expect(sem_api_configs).to receive(:to_hash).with(config)
-
-      sem_api_configs.list_for_org(org_name)
-    end
-
-    it "returns the config hashes" do
-      return_value = sem_api_configs.list_for_org(org_name)
-
-      expect(return_value).to eql([config_hash])
-    end
-  end
-
-  describe "#info" do
-    let(:config_hash_0) { { :name => config_name } }
-    let(:config_hash_1) { { :name => "config_1" } }
-
-    before { allow(sem_api_configs).to receive(:list_for_org).and_return([config_hash_0, config_hash_1]) }
-
-    it "calls list_for_org on the subject" do
-      expect(sem_api_configs).to receive(:list_for_org).with(org_name)
-
-      sem_api_configs.info(config_path)
-    end
-
-    it "returns the selected config" do
-      return_value = sem_api_configs.info(config_path)
-
-      expect(return_value).to eql(config_hash_0)
-    end
-  end
-
-  describe "#add_to_team" do
     let(:team_id) { 0 }
     let(:team) { { :id => team_id } }
 
     before do
-      allow(sem_api_configs).to receive(:info).and_return(config_hash)
-      allow(Sem::API::Teams).to receive(:info).and_return(team)
-      allow(configs_api).to receive(:attach_to_team)
-    end
-
-    it "calls info on the subject" do
-      expect(sem_api_configs).to receive(:info).with(config_path)
-
-      sem_api_configs.add_to_team(team_path, config_path)
-    end
-
-    it "calls info on sem_api_teams" do
-      expect(Sem::API::Teams).to receive(:info).with(team_path)
-
-      sem_api_configs.add_to_team(team_path, config_path)
-    end
-
-    it "calls attach_to_team on the configs_api" do
-      expect(configs_api).to receive(:attach_to_team).with(config_id, team_id)
-
-      sem_api_configs.add_to_team(team_path, config_path)
-    end
-  end
-
-  describe "#remove_from_team" do
-    let(:team_id) { 0 }
-    let(:team) { { :id => team_id } }
-
-    before do
-      allow(sem_api_configs).to receive(:info).and_return(config_hash)
+      allow(described_class).to receive(:info).and_return(config_hash)
       allow(Sem::API::Teams).to receive(:info).and_return(team)
       allow(configs_api).to receive(:detach_from_team)
     end
 
-    it "calls info on the subject" do
-      expect(sem_api_configs).to receive(:info).with(config_path)
+    it "calls info on the described class" do
+      expect(described_class).to receive(:info).with(config_path)
 
-      sem_api_configs.remove_from_team(team_path, config_path)
+      described_class.remove_from_team(team_path, config_path)
     end
 
     it "calls info on sem_api_teams" do
       expect(Sem::API::Teams).to receive(:info).with(team_path)
 
-      sem_api_configs.remove_from_team(team_path, config_path)
+      described_class.remove_from_team(team_path, config_path)
     end
 
     it "calls detach_from_team on the projects_api" do
       expect(configs_api).to receive(:detach_from_team).with(config_id, team_id)
 
-      sem_api_configs.remove_from_team(team_path, config_path)
+      described_class.remove_from_team(team_path, config_path)
     end
   end
 
-  describe "#to_hash" do
-    before { allow(sem_api_configs).to receive(:to_hash).and_call_original }
+  describe ".api" do
+    it "returns the API from the client" do
+      return_value = described_class.api
+
+      expect(return_value).to eql(configs_api)
+    end
+  end
+
+  describe ".to_hash" do
+    before { allow(described_class).to receive(:to_hash).and_call_original }
 
     it "returns the hash" do
-      return_value = sem_api_configs.send(:to_hash, config)
+      return_value = described_class.to_hash(config)
 
       expect(return_value).to eql(:id => 0, :name => "config")
     end
