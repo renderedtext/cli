@@ -1,23 +1,27 @@
 require "spec_helper"
 
+require_relative "traits/belonging_to_team_spec"
+
 describe Sem::API::Projects do
-  let(:projects_api) { instance_double(SemaphoreClient::Api::Project) }
-  let(:client) { instance_double(SemaphoreClient, :projects => projects_api) }
+  let(:class_api) { instance_double(SemaphoreClient::Api::Project) }
+  let(:client) { instance_double(SemaphoreClient, :projects => class_api) }
 
   let(:org_name) { "org" }
-  let(:project_path) { "#{org_name}/project" }
+  let(:instance_path) { "#{org_name}/project" }
   let(:team_path) { "#{org_name}/team" }
 
-  let(:project_id) { 0 }
-  let(:project_name) { "project" }
-  let(:project_hash) { { :id => project_id } }
+  let(:instance_id) { 0 }
+  let(:instance_name) { "project" }
+  let(:instance_hash) { { :id => instance_id } }
 
-  let(:project) { instance_double(SemaphoreClient::Model::Project, :id => project_id, :name => project_name) }
+  let(:instance) { instance_double(SemaphoreClient::Model::Project, :id => instance_id, :name => instance_name) }
 
   before do
     allow(described_class).to receive(:client).and_return(client)
-    allow(described_class).to receive(:to_hash).and_return(project_hash)
+    allow(described_class).to receive(:to_hash).and_return(instance_hash)
   end
+
+  it_behaves_like "belonging_to_team"
 
   describe ".list" do
     let(:org_username) { "org" }
@@ -25,7 +29,7 @@ describe Sem::API::Projects do
 
     before do
       allow(Sem::API::Orgs).to receive(:list).and_return([org])
-      allow(described_class).to receive(:list_for_org).and_return([project_hash])
+      allow(described_class).to receive(:list_for_org).and_return([instance_hash])
     end
 
     it "calls list on the sem_api_orgs" do
@@ -40,143 +44,51 @@ describe Sem::API::Projects do
       described_class.list
     end
 
-    it "returns the project hashes" do
+    it "returns the instance hashes" do
       return_value = described_class.list
 
-      expect(return_value).to eql([project_hash])
+      expect(return_value).to eql([instance_hash])
     end
   end
 
   describe ".list_for_org" do
-    before { allow(projects_api).to receive(:list_for_org).and_return([project]) }
+    before { allow(class_api).to receive(:list_for_org).and_return([instance]) }
 
-    it "calls list_for_org on the projects_api" do
-      expect(projects_api).to receive(:list_for_org).with(org_name)
-
-      described_class.list_for_org(org_name)
-    end
-
-    it "converts the projects to project hashes" do
-      expect(described_class).to receive(:to_hash).with(project)
+    it "calls list_for_org on the class_api" do
+      expect(class_api).to receive(:list_for_org).with(org_name)
 
       described_class.list_for_org(org_name)
     end
 
-    it "returns the project hashes" do
+    it "converts the instances to instance hashes" do
+      expect(described_class).to receive(:to_hash).with(instance)
+
+      described_class.list_for_org(org_name)
+    end
+
+    it "returns the instance hashes" do
       return_value = described_class.list_for_org(org_name)
 
-      expect(return_value).to eql([project_hash])
-    end
-  end
-
-  describe ".list_for_team" do
-    let(:team_id) { 0 }
-    let(:team) { { :id => team_id } }
-
-    before do
-      allow(Sem::API::Teams).to receive(:info).and_return(team)
-      allow(projects_api).to receive(:list_for_team).and_return([project])
-    end
-
-    it "calls info on sem_api_teams" do
-      expect(Sem::API::Teams).to receive(:info).with(team_path)
-
-      described_class.list_for_team(team_path)
-    end
-
-    it "calls list_for_team on the projects_api" do
-      expect(projects_api).to receive(:list_for_team).with(team_id)
-
-      described_class.list_for_team(team_path)
-    end
-
-    it "converts the projects to project hashes" do
-      expect(described_class).to receive(:to_hash).with(project)
-
-      described_class.list_for_team(team_path)
-    end
-
-    it "returns the user hashes" do
-      return_value = described_class.list_for_team(team_path)
-
-      expect(return_value).to eql([project_hash])
+      expect(return_value).to eql([instance_hash])
     end
   end
 
   describe ".info" do
-    let(:project_hash_0) { { :name => project_name } }
-    let(:project_hash_1) { { :name => "project_1" } }
+    let(:instance_hash_0) { { :name => instance_name } }
+    let(:instance_hash_1) { { :name => "project_1" } }
 
-    before { allow(described_class).to receive(:list_for_org).and_return([project_hash_0, project_hash_1]) }
+    before { allow(described_class).to receive(:list_for_org).and_return([instance_hash_0, instance_hash_1]) }
 
     it "calls list_for_org on the described class" do
       expect(described_class).to receive(:list_for_org).with(org_name)
 
-      described_class.info(project_path)
+      described_class.info(instance_path)
     end
 
-    it "returns the selected project" do
-      return_value = described_class.info(project_path)
+    it "returns the selected instance" do
+      return_value = described_class.info(instance_path)
 
-      expect(return_value).to eql(project_hash_0)
-    end
-  end
-
-  describe ".add_to_team" do
-    let(:team_id) { 0 }
-    let(:team) { { :id => team_id } }
-
-    before do
-      allow(described_class).to receive(:info).and_return(project_hash)
-      allow(Sem::API::Teams).to receive(:info).and_return(team)
-      allow(projects_api).to receive(:attach_to_team)
-    end
-
-    it "calls info on the described class" do
-      expect(described_class).to receive(:info).with(project_path)
-
-      described_class.add_to_team(team_path, project_path)
-    end
-
-    it "calls info on sem_api_teams" do
-      expect(Sem::API::Teams).to receive(:info).with(team_path)
-
-      described_class.add_to_team(team_path, project_path)
-    end
-
-    it "calls attach_to_team on the projects_api" do
-      expect(projects_api).to receive(:attach_to_team).with(project_id, team_id)
-
-      described_class.add_to_team(team_path, project_path)
-    end
-  end
-
-  describe ".remove_from_team" do
-    let(:team_id) { 0 }
-    let(:team) { { :id => team_id } }
-
-    before do
-      allow(described_class).to receive(:info).and_return(project_hash)
-      allow(Sem::API::Teams).to receive(:info).and_return(team)
-      allow(projects_api).to receive(:detach_from_team)
-    end
-
-    it "calls info on the described class" do
-      expect(described_class).to receive(:info).with(project_path)
-
-      described_class.remove_from_team(team_path, project_path)
-    end
-
-    it "calls info on sem_api_teams" do
-      expect(Sem::API::Teams).to receive(:info).with(team_path)
-
-      described_class.remove_from_team(team_path, project_path)
-    end
-
-    it "calls detach_from_team on the projects_api" do
-      expect(projects_api).to receive(:detach_from_team).with(project_id, team_id)
-
-      described_class.remove_from_team(team_path, project_path)
+      expect(return_value).to eql(instance_hash_0)
     end
   end
 
@@ -184,7 +96,7 @@ describe Sem::API::Projects do
     it "returns the API from the client" do
       return_value = described_class.api
 
-      expect(return_value).to eql(projects_api)
+      expect(return_value).to eql(class_api)
     end
   end
 
@@ -192,7 +104,7 @@ describe Sem::API::Projects do
     before { allow(described_class).to receive(:to_hash).and_call_original }
 
     it "returns the hash" do
-      return_value = described_class.to_hash(project)
+      return_value = described_class.to_hash(instance)
 
       expect(return_value).to eql(:id => 0, :name => "project")
     end

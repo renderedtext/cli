@@ -1,5 +1,6 @@
 module Sem
   module API
+    require_relative "api/traits"
     require_relative "api/base"
     require_relative "api/orgs"
     require_relative "api/users"
