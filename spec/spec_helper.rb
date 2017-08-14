@@ -3,7 +3,10 @@ require "sem"
 require "simplecov"
 require_relative "support/coverage"
 
-SimpleCov.start { add_filter "/spec/" }
+SimpleCov.start do
+  add_filter "/spec/"
+  add_filter "/.bundle/"
+end
 
 def sem_run(args)
   original_stdout = $stdout
