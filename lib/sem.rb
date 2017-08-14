@@ -6,6 +6,7 @@ require "fileutils"
 module Sem
   require "sem/errors"
   require "sem/credentials"
+  require "sem/multithread"
   require "sem/cli"
   require "sem/api"
   require "sem/views"
