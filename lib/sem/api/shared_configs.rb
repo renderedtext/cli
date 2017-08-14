@@ -1,6 +1,6 @@
 module Sem
   module API
-    class Configs < Base
+    class SharedConfigs < Base
       extend Traits::AssociatedWithTeam
       extend Traits::AssociatedWithOrg
 

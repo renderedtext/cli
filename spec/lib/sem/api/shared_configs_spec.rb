@@ -3,7 +3,7 @@ require "spec_helper"
 require_relative "traits/associated_with_org_spec"
 require_relative "traits/associated_with_team_spec"
 
-describe Sem::API::Configs do
+describe Sem::API::SharedConfigs do
   let(:class_api) { instance_double(SemaphoreClient::Api::SharedConfig) }
   let(:client) { instance_double(SemaphoreClient, :shared_configs => class_api) }
 
