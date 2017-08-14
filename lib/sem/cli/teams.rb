@@ -123,26 +123,26 @@ class Sem::CLI::Teams < Sem::ThorExt::SubcommandThor
     end
   end
 
-  class Configs < Sem::ThorExt::SubcommandThor
-    namespace "teams:configs"
+  class SharedConfigs < Sem::ThorExt::SubcommandThor
+    namespace "teams:shared-configs"
 
-    desc "list", "list shared confgiurations in a team"
+    desc "list", "list shared configurations in a team"
     def list(team_name)
-      configs = Sem::API::Configs.list_for_team(team_name)
+      configs = Sem::API::SharedConfigs.list_for_team(team_name)
 
-      print_table(Sem::CLI::Configs.instances_table(configs))
+      print_table(Sem::CLI::SharedConfigs.instances_table(configs))
     end
 
     desc "add", "add a shared configuration to a team"
     def add(team_name, shared_config_name)
-      Sem::API::Configs.add_to_team(team_name, shared_config_name)
+      Sem::API::SharedConfigs.add_to_team(team_name, shared_config_name)
 
       puts "Shared Configuration #{shared_config_name} added to the team."
     end
 
     desc "remove", "removes a project from the team"
     def remove(team_name, shared_config_name)
-      Sem::API::Configs.remove_from_team(team_name, shared_config_name)
+      Sem::API::SharedConfigs.remove_from_team(team_name, shared_config_name)
 
       puts "Shared Configuration #{shared_config_name} removed from the team."
     end
@@ -154,6 +154,6 @@ class Sem::CLI::Teams < Sem::ThorExt::SubcommandThor
   desc "projects", "manage team members", :hide => true
   subcommand "projects", Projects
 
-  desc "configs", "manage shared configurations", :hide => true
-  subcommand "configs", Configs
+  desc "shared_configs", "manage shared configurations", :hide => true
+  subcommand "shared_configs", SharedConfigs
 end
