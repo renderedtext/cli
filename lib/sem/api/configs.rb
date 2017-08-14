@@ -1,8 +1,8 @@
 module Sem
   module API
     class Configs < Base
-      include Traits::AssociatedWithTeam
-      include Traits::AssociatedWithOrg
+      extend Traits::AssociatedWithTeam
+      extend Traits::AssociatedWithOrg
 
       def self.list
         org_names = Orgs.list.map { |org| org[:username] }

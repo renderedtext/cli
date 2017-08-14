@@ -1,7 +1,7 @@
 module Sem
   module API
     class Teams < Base
-      include Traits::AssociatedWithOrg
+      extend Traits::AssociatedWithOrg
 
       def self.list
         org_names = Sem::API::Orgs.list.map { |org| org[:username] }

@@ -1,8 +1,8 @@
 module Sem
   module API
     class Projects < Base
-      include Traits::AssociatedWithOrg
-      include Traits::AssociatedWithTeam
+      extend Traits::AssociatedWithOrg
+      extend Traits::AssociatedWithTeam
 
       def self.list
         org_names = Orgs.list.map { |org| org[:username] }
