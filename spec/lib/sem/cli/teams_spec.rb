@@ -354,9 +354,9 @@ describe Sem::CLI::Teams do
       before { allow(Sem::API::SharedConfigs).to receive(:add_to_team) }
 
       it "calls the projects API" do
-        expect(Sem::API::SharedConfigs).to receive(:add_to_team).with("renderedtext/developers", "renderedtext/aws-tokens")
+        expect(Sem::API::SharedConfigs).to receive(:add_to_team).with("rt/developers", "rt/aws-tokens")
 
-        sem_run("teams:shared-configs:add renderedtext/developers renderedtext/aws-tokens")
+        sem_run("teams:shared-configs:add rt/developers rt/aws-tokens")
       end
 
       it "add a project to the team" do
@@ -371,9 +371,9 @@ describe Sem::CLI::Teams do
       before { allow(Sem::API::SharedConfigs).to receive(:remove_from_team) }
 
       it "calls the projects API" do
-        expect(Sem::API::SharedConfigs).to receive(:remove_from_team).with("renderedtext/developers", "renderedtext/tokens")
+        expect(Sem::API::SharedConfigs).to receive(:remove_from_team).with("rt/developers", "rt/tokens")
 
-        sem_run("teams:shared-configs:remove renderedtext/developers renderedtext/tokens")
+        sem_run("teams:shared-configs:remove rt/developers rt/tokens")
       end
 
       it "removes a project from the team" do

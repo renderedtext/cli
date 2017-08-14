@@ -54,7 +54,7 @@ describe Sem::CLI::SharedConfigs do
   end
 
   describe "#rename" do
-    it "rename a shared configuration" do
+    it "renames a shared configuration" do
       stdout, stderr = sem_run("shared-configs:rename renderedtext/tokens renderedtext/new-tokens")
 
       msg = [
@@ -67,6 +67,15 @@ describe Sem::CLI::SharedConfigs do
       ]
 
       expect(stdout.strip).to eq(msg.join("\n"))
+      expect(stderr).to eq("")
+    end
+  end
+
+  describe "#delete" do
+    it "deletes the shared configuration" do
+      stdout, stderr = sem_run("shared-configs:delete renderedtext/tokens")
+
+      expect(stdout.strip).to eq("Deleted shared configuration renderedtext/tokens")
       expect(stderr).to eq("")
     end
   end
