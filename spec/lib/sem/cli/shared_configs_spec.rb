@@ -35,4 +35,40 @@ describe Sem::CLI::SharedConfigs do
     end
   end
 
+  describe "#create" do
+    it "create a new shared configuration" do
+      stdout, stderr = sem_run("shared-configs:create renderedtext/tokens")
+
+      msg = [
+        "ID                     3bc7ed43-ac8a-487e-b488-c38bc757a034",
+        "Name                   renderedtext/tokens",
+        "Config Files           0",
+        "Environment Variables  0",
+        "Created                2017-08-01 13:14:40 +0200",
+        "Updated                2017-08-02 13:14:40 +0200"
+      ]
+
+      expect(stdout.strip).to eq(msg.join("\n"))
+      expect(stderr).to eq("")
+    end
+  end
+
+  describe "#rename" do
+    it "rename a shared configuration" do
+      stdout, stderr = sem_run("shared-configs:rename renderedtext/tokens renderedtext/new-tokens")
+
+      msg = [
+        "ID                     3bc7ed43-ac8a-487e-b488-c38bc757a034",
+        "Name                   renderedtext/new-tokens",
+        "Config Files           0",
+        "Environment Variables  0",
+        "Created                2017-08-01 13:14:40 +0200",
+        "Updated                2017-08-02 13:14:40 +0200"
+      ]
+
+      expect(stdout.strip).to eq(msg.join("\n"))
+      expect(stderr).to eq("")
+    end
+  end
+
 end
