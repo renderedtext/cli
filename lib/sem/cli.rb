@@ -1,5 +1,6 @@
 module Sem
   class CLI < Sem::ThorExt::TopLevelThor
+    require_relative "cli/orgs"
     require_relative "cli/users"
     require_relative "cli/projects"
     require_relative "cli/configs"
@@ -9,6 +10,9 @@ module Sem
     def login
       puts "NOT IMPLEMENTED"
     end
+
+    desc "orgs", "manage organizations"
+    subcommand "orgs", Sem::CLI::Orgs
 
     desc "teams", "manage teams and team membership"
     subcommand "teams", Sem::CLI::Teams
