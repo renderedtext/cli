@@ -117,4 +117,41 @@ describe Sem::CLI::SharedConfigs do
 
   end
 
+  describe Sem::CLI::SharedConfigs::EnvVars do
+
+    describe "#list" do
+      it "lists env vars in a shared_configuration" do
+        stdout, stderr = sem_run("shared-configs:env-vars:list renderedtext/tokens")
+
+        msg = [
+          "ID                                    NAME           ENCRYPTED?  CONTENT",
+          "3bc7ed43-ac8a-487e-b488-c38bc757a034  AWS_CLIENT_ID  true        -",
+          "37d8fdc0-4a96-4535-a4bc-601d1c7c7058  EMAIL          false       admin@semaphoreci.com"
+        ]
+
+        expect(stdout.strip).to eq(msg.join("\n"))
+        expect(stderr).to eq("")
+      end
+    end
+
+    describe "#add" do
+      it "adds an env var to the shared configuration" do
+        stdout, stderr = sem_run("shared-configs:env-vars:add rt/tokens --name AWS_CLIENT_ID --content 3412341234123")
+
+        expect(stderr).to eq("")
+        expect(stdout.strip).to eq("Added AWS_CLIENT_ID to rt/tokens")
+      end
+    end
+
+    describe "#remove" do
+      it "deletes an env var from the shared configuration" do
+        stdout, stderr = sem_run("shared-configs:env-vars:remove renderedtext/tokens AWS_CLIENT_ID")
+
+        expect(stdout.strip).to eq("Removed AWS_CLIENT_ID from renderedtext/tokens")
+        expect(stderr).to eq("")
+      end
+    end
+
+  end
+
 end

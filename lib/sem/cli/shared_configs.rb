@@ -84,7 +84,7 @@ class Sem::CLI::SharedConfigs < Sem::ThorExt::SubcommandThor
     end
 
     desc "add", "add a file to the shared configuration"
-    method_option :file, :aliases => "-f", :desc => "File to upload"
+    method_option :file, :aliases => "f", :desc => "File to upload", :required => true
     def add(shared_config_name, file_name)
       puts "Added #{file_name} to #{shared_config_name}"
     end
@@ -113,9 +113,10 @@ class Sem::CLI::SharedConfigs < Sem::ThorExt::SubcommandThor
     end
 
     desc "add", "add an environment variable to the shared configuration"
-    method_option :file, :aliases => "-f", :desc => "File to upload"
-    def add(shared_config_name, env_var)
-      puts "Added #{env_var} to #{shared_config_name}"
+    method_option :name, :aliases => "-n", :desc => "Name of the variable", :required => true
+    method_option :content, :aliases => "-c", :desc => "Content of the variable", :required => true
+    def add(shared_config_name)
+      puts "Added #{options[:name]} to #{shared_config_name}"
     end
 
     desc "remove", "remove an environment variable from the shared configuration"
