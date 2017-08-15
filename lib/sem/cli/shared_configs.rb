@@ -69,4 +69,33 @@ class Sem::CLI::SharedConfigs < Sem::ThorExt::SubcommandThor
     puts "Deleted shared configuration #{name}"
   end
 
+  class Files < Sem::ThorExt::SubcommandThor
+    namespace "shared_configs:files"
+
+    desc "list", "list files in the shared configuration"
+    def list(_shared_config_name)
+      files = [
+        ["ID", "NAME", "ENCRYPTED?"],
+        ["3bc7ed43-ac8a-487e-b488-c38bc757a034", "secrets.txt", "true"],
+        ["37d8fdc0-4a96-4535-a4bc-601d1c7c7058", "config.yml", "true"]
+      ]
+
+      print_table(files)
+    end
+
+    desc "add", "add a file to the shared configuration"
+    method_option :file, :aliases => "-f", :desc => "File to upload"
+    def add(shared_config_name, file_name)
+      puts "Added #{file_name} to #{shared_config_name}"
+    end
+
+    desc "remove", "remove a file from the shared configuration"
+    def remove(shared_config_name, file_name)
+      puts "Removed #{file_name} from #{shared_config_name}"
+    end
+  end
+
+  desc "files", "manage files", :hide => true
+  subcommand "files", Files
+
 end

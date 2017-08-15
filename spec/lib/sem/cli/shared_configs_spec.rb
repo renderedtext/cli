@@ -80,4 +80,41 @@ describe Sem::CLI::SharedConfigs do
     end
   end
 
+  describe Sem::CLI::SharedConfigs::Files do
+
+    describe "#list" do
+      it "lists files in a shared_configuration" do
+        stdout, stderr = sem_run("shared-configs:files:list renderedtext/tokens")
+
+        msg = [
+          "ID                                    NAME         ENCRYPTED?",
+          "3bc7ed43-ac8a-487e-b488-c38bc757a034  secrets.txt  true",
+          "37d8fdc0-4a96-4535-a4bc-601d1c7c7058  config.yml   true"
+        ]
+
+        expect(stdout.strip).to eq(msg.join("\n"))
+        expect(stderr).to eq("")
+      end
+    end
+
+    describe "#add" do
+      it "adds a file to the shared configuration" do
+        stdout, stderr = sem_run("shared-configs:files:add renderedtext/tokens secrets.yml -f secrets.yml")
+
+        expect(stdout.strip).to eq("Added secrets.yml to renderedtext/tokens")
+        expect(stderr).to eq("")
+      end
+    end
+
+    describe "#remove" do
+      it "deletes a file from the shared configuration" do
+        stdout, stderr = sem_run("shared-configs:files:remove renderedtext/tokens secrets.yml")
+
+        expect(stdout.strip).to eq("Removed secrets.yml from renderedtext/tokens")
+        expect(stderr).to eq("")
+      end
+    end
+
+  end
+
 end
