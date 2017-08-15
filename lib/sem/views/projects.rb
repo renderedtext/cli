@@ -10,8 +10,4 @@ class Sem::Views::Projects < Sem::Views::Base
     print_table([header, *body])
   end
 
-  def self.info(project)
-
-  end
-
 end

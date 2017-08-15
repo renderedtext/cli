@@ -84,7 +84,7 @@ class Sem::CLI::Teams < Sem::ThorExt::SubcommandThor
     def list(team_name)
       projects = Sem::API::Projects.list_for_team(team_name)
 
-      print_table(Sem::CLI::Projects.instances_table(projects))
+      Sem::Views::Projects.list(projects)
     end
 
     desc "add", "add a project to a team"
@@ -109,7 +109,7 @@ class Sem::CLI::Teams < Sem::ThorExt::SubcommandThor
     def list(team_name)
       configs = Sem::API::SharedConfigs.list_for_team(team_name)
 
-      print_table(Sem::CLI::SharedConfigs.instances_table(configs))
+      Sem::Views::SharedConfigs.list(configs)
     end
 
     desc "add", "add a shared configuration to a team"
