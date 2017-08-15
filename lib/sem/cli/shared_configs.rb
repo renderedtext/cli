@@ -98,4 +98,32 @@ class Sem::CLI::SharedConfigs < Sem::ThorExt::SubcommandThor
   desc "files", "manage files", :hide => true
   subcommand "files", Files
 
+  class EnvVars < Sem::ThorExt::SubcommandThor
+    namespace "shared_configs:env-vars"
+
+    desc "list", "list environment variables in the shared configuration"
+    def list(_shared_config_name)
+      files = [
+        ["ID", "NAME", "ENCRYPTED?", "CONTENT"],
+        ["3bc7ed43-ac8a-487e-b488-c38bc757a034", "AWS_CLIENT_ID", "true", "-"],
+        ["37d8fdc0-4a96-4535-a4bc-601d1c7c7058", "EMAIL", "false", "admin@semaphoreci.com"]
+      ]
+
+      print_table(files)
+    end
+
+    desc "add", "add an environment variable to the shared configuration"
+    method_option :file, :aliases => "-f", :desc => "File to upload"
+    def add(shared_config_name, env_var)
+      puts "Added #{env_var} to #{shared_config_name}"
+    end
+
+    desc "remove", "remove an environment variable from the shared configuration"
+    def remove(shared_config_name, env_var)
+      puts "Removed #{env_var} from #{shared_config_name}"
+    end
+  end
+
+  desc "env_vars", "manage environment variables", :hide => true
+  subcommand "env_vars", EnvVars
 end
