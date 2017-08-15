@@ -12,36 +12,6 @@ describe Sem::CLI::Teams do
     }
   end
 
-  describe ".instances_table" do
-    it "returns the teams in table format" do
-      return_value = described_class.instances_table([team])
-
-      expected_value = [
-        ["ID", "NAME", "PERMISSION", "MEMBERS"],
-        ["3bc7ed43-ac8a-487e-b488-c38bc757a034", "renderedtext/developers", "write", "72 members"]
-      ]
-
-      expect(return_value).to eql(expected_value)
-    end
-  end
-
-  describe ".instance_table" do
-    it "returns the team in table format" do
-      return_value = described_class.instance_table(team)
-
-      expected_value = [
-        ["ID", "3bc7ed43-ac8a-487e-b488-c38bc757a034"],
-        ["Name", "renderedtext/developers"],
-        ["Permission", "write"],
-        ["Members", "72 members"],
-        ["Created", "2017-08-01 13:14:40 +0200"],
-        ["Updated", "2017-08-02 13:14:40 +0200"]
-      ]
-
-      expect(return_value).to eql(expected_value)
-    end
-  end
-
   describe "#list" do
     let(:another_team) do
       {
