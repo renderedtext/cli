@@ -1,16 +1,6 @@
 class Sem::CLI::SharedConfigs < Sem::ThorExt::SubcommandThor
   namespace "shared-configs"
 
-  def self.instances_table(configs)
-    header = ["ID", "NAME"]
-
-    body = configs.map do |config|
-      [config[:id], config[:name]]
-    end
-
-    [header, *body]
-  end
-
   desc "list", "list shared cofigurations"
   def list
     shared_configs = [
