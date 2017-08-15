@@ -33,4 +33,19 @@ describe Sem::CLI::Orgs do
     end
   end
 
+  describe "#members" do
+    it "list members in an organization" do
+      stdout, stderr = sem_run("orgs:members renderedtext")
+
+      msg = [
+        "ID                                    NAME        PERMISSION  2FA",
+        "3bc7ed43-ac8a-487e-b488-c38bc757a034  ijovan      write       true",
+        "fe3624cf-0cea-4d87-9dde-cb9ddacfefc0  shiroyasha  admin       true"
+      ]
+
+      expect(stdout.strip).to eq(msg.join("\n"))
+      expect(stderr).to eq("")
+    end
+  end
+
 end
