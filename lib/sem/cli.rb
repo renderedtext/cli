@@ -1,7 +1,6 @@
 module Sem
   class CLI < Sem::ThorExt::TopLevelThor
     require_relative "cli/orgs"
-    require_relative "cli/users"
     require_relative "cli/projects"
     require_relative "cli/teams"
     require_relative "cli/shared_configs"

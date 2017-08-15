@@ -1,39 +1,18 @@
 class Sem::CLI::Teams < Sem::ThorExt::SubcommandThor
   namespace "teams"
 
-  def self.instances_table(teams)
-    header = ["ID", "NAME", "PERMISSION", "MEMBERS"]
-
-    body = teams.map do |team|
-      [team[:id], team[:name], team[:permission], "#{team[:members]} members"]
-    end
-
-    [header, *body]
-  end
-
-  def self.instance_table(team)
-    [
-      ["ID", team[:id]],
-      ["Name", team[:name]],
-      ["Permission", team[:permission]],
-      ["Members", "#{team[:members]} members"],
-      ["Created", team[:created_at]],
-      ["Updated", team[:updated_at]]
-    ]
-  end
-
   desc "list", "list teams"
   def list
     teams = Sem::API::Teams.list
 
-    print_table(Sem::CLI::Teams.instances_table(teams))
+    Sem::Views::Teams.list(teams)
   end
 
   desc "info", "show information about a team"
   def info(name)
     team = Sem::API::Teams.info(name)
 
-    print_table(Sem::CLI::Teams.instance_table(team))
+    Sem::Views::Teams.info(team)
   end
 
   desc "create", "create a new team"
@@ -47,7 +26,7 @@ class Sem::CLI::Teams < Sem::ThorExt::SubcommandThor
                                   :name => team_name,
                                   :permission => options["permission"])
 
-    print_table(Sem::CLI::Teams.instance_table(team))
+    Sem::Views::Teams.info(team)
   end
 
   desc "rename", "change the name of the team"
@@ -56,14 +35,14 @@ class Sem::CLI::Teams < Sem::ThorExt::SubcommandThor
 
     team = Sem::API::Teams.update(old_name, :name => name)
 
-    print_table(Sem::CLI::Teams.instance_table(team))
+    Sem::Views::Teams.info(team)
   end
 
   desc "set-permission", "set the permission level of the team"
   def set_permission(team_name, permission)
     team = Sem::API::Teams.update(team_name, :permission => permission)
 
-    print_table(Sem::CLI::Teams.instance_table(team))
+    Sem::Views::Teams.info(team)
   end
 
   desc "delete", "removes a team from your organization"
@@ -80,7 +59,7 @@ class Sem::CLI::Teams < Sem::ThorExt::SubcommandThor
     def list(team_name)
       members = Sem::API::Users.list_for_team(team_name)
 
-      print_table(Sem::CLI::Users.instances_table(members))
+      Sem::Views::Users.list(members)
     end
 
     desc "add", "add a user to the team"
@@ -105,7 +84,7 @@ class Sem::CLI::Teams < Sem::ThorExt::SubcommandThor
     def list(team_name)
       projects = Sem::API::Projects.list_for_team(team_name)
 
-      print_table(Sem::CLI::Projects.instances_table(projects))
+      Sem::Views::Projects.list(projects)
     end
 
     desc "add", "add a project to a team"
@@ -130,7 +109,7 @@ class Sem::CLI::Teams < Sem::ThorExt::SubcommandThor
     def list(team_name)
       configs = Sem::API::SharedConfigs.list_for_team(team_name)
 
-      print_table(Sem::CLI::SharedConfigs.instances_table(configs))
+      Sem::Views::SharedConfigs.list(configs)
     end
 
     desc "add", "add a shared configuration to a team"

@@ -1,4 +1,5 @@
 require "bundler/setup"
+require "byebug"
 require "sem"
 require "simplecov"
 require_relative "support/coverage"

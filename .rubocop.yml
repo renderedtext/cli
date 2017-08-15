@@ -11,8 +11,7 @@ Style/StringLiterals:
   EnforcedStyle: double_quotes
 
 Style/ClassAndModuleChildren:
-  Exclude:
-    - "lib/sem/cli/**/*"
+  Enabled: false
 
 Style/StringLiteralsInInterpolation:
   EnforcedStyle: double_quotes

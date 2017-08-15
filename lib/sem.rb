@@ -10,4 +10,5 @@ require "semaphore_client"
 module Sem
   require "sem/cli"
   require "sem/api"
+  require "sem/views"
 end
