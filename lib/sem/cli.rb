@@ -19,5 +19,8 @@ module Sem
 
     desc "shared_configs", "manage shared configurations"
     subcommand "shared_configs", Sem::CLI::SharedConfigs
+
+    desc "projects", "manage projects"
+    subcommand "projects", Sem::CLI::Projects
   end
 end
