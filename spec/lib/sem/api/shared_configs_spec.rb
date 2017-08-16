@@ -72,6 +72,42 @@ describe Sem::API::SharedConfigs do
     end
   end
 
+  describe ".list_env_vars" do
+    let(:env_var_hash) { { :id => 0 } }
+
+    before { allow(Sem::API::EnvVars).to receive(:list_for_shared_config).and_return([env_var_hash]) }
+
+    it "calls the env_vars api" do
+      expect(Sem::API::EnvVars).to receive(:list_for_shared_config).with(instance_path)
+
+      described_class.list_env_vars(instance_path)
+    end
+
+    it "returns the env_vars" do
+      return_value = described_class.list_env_vars(instance_path)
+
+      expect(return_value).to eql([env_var_hash])
+    end
+  end
+
+  describe ".list_files" do
+    let(:file_hash) { { :id => 0 } }
+
+    before { allow(Sem::API::Files).to receive(:list_for_shared_config).and_return([file_hash]) }
+
+    it "calls the files api" do
+      expect(Sem::API::Files).to receive(:list_for_shared_config).with(instance_path)
+
+      described_class.list_files(instance_path)
+    end
+
+    it "returns the files" do
+      return_value = described_class.list_files(instance_path)
+
+      expect(return_value).to eql([file_hash])
+    end
+  end
+
   describe ".api" do
     it "returns the API from the client" do
       return_value = described_class.api

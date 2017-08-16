@@ -16,6 +16,14 @@ module Sem
         list_for_org(org_name).find { |config| config[:name] == config_name }
       end
 
+      def self.list_env_vars(path)
+        Sem::API::EnvVars.list_for_shared_config(path)
+      end
+
+      def self.list_files(path)
+        Sem::API::Files.list_for_shared_config(path)
+      end
+
       def self.api
         client.shared_configs
       end
