@@ -2,7 +2,31 @@ require "spec_helper"
 
 describe Sem::CLI::Orgs do
 
+  let(:org) do
+    {
+      :id => "3bc7ed43-ac8a-487e-b488-c38bc757a034",
+      :name => "renderedtext",
+      :created_at => "2017-08-01 13:14:40 +0200",
+      :updated_at => "2017-08-02 13:14:40 +0200"
+    }
+  end
+
   describe "#list" do
+    let(:another_org) do
+      {
+        :id => "fe3624cf-0cea-4d87-9dde-cb9ddacfefc0",
+        :name => "tb-render"
+      }
+    end
+
+    before { allow(Sem::API::Orgs).to receive(:list).and_return([org, another_org]) }
+
+    it "calls the API" do
+      expect(Sem::API::Orgs).to receive(:list)
+
+      sem_run("orgs:list")
+    end
+
     it "lists organizations" do
       stdout, stderr = sem_run("orgs:list")
 
@@ -18,6 +42,14 @@ describe Sem::CLI::Orgs do
   end
 
   describe "#info" do
+    before { allow(Sem::API::Orgs).to receive(:info).and_return(org) }
+
+    it "calls the API" do
+      expect(Sem::API::Orgs).to receive(:info)
+
+      sem_run("orgs:info renderedtext")
+    end
+
     it "shows detailed information about an organization" do
       stdout, stderr = sem_run("orgs:info renderedtext")
 
@@ -34,13 +66,49 @@ describe Sem::CLI::Orgs do
   end
 
   describe "#members" do
+    let(:user_1) do
+      { :id => "ijovan", :permission => "write" }
+    end
+
+    let(:user_2) do
+      { :id => "shiroyasha", :permission => "admin" }
+    end
+
+    before do
+      allow(Sem::API::Orgs).to receive(:list_users).and_return([user_1, user_2])
+      allow(Sem::API::Orgs).to receive(:list_admins).and_return([user_2])
+      allow(Sem::API::Orgs).to receive(:list_owners).and_return([user_2])
+    end
+
+    it "calls the API" do
+      expect(Sem::API::Orgs).to receive(:list_users).with("renderedtext")
+
+      sem_run("orgs:members renderedtext")
+    end
+
+    context "admins option is true" do
+      it "calls the API" do
+        expect(Sem::API::Orgs).to receive(:list_admins).with("renderedtext")
+
+        sem_run("orgs:members renderedtext --admins true")
+      end
+    end
+
+    context "owners option is true" do
+      it "calls the API" do
+        expect(Sem::API::Orgs).to receive(:list_owners).with("renderedtext")
+
+        sem_run("orgs:members renderedtext --owners true")
+      end
+    end
+
     it "list members in an organization" do
       stdout, stderr = sem_run("orgs:members renderedtext")
 
       msg = [
-        "ID                                    NAME        PERMISSION  2FA",
-        "3bc7ed43-ac8a-487e-b488-c38bc757a034  ijovan      write       true",
-        "fe3624cf-0cea-4d87-9dde-cb9ddacfefc0  shiroyasha  admin       true"
+        "NAME",
+        "ijovan",
+        "shiroyasha"
       ]
 
       expect(stdout.strip).to eq(msg.join("\n"))

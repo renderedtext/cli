@@ -6,7 +6,7 @@ describe Sem::Views::Users do
   describe ".list" do
     it "shows list of users" do
       expected_value = [
-        ["USERNAME"],
+        ["NAME"],
         [user[:id]]
       ]
 

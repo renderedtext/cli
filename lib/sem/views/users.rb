@@ -1,7 +1,7 @@
 class Sem::Views::Users < Sem::Views::Base
 
   def self.list(users)
-    header = ["USERNAME"]
+    header = ["NAME"]
 
     body = users.map do |user|
       [user[:id]]
