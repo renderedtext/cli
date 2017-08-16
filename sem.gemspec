@@ -21,7 +21,6 @@ Gem::Specification.new do |spec|
   spec.executables   = spec.files.grep(%r{^exe/}) { |f| File.basename(f) }
   spec.require_paths = ["lib"]
 
-  spec.add_dependency "thor", "~> 0.19.4"
   spec.add_dependency "terminal-table", "~> 1.8.0"
   spec.add_dependency "semaphore_client", "~> 2.0.5"
 
