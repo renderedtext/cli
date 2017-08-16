@@ -1,5 +1,4 @@
-class Sem::CLI::Teams < Sem::ThorExt::SubcommandThor
-  namespace "teams"
+class Sem::CLI::Teams < Dracula
 
   desc "list", "list teams"
   def list
@@ -16,9 +15,9 @@ class Sem::CLI::Teams < Sem::ThorExt::SubcommandThor
   end
 
   desc "create", "create a new team"
-  method_option :permission, :default => "read",
-                             :aliases => "-p",
-                             :desc => "Permission level of the team in the organization"
+  option :permission, :default => "read",
+                      :aliases => "-p",
+                      :desc => "Permission level of the team in the organization"
   def create(name)
     org_name, team_name = name.split("/")
 
@@ -52,9 +51,7 @@ class Sem::CLI::Teams < Sem::ThorExt::SubcommandThor
     puts "Deleted team #{name}"
   end
 
-  class Members < Sem::ThorExt::SubcommandThor
-    namespace "teams:members"
-
+  class Members < Dracula
     desc "list", "lists members of the team"
     def list(team_name)
       members = Sem::API::Users.list_for_team(team_name)
@@ -77,9 +74,7 @@ class Sem::CLI::Teams < Sem::ThorExt::SubcommandThor
     end
   end
 
-  class Projects < Sem::ThorExt::SubcommandThor
-    namespace "teams:projects"
-
+  class Projects < Dracula
     desc "list", "lists projects in a team"
     def list(team_name)
       projects = Sem::API::Projects.list_for_team(team_name)
@@ -102,9 +97,7 @@ class Sem::CLI::Teams < Sem::ThorExt::SubcommandThor
     end
   end
 
-  class SharedConfigs < Sem::ThorExt::SubcommandThor
-    namespace "teams:shared-configs"
-
+  class SharedConfigs < Dracula
     desc "list", "list shared configurations in a team"
     def list(team_name)
       configs = Sem::API::SharedConfigs.list_for_team(team_name)
@@ -127,12 +120,7 @@ class Sem::CLI::Teams < Sem::ThorExt::SubcommandThor
     end
   end
 
-  desc "members", "manage team members", :hide => true
-  subcommand "members", Members
-
-  desc "projects", "manage team members", :hide => true
-  subcommand "projects", Projects
-
-  desc "shared_configs", "manage shared configurations", :hide => true
-  subcommand "shared_configs", SharedConfigs
+  register "members", "manage team members", Members
+  register "projects", "manage team members", Projects
+  register "shared_configs", "manage shared configurations", SharedConfigs
 end

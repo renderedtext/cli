@@ -1,5 +1,4 @@
-class Sem::CLI::Projects < Sem::ThorExt::SubcommandThor
-  namespace "projects"
+class Sem::CLI::Projects < Dracula
 
   desc "list", "list projects"
   def list
@@ -14,4 +13,5 @@ class Sem::CLI::Projects < Sem::ThorExt::SubcommandThor
 
     Sem::Views::Projects.info(project)
   end
+
 end

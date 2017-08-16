@@ -1,5 +1,4 @@
-class Sem::CLI::SharedConfigs < Sem::ThorExt::SubcommandThor
-  namespace "shared-configs"
+class Sem::CLI::SharedConfigs < Dracula
 
   desc "list", "list shared cofigurations"
   def list
@@ -40,9 +39,7 @@ class Sem::CLI::SharedConfigs < Sem::ThorExt::SubcommandThor
     puts "Deleted shared configuration #{path}"
   end
 
-  class Files < Sem::ThorExt::SubcommandThor
-    namespace "shared_configs:files"
-
+  class Files < Dracula
     desc "list", "list files in the shared configuration"
     def list(shared_config_path)
       files = Sem::API::SharedConfigs.list_files(shared_config_path)
@@ -51,7 +48,7 @@ class Sem::CLI::SharedConfigs < Sem::ThorExt::SubcommandThor
     end
 
     desc "add", "add a file to the shared configuration"
-    method_option :file, :aliases => "f", :desc => "File to upload", :required => true
+    option :file, :aliases => "f", :desc => "File to upload", :required => true
     def add(shared_config_path, file_name)
       content = File.read(options[:file])
 
@@ -68,12 +65,7 @@ class Sem::CLI::SharedConfigs < Sem::ThorExt::SubcommandThor
     end
   end
 
-  desc "files", "manage files", :hide => true
-  subcommand "files", Files
-
-  class EnvVars < Sem::ThorExt::SubcommandThor
-    namespace "shared_configs:env-vars"
-
+  class EnvVars < Dracula
     desc "list", "list environment variables in the shared configuration"
     def list(shared_config_path)
       env_vars = Sem::API::SharedConfigs.list_env_vars(shared_config_path)
@@ -82,8 +74,8 @@ class Sem::CLI::SharedConfigs < Sem::ThorExt::SubcommandThor
     end
 
     desc "add", "add an environment variable to the shared configuration"
-    method_option :name, :aliases => "-n", :desc => "Name of the variable", :required => true
-    method_option :content, :aliases => "-c", :desc => "Content of the variable", :required => true
+    option :name, :aliases => "-n", :desc => "Name of the variable", :required => true
+    option :content, :aliases => "-c", :desc => "Content of the variable", :required => true
     def add(shared_config_path)
       Sem::API::EnvVars.add_to_shared_config(shared_config_path,
                                              :name => options[:name],
@@ -100,6 +92,6 @@ class Sem::CLI::SharedConfigs < Sem::ThorExt::SubcommandThor
     end
   end
 
-  desc "env_vars", "manage environment variables", :hide => true
-  subcommand "env_vars", EnvVars
+  register "files", "manage files", Files
+  register "env-vars", "manage environment variables", EnvVars
 end

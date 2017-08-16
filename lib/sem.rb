@@ -1,9 +1,9 @@
 require "sem/version"
-require "thor"
+require "dracula"
 
-# Thor monkeypatchinging to support namespace:command
-require "sem/thor_ext/top_level_thor"
-require "sem/thor_ext/subcommand_thor"
+# # Thor monkeypatchinging to support namespace:command
+# require "sem/thor_ext/top_level_thor"
+# require "sem/thor_ext/subcommand_thor"
 
 require "semaphore_client"
 
