@@ -72,6 +72,76 @@ describe Sem::API::SharedConfigs do
     end
   end
 
+  describe ".create" do
+    let(:args) { { :id => 0 } }
+
+    before { allow(class_api).to receive(:create_for_org).and_return(instance) }
+
+    it "calls create_for_org on the class_api" do
+      expect(class_api).to receive(:create_for_org).with(org_name, args)
+
+      described_class.create(org_name, args)
+    end
+
+    it "converts the instance to instance hash" do
+      expect(described_class).to receive(:to_hash).with(instance)
+
+      described_class.create(org_name, args)
+    end
+
+    it "returns the instance hash" do
+      return_value = described_class.create(org_name, args)
+
+      expect(return_value).to eql(instance_hash)
+    end
+  end
+
+  describe ".update" do
+    let(:args) { { "name" => instance_name } }
+
+    before do
+      allow(described_class).to receive(:info).and_return(instance_hash)
+      allow(class_api).to receive(:update)
+    end
+
+    it "calls info on the described class" do
+      expect(described_class).to receive(:info).with(instance_path)
+
+      described_class.update(instance_path, args)
+    end
+
+    it "calls delete on the class_api" do
+      expect(class_api).to receive(:update).with(instance_id, args)
+
+      described_class.update(instance_path, args)
+    end
+
+    it "returns the instance hash" do
+      return_value = described_class.update(instance_path, args)
+
+      expect(return_value).to eql(instance_hash)
+    end
+  end
+
+  describe ".delete" do
+    before do
+      allow(described_class).to receive(:info).and_return(instance_hash)
+      allow(class_api).to receive(:delete)
+    end
+
+    it "calls info on the described class" do
+      expect(described_class).to receive(:info).with(instance_path)
+
+      described_class.delete(instance_path)
+    end
+
+    it "calls delete on the class_api" do
+      expect(class_api).to receive(:delete).with(instance_id)
+
+      described_class.delete(instance_path)
+    end
+  end
+
   describe ".list_env_vars" do
     let(:env_var_hash) { { :id => 0 } }
 
@@ -117,8 +187,13 @@ describe Sem::API::SharedConfigs do
   end
 
   describe ".to_hash" do
-    let(:config_files_api) { instance_double(SemaphoreClient::Api::ConfigFile, :list_for_shared_config => ["config_file_0"]) }
-    let(:env_vars_api) { instance_double(SemaphoreClient::Api::EnvVar, :list_for_shared_config => ["env_var_0", "env_var_1"]) }
+    let(:config_files_api) do
+      instance_double(SemaphoreClient::Api::ConfigFile, :list_for_shared_config => ["config_file_0"])
+    end
+
+    let(:env_vars_api) do
+      instance_double(SemaphoreClient::Api::EnvVar, :list_for_shared_config => ["env_var_0", "env_var_1"])
+    end
 
     before do
       allow(described_class).to receive(:to_hash).and_call_original

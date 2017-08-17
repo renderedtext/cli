@@ -3,60 +3,41 @@ class Sem::CLI::SharedConfigs < Sem::ThorExt::SubcommandThor
 
   desc "list", "list shared cofigurations"
   def list
-    shared_configs = [
-      ["ID", "NAME", "CONFIG FILES", "ENV VARS"],
-      ["3bc7ed43-ac8a-487e-b488-c38bc757a034", "renderedtext/aws-tokens", "3", "1"],
-      ["37d8fdc0-4a96-4535-a4bc-601d1c7c7058", "renderedtext/rubygems", "1", "0"]
-    ]
+    shared_configs = Sem::API::SharedConfigs.list
 
-    print_table(shared_configs)
+    Sem::Views::SharedConfigs.list(shared_configs)
   end
 
   desc "info", "show information about a shared configuration"
-  def info(name)
-    shared_config = [
-      ["ID", "3bc7ed43-ac8a-487e-b488-c38bc757a034"],
-      ["Name", name],
-      ["Config Files", "3"],
-      ["Environment Variables", "1"],
-      ["Created", "2017-08-01 13:14:40 +0200"],
-      ["Updated", "2017-08-02 13:14:40 +0200"]
-    ]
+  def info(path)
+    shared_config = Sem::API::SharedConfigs.info(path)
 
-    print_table(shared_config)
+    Sem::Views::SharedConfigs.info(shared_config)
   end
 
   desc "create", "create a new shared configuration"
-  def create(name)
-    shared_config = [
-      ["ID", "3bc7ed43-ac8a-487e-b488-c38bc757a034"],
-      ["Name", name],
-      ["Config Files", "0"],
-      ["Environment Variables", "0"],
-      ["Created", "2017-08-01 13:14:40 +0200"],
-      ["Updated", "2017-08-02 13:14:40 +0200"]
-    ]
+  def create(path)
+    org_name, shared_config_name = path.split("/")
 
-    print_table(shared_config)
+    shared_config = Sem::API::SharedConfigs.create(org_name, :name => shared_config_name)
+
+    Sem::Views::SharedConfigs.info(shared_config)
   end
 
   desc "rename", "rename a shared configuration"
-  def rename(_name, new_name)
-    shared_config = [
-      ["ID", "3bc7ed43-ac8a-487e-b488-c38bc757a034"],
-      ["Name", new_name],
-      ["Config Files", "0"],
-      ["Environment Variables", "0"],
-      ["Created", "2017-08-01 13:14:40 +0200"],
-      ["Updated", "2017-08-02 13:14:40 +0200"]
-    ]
+  def rename(old_path, new_path)
+    _, name = new_path.split("/")
 
-    print_table(shared_config)
+    shared_config = Sem::API::SharedConfigs.update(old_path, :name => name)
+
+    Sem::Views::SharedConfigs.info(shared_config)
   end
 
   desc "delete", "removes a shared configuration from your organization"
-  def delete(name)
-    puts "Deleted shared configuration #{name}"
+  def delete(path)
+    Sem::API::SharedConfigs.delete(path)
+
+    puts "Deleted shared configuration #{path}"
   end
 
   class Files < Sem::ThorExt::SubcommandThor

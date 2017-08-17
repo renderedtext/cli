@@ -2,14 +2,42 @@ require "spec_helper"
 
 describe Sem::CLI::SharedConfigs do
 
+  let(:shared_config) do
+    {
+      :id => "3bc7ed43-ac8a-487e-b488-c38bc757a034",
+      :name => "renderedtext/aws-tokens",
+      :config_files => 3,
+      :env_vars => 1,
+      :created_at => "2017-08-01 13:14:40 +0200",
+      :updated_at => "2017-08-02 13:14:40 +0200"
+    }
+  end
+
   describe "#list" do
+    let(:another_shared_config) do
+      {
+        :id => "37d8fdc0-4a96-4535-a4bc-601d1c7c7058",
+        :name => "renderedtext/rubygems",
+        :config_files => 1,
+        :env_vars => 0
+      }
+    end
+
+    before { allow(Sem::API::SharedConfigs).to receive(:list).and_return([shared_config, another_shared_config]) }
+
+    it "calls the API" do
+      expect(Sem::API::SharedConfigs).to receive(:list)
+
+      sem_run("shared-configs:list")
+    end
+
     it "lists shared configurations" do
       stdout, stderr = sem_run("shared-configs:list")
 
       msg = [
         "ID                                    NAME                     CONFIG FILES  ENV VARS",
-        "3bc7ed43-ac8a-487e-b488-c38bc757a034  renderedtext/aws-tokens  3             1",
-        "37d8fdc0-4a96-4535-a4bc-601d1c7c7058  renderedtext/rubygems    1             0"
+        "3bc7ed43-ac8a-487e-b488-c38bc757a034  renderedtext/aws-tokens             3         1",
+        "37d8fdc0-4a96-4535-a4bc-601d1c7c7058  renderedtext/rubygems               1         0"
       ]
 
       expect(stdout.strip).to eq(msg.join("\n"))
@@ -18,6 +46,14 @@ describe Sem::CLI::SharedConfigs do
   end
 
   describe "#info" do
+    before { allow(Sem::API::SharedConfigs).to receive(:info).and_return(shared_config) }
+
+    it "calls the API" do
+      expect(Sem::API::SharedConfigs).to receive(:info).with("renderedtext/aws-tokens")
+
+      sem_run("shared-configs:info renderedtext/aws-tokens")
+    end
+
     it "shows information about a shared configuration" do
       stdout, stderr = sem_run("shared-configs:info renderedtext/aws-tokens")
 
@@ -36,14 +72,22 @@ describe Sem::CLI::SharedConfigs do
   end
 
   describe "#create" do
+    before { allow(Sem::API::SharedConfigs).to receive(:create).and_return(shared_config) }
+
+    it "calls the API" do
+      expect(Sem::API::SharedConfigs).to receive(:create).with("renderedtext", :name => "aws-tokens")
+
+      sem_run("shared-configs:create renderedtext/aws-tokens")
+    end
+
     it "create a new shared configuration" do
-      stdout, stderr = sem_run("shared-configs:create renderedtext/tokens")
+      stdout, stderr = sem_run("shared-configs:create renderedtext/aws-tokens")
 
       msg = [
         "ID                     3bc7ed43-ac8a-487e-b488-c38bc757a034",
-        "Name                   renderedtext/tokens",
-        "Config Files           0",
-        "Environment Variables  0",
+        "Name                   renderedtext/aws-tokens",
+        "Config Files           3",
+        "Environment Variables  1",
         "Created                2017-08-01 13:14:40 +0200",
         "Updated                2017-08-02 13:14:40 +0200"
       ]
@@ -54,14 +98,22 @@ describe Sem::CLI::SharedConfigs do
   end
 
   describe "#rename" do
+    before { allow(Sem::API::SharedConfigs).to receive(:update).and_return(shared_config) }
+
+    it "calls the API" do
+      expect(Sem::API::SharedConfigs).to receive(:update).with("renderedtext/tokens", :name => "aws-tokens")
+
+      sem_run("shared-configs:rename renderedtext/tokens renderedtext/aws-tokens")
+    end
+
     it "renames a shared configuration" do
-      stdout, stderr = sem_run("shared-configs:rename renderedtext/tokens renderedtext/new-tokens")
+      stdout, stderr = sem_run("shared-configs:rename renderedtext/tokens renderedtext/aws-tokens")
 
       msg = [
         "ID                     3bc7ed43-ac8a-487e-b488-c38bc757a034",
-        "Name                   renderedtext/new-tokens",
-        "Config Files           0",
-        "Environment Variables  0",
+        "Name                   renderedtext/aws-tokens",
+        "Config Files           3",
+        "Environment Variables  1",
         "Created                2017-08-01 13:14:40 +0200",
         "Updated                2017-08-02 13:14:40 +0200"
       ]
@@ -72,6 +124,14 @@ describe Sem::CLI::SharedConfigs do
   end
 
   describe "#delete" do
+    before { allow(Sem::API::SharedConfigs).to receive(:delete) }
+
+    it "calls the API" do
+      expect(Sem::API::SharedConfigs).to receive(:delete).with("renderedtext/tokens")
+
+      sem_run("shared-configs:delete renderedtext/tokens")
+    end
+
     it "deletes the shared configuration" do
       stdout, stderr = sem_run("shared-configs:delete renderedtext/tokens")
 
