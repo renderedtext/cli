@@ -14,7 +14,7 @@ module Sem
 
     register "orgs", "manage organizations", Sem::CLI::Orgs
     register "teams", "manage teams and team membership", Sem::CLI::Teams
-    register "shared_configs", "manage shared configurations", Sem::CLI::SharedConfigs
+    register "shared-configs", "manage shared configurations", Sem::CLI::SharedConfigs
     register "projects", "manage projects", Sem::CLI::Projects
   end
 end
