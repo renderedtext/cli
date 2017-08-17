@@ -122,5 +122,5 @@ class Sem::CLI::Teams < Dracula
 
   register "members", "manage team members", Members
   register "projects", "manage team members", Projects
-  register "shared_configs", "manage shared configurations", SharedConfigs
+  register "shared-configs", "manage shared configurations", SharedConfigs
 end
