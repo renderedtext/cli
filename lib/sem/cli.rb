@@ -1,5 +1,7 @@
 module Sem
-  class CLI < Sem::ThorExt::TopLevelThor
+  class CLI < Dracula
+    program_name "sem"
+
     require_relative "cli/orgs"
     require_relative "cli/projects"
     require_relative "cli/teams"
@@ -10,16 +12,9 @@ module Sem
       puts "NOT IMPLEMENTED"
     end
 
-    desc "orgs", "manage organizations"
-    subcommand "orgs", Sem::CLI::Orgs
-
-    desc "teams", "manage teams and team membership"
-    subcommand "teams", Sem::CLI::Teams
-
-    desc "shared_configs", "manage shared configurations"
-    subcommand "shared_configs", Sem::CLI::SharedConfigs
-
-    desc "projects", "manage projects"
-    subcommand "projects", Sem::CLI::Projects
+    register "orgs", "manage organizations", Sem::CLI::Orgs
+    register "teams", "manage teams and team membership", Sem::CLI::Teams
+    register "shared-configs", "manage shared configurations", Sem::CLI::SharedConfigs
+    register "projects", "manage projects", Sem::CLI::Projects
   end
 end

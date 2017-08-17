@@ -1,5 +1,4 @@
-class Sem::CLI::Orgs < Sem::ThorExt::SubcommandThor
-  namespace "orgs"
+class Sem::CLI::Orgs < Dracula
 
   desc "list", "list organizations"
   def list
@@ -16,25 +15,25 @@ class Sem::CLI::Orgs < Sem::ThorExt::SubcommandThor
   end
 
   desc "members", "list members of an organization"
-  method_option :with_2fa,
-                :default => false,
-                :type => :boolean,
-                :desc => "list members that have two factor authentication enabled"
-  method_option :admins,
-                :default => false,
-                :type => :boolean,
-                :desc => "list only admins in the organization"
-  method_option :owners,
-                :default => false,
-                :type => :boolean,
-                :desc => "list only owners in the organization"
+  option :with_2fa,
+         :default => false,
+         :type => :boolean,
+         :desc => "list members that have two factor authentication enabled"
+  option :admins,
+         :default => false,
+         :type => :boolean,
+         :desc => "list only admins in the organization"
+  option :owners,
+         :default => false,
+         :type => :boolean,
+         :desc => "list only owners in the organization"
   def members(org_name)
-    raise "Not Implemented" if options["with_2fa"]
+    raise "Not Implemented" if options[:with_2fa]
 
     users =
-      if options["owners"]
+      if options[:owners]
         Sem::API::Orgs.list_owners(org_name)
-      elsif options["admins"]
+      elsif options[:admins]
         Sem::API::Orgs.list_admins(org_name)
       else
         Sem::API::Orgs.list_users(org_name)
