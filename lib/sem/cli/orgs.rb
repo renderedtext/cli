@@ -28,12 +28,13 @@ class Sem::CLI::Orgs < Dracula
          :type => :boolean,
          :desc => "list only owners in the organization"
   def members(org_name)
-    raise "Not Implemented" if options["with_2fa"]
+    p options
+    raise "Not Implemented" if options[:with_2fa]
 
     users =
-      if options["owners"]
+      if options[:owners]
         Sem::API::Orgs.list_owners(org_name)
-      elsif options["admins"]
+      elsif options[:admins]
         Sem::API::Orgs.list_admins(org_name)
       else
         Sem::API::Orgs.list_users(org_name)

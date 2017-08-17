@@ -90,7 +90,7 @@ describe Sem::CLI::Orgs do
       it "calls the API" do
         expect(Sem::API::Orgs).to receive(:list_admins).with("renderedtext")
 
-        sem_run("orgs:members renderedtext --admins true")
+        sem_run("orgs:members renderedtext --admins")
       end
     end
 
