@@ -10,7 +10,9 @@ module Sem
       def self.to_hash(env_var)
         {
           :id => env_var.id,
-          :name => env_var.name
+          :name => env_var.name,
+          :encrypted? => env_var.encrypted,
+          :content => env_var.content
         }
       end
     end

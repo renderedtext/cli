@@ -233,6 +233,32 @@ describe Sem::CLI::SharedConfigs do
   describe Sem::CLI::SharedConfigs::EnvVars do
 
     describe "#list" do
+      let(:env_var_0) do
+        {
+          :id => "3bc7ed43-ac8a-487e-b488-c38bc757a034",
+          :name => "AWS_CLIENT_ID",
+          :encrypted? => true,
+          :content => "-"
+        }
+      end
+
+      let(:env_var_1) do
+        {
+          :id => "37d8fdc0-4a96-4535-a4bc-601d1c7c7058",
+          :name => "EMAIL",
+          :encrypted? => false,
+          :content => "admin@semaphoreci.com"
+        }
+      end
+
+      before { allow(Sem::API::SharedConfigs).to receive(:list_env_vars).and_return([env_var_0, env_var_1]) }
+
+      it "calls the configs API" do
+        expect(Sem::API::SharedConfigs).to receive(:list_env_vars).with("renderedtext/tokens")
+
+        sem_run("shared-configs:env-vars:list renderedtext/tokens")
+      end
+
       it "lists env vars in a shared_configuration" do
         stdout, stderr = sem_run("shared-configs:env-vars:list renderedtext/tokens")
 
@@ -248,6 +274,16 @@ describe Sem::CLI::SharedConfigs do
     end
 
     describe "#add" do
+      before { allow(Sem::API::EnvVars).to receive(:add_to_shared_config) }
+
+      it "calls the projects API" do
+        expect(Sem::API::EnvVars).to receive(:add_to_shared_config).with("rt/tokens",
+                                                                         :name => "AWS_CLIENT_ID",
+                                                                         :content => "3412341234123")
+
+        sem_run("shared-configs:env-vars:add rt/tokens --name AWS_CLIENT_ID --content 3412341234123")
+      end
+
       it "adds an env var to the shared configuration" do
         stdout, stderr = sem_run("shared-configs:env-vars:add rt/tokens --name AWS_CLIENT_ID --content 3412341234123")
 
@@ -257,6 +293,14 @@ describe Sem::CLI::SharedConfigs do
     end
 
     describe "#remove" do
+      before { allow(Sem::API::EnvVars).to receive(:remove_from_shared_config) }
+
+      it "calls the projects API" do
+        expect(Sem::API::EnvVars).to receive(:remove_from_shared_config).with("renderedtext/tokens", "AWS_CLIENT_ID")
+
+        sem_run("shared-configs:env-vars:remove renderedtext/tokens AWS_CLIENT_ID")
+      end
+
       it "deletes an env var from the shared configuration" do
         stdout, stderr = sem_run("shared-configs:env-vars:remove renderedtext/tokens AWS_CLIENT_ID")
 

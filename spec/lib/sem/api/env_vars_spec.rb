@@ -8,9 +8,18 @@ describe Sem::API::EnvVars do
 
   let(:instance_id) { 0 }
   let(:instance_name) { "env_var" }
-  let(:instance_hash) { { :id => instance_id, :name => instance_name } }
+  let(:instance_content) { "content" }
+  let(:instance_hash) do
+    { :id => instance_id, :name => instance_name, :encrypted? => true, :content => instance_content }
+  end
 
-  let(:instance) { instance_double(SemaphoreClient::Model::EnvVar, :id => instance_id, :name => instance_name) }
+  let(:instance) do
+    instance_double(SemaphoreClient::Model::EnvVar,
+                    :id => instance_id,
+                    :name => instance_name,
+                    :encrypted => true,
+                    :content => instance_content)
+  end
 
   before do
     allow(described_class).to receive(:client).and_return(client)

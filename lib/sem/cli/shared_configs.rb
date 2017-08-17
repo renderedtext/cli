@@ -75,26 +75,28 @@ class Sem::CLI::SharedConfigs < Sem::ThorExt::SubcommandThor
     namespace "shared_configs:env-vars"
 
     desc "list", "list environment variables in the shared configuration"
-    def list(_shared_config_name)
-      files = [
-        ["ID", "NAME", "ENCRYPTED?", "CONTENT"],
-        ["3bc7ed43-ac8a-487e-b488-c38bc757a034", "AWS_CLIENT_ID", "true", "-"],
-        ["37d8fdc0-4a96-4535-a4bc-601d1c7c7058", "EMAIL", "false", "admin@semaphoreci.com"]
-      ]
+    def list(shared_config_path)
+      env_vars = Sem::API::SharedConfigs.list_env_vars(shared_config_path)
 
-      print_table(files)
+      Sem::Views::EnvVars.list(env_vars)
     end
 
     desc "add", "add an environment variable to the shared configuration"
     method_option :name, :aliases => "-n", :desc => "Name of the variable", :required => true
     method_option :content, :aliases => "-c", :desc => "Content of the variable", :required => true
-    def add(shared_config_name)
-      puts "Added #{options[:name]} to #{shared_config_name}"
+    def add(shared_config_path)
+      Sem::API::EnvVars.add_to_shared_config(shared_config_path,
+                                             :name => options[:name],
+                                             :content => options[:content])
+
+      puts "Added #{options[:name]} to #{shared_config_path}"
     end
 
     desc "remove", "remove an environment variable from the shared configuration"
-    def remove(shared_config_name, env_var)
-      puts "Removed #{env_var} from #{shared_config_name}"
+    def remove(shared_config_path, env_var_name)
+      Sem::API::EnvVars.remove_from_shared_config(shared_config_path, env_var_name)
+
+      puts "Removed #{env_var_name} from #{shared_config_path}"
     end
   end
 
