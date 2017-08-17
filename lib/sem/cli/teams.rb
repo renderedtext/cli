@@ -23,7 +23,7 @@ class Sem::CLI::Teams < Dracula
 
     team = Sem::API::Teams.create(org_name,
                                   :name => team_name,
-                                  :permission => options["permission"])
+                                  :permission => options[:permission])
 
     Sem::Views::Teams.info(team)
   end
