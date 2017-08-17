@@ -186,7 +186,7 @@ describe Sem::CLI::Teams do
         stdout, stderr = sem_run("teams:members:list renderedtext/cli")
 
         msg = [
-          "USERNAME",
+          "NAME",
           "ijovan",
           "shiroyasha"
         ]

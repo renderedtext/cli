@@ -3,25 +3,16 @@ class Sem::CLI::Orgs < Sem::ThorExt::SubcommandThor
 
   desc "list", "list organizations"
   def list
-    orgs = [
-      ["ID", "NAME"],
-      ["3bc7ed43-ac8a-487e-b488-c38bc757a034", "renderedtext"],
-      ["fe3624cf-0cea-4d87-9dde-cb9ddacfefc0", "tb-render"]
-    ]
+    orgs = Sem::API::Orgs.list
 
-    print_table(orgs)
+    Sem::Views::Orgs.list(orgs)
   end
 
   desc "info", "shows detailed information about an organization"
-  def info(_org_name)
-    org = [
-      ["ID", "3bc7ed43-ac8a-487e-b488-c38bc757a034"],
-      ["Name", "renderedtext"],
-      ["Created", "2017-08-01 13:14:40 +0200"],
-      ["Updated", "2017-08-02 13:14:40 +0200"]
-    ]
+  def info(org_name)
+    org = Sem::API::Orgs.info(org_name)
 
-    print_table(org)
+    Sem::Views::Orgs.info(org)
   end
 
   desc "members", "list members of an organization"
@@ -37,14 +28,19 @@ class Sem::CLI::Orgs < Sem::ThorExt::SubcommandThor
                 :default => false,
                 :type => :boolean,
                 :desc => "list only owners in the organization"
-  def members(_org_name)
-    orgs = [
-      ["ID", "NAME", "PERMISSION", "2FA"],
-      ["3bc7ed43-ac8a-487e-b488-c38bc757a034", "ijovan", "write", "true"],
-      ["fe3624cf-0cea-4d87-9dde-cb9ddacfefc0", "shiroyasha", "admin", "true"]
-    ]
+  def members(org_name)
+    raise "Not Implemented" if options["with_2fa"]
 
-    print_table(orgs)
+    users =
+      if options["owners"]
+        Sem::API::Orgs.list_owners(org_name)
+      elsif options["admins"]
+        Sem::API::Orgs.list_admins(org_name)
+      else
+        Sem::API::Orgs.list_users(org_name)
+      end
+
+    Sem::Views::Users.list(users)
   end
 
 end
