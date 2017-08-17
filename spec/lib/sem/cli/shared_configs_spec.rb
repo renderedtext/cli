@@ -143,6 +143,30 @@ describe Sem::CLI::SharedConfigs do
   describe Sem::CLI::SharedConfigs::Files do
 
     describe "#list" do
+      let(:file_0) do
+        {
+          :id => "3bc7ed43-ac8a-487e-b488-c38bc757a034",
+          :name => "secrets.txt",
+          :encrypted? => true
+        }
+      end
+
+      let(:file_1) do
+        {
+          :id => "37d8fdc0-4a96-4535-a4bc-601d1c7c7058",
+          :name => "config.yml",
+          :encrypted? => true
+        }
+      end
+
+      before { allow(Sem::API::SharedConfigs).to receive(:list_files).and_return([file_0, file_1]) }
+
+      it "calls the configs API" do
+        expect(Sem::API::SharedConfigs).to receive(:list_files).with("renderedtext/tokens")
+
+        sem_run("shared-configs:files:list renderedtext/tokens")
+      end
+
       it "lists files in a shared_configuration" do
         stdout, stderr = sem_run("shared-configs:files:list renderedtext/tokens")
 
@@ -158,6 +182,27 @@ describe Sem::CLI::SharedConfigs do
     end
 
     describe "#add" do
+      let(:content) { "content" }
+
+      before do
+        allow(File).to receive(:read).and_return(content)
+        allow(Sem::API::Files).to receive(:add_to_shared_config)
+      end
+
+      it "reads the file" do
+        expect(File).to receive(:read).with("secrets.yml")
+
+        sem_run("shared-configs:files:add renderedtext/tokens secrets.yml -f secrets.yml")
+      end
+
+      it "calls the projects API" do
+        expect(Sem::API::Files).to receive(:add_to_shared_config).with("renderedtext/tokens",
+                                                                       :path => "secrets.yml",
+                                                                       :content => content)
+
+        sem_run("shared-configs:files:add renderedtext/tokens secrets.yml -f secrets.yml")
+      end
+
       it "adds a file to the shared configuration" do
         stdout, stderr = sem_run("shared-configs:files:add renderedtext/tokens secrets.yml -f secrets.yml")
 
@@ -167,6 +212,14 @@ describe Sem::CLI::SharedConfigs do
     end
 
     describe "#remove" do
+      before { allow(Sem::API::Files).to receive(:remove_from_shared_config) }
+
+      it "calls the projects API" do
+        expect(Sem::API::Files).to receive(:remove_from_shared_config).with("renderedtext/tokens", "secrets.yml")
+
+        sem_run("shared-configs:files:remove renderedtext/tokens secrets.yml")
+      end
+
       it "deletes a file from the shared configuration" do
         stdout, stderr = sem_run("shared-configs:files:remove renderedtext/tokens secrets.yml")
 

@@ -8,9 +8,11 @@ describe Sem::API::Files do
 
   let(:instance_id) { 0 }
   let(:instance_name) { "file" }
-  let(:instance_hash) { { :id => instance_id, :name => instance_name } }
+  let(:instance_hash) { { :id => instance_id, :name => instance_name, :encrypted? => true } }
 
-  let(:instance) { instance_double(SemaphoreClient::Model::ConfigFile, :id => instance_id, :path => instance_name) }
+  let(:instance) do
+    instance_double(SemaphoreClient::Model::ConfigFile, :id => instance_id, :path => instance_name, :encrypted => true)
+  end
 
   before do
     allow(described_class).to receive(:client).and_return(client)

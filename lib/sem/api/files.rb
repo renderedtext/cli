@@ -7,10 +7,11 @@ module Sem
         client.config_files
       end
 
-      def self.to_hash(env_var)
+      def self.to_hash(files)
         {
-          :id => env_var.id,
-          :name => env_var.path
+          :id => files.id,
+          :name => files.path,
+          :encrypted? => files.encrypted
         }
       end
     end

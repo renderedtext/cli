@@ -44,25 +44,27 @@ class Sem::CLI::SharedConfigs < Sem::ThorExt::SubcommandThor
     namespace "shared_configs:files"
 
     desc "list", "list files in the shared configuration"
-    def list(_shared_config_name)
-      files = [
-        ["ID", "NAME", "ENCRYPTED?"],
-        ["3bc7ed43-ac8a-487e-b488-c38bc757a034", "secrets.txt", "true"],
-        ["37d8fdc0-4a96-4535-a4bc-601d1c7c7058", "config.yml", "true"]
-      ]
+    def list(shared_config_path)
+      files = Sem::API::SharedConfigs.list_files(shared_config_path)
 
-      print_table(files)
+      Sem::Views::Files.list(files)
     end
 
     desc "add", "add a file to the shared configuration"
     method_option :file, :aliases => "f", :desc => "File to upload", :required => true
-    def add(shared_config_name, file_name)
-      puts "Added #{file_name} to #{shared_config_name}"
+    def add(shared_config_path, file_name)
+      content = File.read(options[:file])
+
+      Sem::API::Files.add_to_shared_config(shared_config_path, :path => file_name, :content => content)
+
+      puts "Added #{file_name} to #{shared_config_path}"
     end
 
     desc "remove", "remove a file from the shared configuration"
-    def remove(shared_config_name, file_name)
-      puts "Removed #{file_name} from #{shared_config_name}"
+    def remove(shared_config_path, file_name)
+      Sem::API::Files.remove_from_shared_config(shared_config_path, file_name)
+
+      puts "Removed #{file_name} from #{shared_config_path}"
     end
   end
 
