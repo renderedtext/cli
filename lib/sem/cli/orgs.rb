@@ -28,7 +28,6 @@ class Sem::CLI::Orgs < Dracula
          :type => :boolean,
          :desc => "list only owners in the organization"
   def members(org_name)
-    p options
     raise "Not Implemented" if options[:with_2fa]
 
     users =
