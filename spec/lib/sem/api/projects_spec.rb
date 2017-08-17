@@ -13,9 +13,22 @@ describe Sem::API::Projects do
 
   let(:instance_id) { 0 }
   let(:instance_name) { "project" }
-  let(:instance_hash) { { :id => instance_id } }
+  let(:instance_hash) do
+    {
+      :id => instance_id,
+      :name => instance_name,
+      :created_at => 123,
+      :updated_at => 456
+    }
+  end
 
-  let(:instance) { instance_double(SemaphoreClient::Model::Project, :id => instance_id, :name => instance_name) }
+  let(:instance) do
+    instance_double(SemaphoreClient::Model::Project,
+                    :id => instance_id,
+                    :name => instance_name,
+                    :created_at => 123,
+                    :updated_at => 456)
+  end
 
   before do
     allow(described_class).to receive(:client).and_return(client)
@@ -86,7 +99,7 @@ describe Sem::API::Projects do
     it "returns the hash" do
       return_value = described_class.to_hash(instance)
 
-      expect(return_value).to eql(:id => 0, :name => "project")
+      expect(return_value).to eql(instance_hash)
     end
   end
 end

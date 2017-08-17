@@ -23,7 +23,9 @@ module Sem
       def self.to_hash(project)
         {
           :id => project.id,
-          :name => project.name
+          :name => project.name,
+          :created_at => project.created_at,
+          :updated_at => project.updated_at
         }
       end
     end

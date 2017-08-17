@@ -3,25 +3,15 @@ class Sem::CLI::Projects < Sem::ThorExt::SubcommandThor
 
   desc "list", "list projects"
   def list
-    orgs = [
-      ["ID", "NAME", "VISIBILITY"],
-      ["3bc7ed43-ac8a-487e-b488-c38bc757a034", "renderedtext/cli", "public"],
-      ["fe3624cf-0cea-4d87-9dde-cb9ddacfefc0", "tb-render/api", "private"]
-    ]
+    projects = Sem::API::Projects.list
 
-    print_table(orgs)
+    Sem::Views::Projects.list(projects)
   end
 
   desc "info", "shows detailed information about a project"
-  def info(_project)
-    project = [
-      ["ID", "3bc7ed43-ac8a-487e-b488-c38bc757a034"],
-      ["Name", "renderedtext/cli"],
-      ["Visibility", "public"],
-      ["Created", "2017-08-01 13:14:40 +0200"],
-      ["Updated", "2017-08-02 13:14:40 +0200"]
-    ]
+  def info(project_path)
+    project = Sem::API::Projects.info(project_path)
 
-    print_table(project)
+    Sem::Views::Projects.info(project)
   end
 end
