@@ -117,12 +117,19 @@ describe Sem::API::SharedConfigs do
   end
 
   describe ".to_hash" do
-    before { allow(described_class).to receive(:to_hash).and_call_original }
+    let(:config_files_api) { instance_double(SemaphoreClient::Api::ConfigFile, :list_for_shared_config => ["config_file_0"]) }
+    let(:env_vars_api) { instance_double(SemaphoreClient::Api::EnvVar, :list_for_shared_config => ["env_var_0", "env_var_1"]) }
+
+    before do
+      allow(described_class).to receive(:to_hash).and_call_original
+      allow(client).to receive(:config_files).and_return(config_files_api)
+      allow(client).to receive(:env_vars).and_return(env_vars_api)
+    end
 
     it "returns the hash" do
       return_value = described_class.to_hash(instance)
 
-      expect(return_value).to eql(:id => 0, :name => "config")
+      expect(return_value).to eql(:id => 0, :name => "config", :config_files => 1, :env_vars => 2)
     end
   end
 end

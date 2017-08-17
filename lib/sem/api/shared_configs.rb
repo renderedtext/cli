@@ -31,7 +31,9 @@ module Sem
       def self.to_hash(configs)
         {
           :id => configs.id,
-          :name => configs.name
+          :name => configs.name,
+          :config_files => client.config_files.list_for_shared_config(configs.id).to_a.count,
+          :env_vars => client.env_vars.list_for_shared_config(configs.id).to_a.count
         }
       end
     end

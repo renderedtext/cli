@@ -295,8 +295,23 @@ describe Sem::CLI::Teams do
 
   describe Sem::CLI::Teams::SharedConfigs do
     describe "#list" do
-      let(:config_0) { { :id => "3bc7ed43-ac8a-487e-b488-c38bc757a034", :name => "renderedtext/aws-tokens" } }
-      let(:config_1) { { :id => "fe3624cf-0cea-4d87-9dde-cb9ddacfefc0", :name => "renderedtext/gemfury" } }
+      let(:config_0) do
+        {
+          :id => "3bc7ed43-ac8a-487e-b488-c38bc757a034",
+          :name => "renderedtext/aws-tokens",
+          :config_files => 2,
+          :env_vars => 1
+        }
+      end
+
+      let(:config_1) do
+        {
+          :id => "fe3624cf-0cea-4d87-9dde-cb9ddacfefc0",
+          :name => "renderedtext/gemfury",
+          :config_files => 1,
+          :env_vars => 2
+        }
+      end
 
       before { allow(Sem::API::SharedConfigs).to receive(:list_for_team).and_return([config_0, config_1]) }
 
@@ -310,9 +325,9 @@ describe Sem::CLI::Teams do
         stdout, stderr = sem_run("teams:shared-configs:list renderedtext/aws-tokens")
 
         msg = [
-          "ID                                    NAME",
-          "3bc7ed43-ac8a-487e-b488-c38bc757a034  renderedtext/aws-tokens",
-          "fe3624cf-0cea-4d87-9dde-cb9ddacfefc0  renderedtext/gemfury"
+          "ID                                    NAME                     CONFIG FILES  ENV VARS",
+          "3bc7ed43-ac8a-487e-b488-c38bc757a034  renderedtext/aws-tokens             2         1",
+          "fe3624cf-0cea-4d87-9dde-cb9ddacfefc0  renderedtext/gemfury                1         2"
         ]
 
         expect(stderr).to eq("")
