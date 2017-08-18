@@ -9,19 +9,27 @@ SimpleCov.start do
   add_filter "/.bundle/"
 end
 
-def sem_run(args)
+def collect_output
   original_stdout = $stdout
   original_stderr = $stderr
 
   $stdout = fake_stdout = StringIO.new
   $stderr = fake_stderr = StringIO.new
 
-  Sem::CLI.start(args.split(" "))
+  result = yield
 
-  [fake_stdout.string.to_s, fake_stderr.string.to_s]
+  [fake_stdout.string.to_s, fake_stderr.string.to_s, result]
 ensure
   $stdout = original_stdout
   $stderr = original_stderr
+end
+
+def sem_run(args)
+  stdout, stderr, = collect_output do
+    Sem::CLI.start(args.split(" "))
+  end
+
+  [stdout, stderr]
 end
 
 RSpec.configure do |config|
