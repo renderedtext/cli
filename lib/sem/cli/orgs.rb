@@ -32,14 +32,14 @@ class Sem::CLI::Orgs < Dracula
 
     users =
       if options[:owners]
-        Sem::API::Orgs.list_owners(org_name)
+        Sem::API::UsersWithPermissions.list_owners_for_org(org_name)
       elsif options[:admins]
-        Sem::API::Orgs.list_admins(org_name)
+        Sem::API::UsersWithPermissions.list_admins_for_org(org_name)
       else
-        Sem::API::Orgs.list_users(org_name)
+        Sem::API::UsersWithPermissions.list_for_org(org_name)
       end
 
-    Sem::Views::Users.list(users)
+    Sem::Views::UsersWithPermissions.list(users)
   end
 
 end
