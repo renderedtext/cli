@@ -19,10 +19,20 @@ module Sem
     puts "Log in with '#{Sem::CLI.program_name} login --auth-token <token>'"
 
     1
-  rescue Sem::Errors::Auth::InvalidCredentils
+  rescue Sem::Errors::Auth::InvalidCredentials
     puts "[ERROR] Your credentials are invalid."
     puts ""
-    puts "Log in with '#{Sem.program_name} login --auth-token <token>'"
+    puts "Log in with '#{Sem::CLI.program_name} login --auth-token <token>'"
+
+    1
+  rescue StandardError => e
+    puts "[PANIC] Unhandled error."
+    puts ""
+    puts "Well, this is emberassing. An unknown error was detected."
+    puts "Please report this issue to https://semaphoreci.com/support."
+    puts ""
+    puts "Backtrace: "
+    puts e.backtrace
 
     1
   end
