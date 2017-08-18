@@ -10,46 +10,51 @@ module Sem
   require "sem/api"
   require "sem/views"
 
-  # Returns exit status as a number.
-  def self.start(args)
-    Sem::CLI.start(args)
+  class << self
 
-    0
-  rescue Sem::Errors::Auth::NoCredentials
-    on_no_credentials
+    # Returns exit status as a number.
+    def start(args)
+      Sem::CLI.start(args)
 
-    1
-  rescue Sem::Errors::Auth::InvalidCredentials
-    on_invalid_credentials
+      0
+    rescue Sem::Errors::Auth::NoCredentials
+      on_no_credentials
 
-    1
-  rescue StandardError => e
-    on_unhandled_error(e)
+      1
+    rescue Sem::Errors::Auth::InvalidCredentials
+      on_invalid_credentials
 
-    1
-  end
+      1
+    rescue StandardError => e
+      on_unhandled_error(e)
 
-  private_class_method def self.on_no_credentials
-    puts "[ERROR] You are not logged in."
-    puts ""
-    puts "Log in with '#{Sem::CLI.program_name} login --auth-token <token>'"
-  end
+      1
+    end
 
-  private_class_method def self.on_invalid_credentials
-    puts "[ERROR] Your credentials are invalid."
-    puts ""
-    puts "Log in with '#{Sem::CLI.program_name} login --auth-token <token>'"
-  end
+    private
 
-  private_class_method def self.on_unhandled_error(exception)
-    puts "[PANIC] Unhandled error."
-    puts ""
-    puts "Well, this is emberassing. An unknown error was detected."
-    puts ""
-    puts "Backtrace: "
-    puts exception.backtrace
-    puts ""
-    puts "Please report this issue to https://semaphoreci.com/support."
+    def on_no_credentials
+      puts "[ERROR] You are not logged in."
+      puts ""
+      puts "Log in with '#{Sem::CLI.program_name} login --auth-token <token>'"
+    end
+
+    def on_invalid_credentials
+      puts "[ERROR] Your credentials are invalid."
+      puts ""
+      puts "Log in with '#{Sem::CLI.program_name} login --auth-token <token>'"
+    end
+
+    def on_unhandled_error(exception)
+      puts "[PANIC] Unhandled error."
+      puts ""
+      puts "Well, this is emberassing. An unknown error was detected."
+      puts ""
+      puts "Backtrace: "
+      puts exception.backtrace
+      puts ""
+      puts "Please report this issue to https://semaphoreci.com/support."
+    end
   end
 
 end
