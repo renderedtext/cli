@@ -6,8 +6,15 @@ describe Sem::Credentials do
 
   describe ".write" do
     before do
+      allow(FileUtils).to receive(:mkdir_p)
       allow(File).to receive(:write)
       allow(File).to receive(:chmod)
+    end
+
+    it "creates the .sem directory" do
+      expect(FileUtils).to receive(:mkdir_p).with(File.dirname(path))
+
+      described_class.write(auth_token)
     end
 
     it "writes to file" do
