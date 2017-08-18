@@ -2,4 +2,4 @@
 
 require "sem"
 
-Sem::CLI.start(ARGV)
+Sem.start(ARGV)
