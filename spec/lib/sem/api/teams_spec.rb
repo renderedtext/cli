@@ -1,6 +1,6 @@
 require "spec_helper"
 
-require_relative "traits/associated_with_org_spec"
+require_relative "traits/shared_examples_for_associated_with_org"
 
 describe Sem::API::Teams do
   let(:class_api) { instance_double(SemaphoreClient::Api::Team) }

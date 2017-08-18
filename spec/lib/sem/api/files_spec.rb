@@ -1,6 +1,6 @@
 require "spec_helper"
 
-require_relative "traits/associated_with_shared_config"
+require_relative "traits/shared_examples_for_associated_with_shared_config"
 
 describe Sem::API::Files do
   let(:class_api) { instance_double(SemaphoreClient::Api::ConfigFile) }
