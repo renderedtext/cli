@@ -27,7 +27,7 @@ module Sem
         def teams_by_permission(all_teams)
           groups = all_teams.group_by(&:permission)
 
-          groups.sort_by { |permission, _| LEVELS[permission] }.to_h.values
+          to_hash(groups.sort_by { |permission, _| LEVELS[permission] }).values
         end
 
         def users_for_team_groups(groups)
@@ -41,11 +41,15 @@ module Sem
         def users_for_team(team)
           users = client.users.list_for_team(team.id)
 
-          users.map { |user| [user.username, transform_user(user, team)] }.to_h
+          to_hash(users.map { |user| [user.username, transform_user(user, team)] })
         end
 
         def transform_user(user, team)
           Users.to_hash(user).merge(:permission => team.permission)
+        end
+
+        def to_hash(array)
+          Hash[array.each_slice(2).to_a]
         end
       end
     end
