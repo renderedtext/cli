@@ -49,7 +49,7 @@ module Sem
         end
 
         def to_hash(array)
-          Hash[array.each_slice(2).to_a]
+          Hash[array]
         end
       end
     end
