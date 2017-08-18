@@ -1,9 +1,11 @@
 require "sem/version"
 require "dracula"
 require "semaphore_client"
+require "fileutils"
 
 module Sem
   require "sem/errors"
+  require "sem/credentials"
   require "sem/cli"
   require "sem/api"
   require "sem/views"
