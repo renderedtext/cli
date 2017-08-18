@@ -44,7 +44,7 @@ module Sem
       def self.to_hash(org)
         {
           :id => org.id,
-          :name => org.username,
+          :username => org.username,
           :created_at => org.created_at,
           :updated_at => org.updated_at
         }

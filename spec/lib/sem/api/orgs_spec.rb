@@ -9,7 +9,7 @@ describe Sem::API::Orgs do
   let(:instance_hash) do
     {
       :id => instance_id,
-      :name => instance_name,
+      :username => instance_name,
       :created_at => 123,
       :updated_at => 456
     }

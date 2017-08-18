@@ -4,7 +4,7 @@ describe Sem::Views::Orgs do
   let(:org) do
     {
       :id => "3bc7ed43-ac8a-487e-b488-c38bc757a034",
-      :name => "renderedtext",
+      :username => "renderedtext",
       :created_at => "2017-08-01 13:14:40 +0200",
       :updated_at => "2017-08-02 13:14:40 +0200"
     }

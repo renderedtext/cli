@@ -4,7 +4,7 @@ class Sem::Views::Orgs < Sem::Views::Base
     header = ["ID", "NAME"]
 
     body = orgs.map do |org|
-      [org[:id], org[:name]]
+      [org[:id], org[:username]]
     end
 
     print_table [header, *body]
@@ -13,7 +13,7 @@ class Sem::Views::Orgs < Sem::Views::Base
   def self.info(org)
     print_table [
       ["ID", org[:id]],
-      ["Name", org[:name]],
+      ["Name", org[:username]],
       ["Created", org[:created_at]],
       ["Updated", org[:updated_at]]
     ]
