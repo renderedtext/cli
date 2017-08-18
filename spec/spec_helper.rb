@@ -25,7 +25,7 @@ ensure
 end
 
 def sem_run(args)
-  stdout, stderr, _ = collect_output do
+  stdout, stderr, = collect_output do
     Sem::CLI.start(args.split(" "))
   end
 

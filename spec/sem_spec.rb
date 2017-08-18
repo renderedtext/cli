@@ -54,12 +54,12 @@ RSpec.describe Sem do
         "[PANIC] Unhandled error.",
         "",
         "Well, this is emberassing. An unknown error was detected.",
-        "Please report this issue to https://semaphoreci.com/support.",
         "",
         "Backtrace:"
       ]
 
       expect(stdout).to include(msg.join("\n"))
+      expect(stdout).to include("Please report this issue to https://semaphoreci.com/support.")
       expect(result).to eq(1)
     end
   end
