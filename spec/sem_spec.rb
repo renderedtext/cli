@@ -55,6 +55,9 @@ RSpec.describe Sem do
         "",
         "Well, this is emberassing. An unknown error was detected.",
         "",
+        "Exception:",
+        "Haisenberg",
+        "",
         "Backtrace:"
       ]
 
