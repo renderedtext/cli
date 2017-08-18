@@ -4,6 +4,7 @@ require "semaphore_client"
 
 module Sem
   require "sem/errors"
+  require "sem/credentials"
   require "sem/cli"
   require "sem/api"
   require "sem/views"

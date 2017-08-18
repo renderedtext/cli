@@ -8,8 +8,10 @@ module Sem
     require_relative "cli/shared_configs"
 
     desc "login", "log in to semaphore from the command line"
-    def login
-      puts "NOT IMPLEMENTED"
+    def login(auth_token)
+      Sem::Credentials.write(auth_token)
+
+      puts "Your credentials have been saved to #{Sem::Credentials::PATH}"
     end
 
     register "orgs", "manage organizations", Sem::CLI::Orgs
