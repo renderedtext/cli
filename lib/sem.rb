@@ -29,10 +29,11 @@ module Sem
     puts "[PANIC] Unhandled error."
     puts ""
     puts "Well, this is emberassing. An unknown error was detected."
-    puts "Please report this issue to https://semaphoreci.com/support."
     puts ""
     puts "Backtrace: "
     puts e.backtrace
+    puts ""
+    puts "Please report this issue to https://semaphoreci.com/support."
 
     1
   end
