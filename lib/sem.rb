@@ -50,6 +50,9 @@ module Sem
       puts ""
       puts "Well, this is emberassing. An unknown error was detected."
       puts ""
+      puts "Exception:"
+      puts exception.message
+      puts ""
       puts "Backtrace: "
       puts exception.backtrace
       puts ""
