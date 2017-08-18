@@ -17,7 +17,7 @@ describe Sem::API::UsersWithPermissions do
     it "returns the owners with permissions" do
       return_value = described_class.list_owners_for_org(org_name)
 
-      expect(return_value).to eql([{ :id => "ijovan", :permission => "admin" }])
+      expect(return_value).to eql([{ :id => "ijovan", :permission => "owner" }])
     end
   end
 

@@ -2,10 +2,10 @@ module Sem
   module API
     class UsersWithPermissions < Base
       class << self
-        LEVELS = { "admin" => 2, "write" => 1, "read" => 0 }.freeze
+        LEVELS = { "owner" => 3, "admin" => 2, "write" => 1, "read" => 0 }.freeze
 
         def list_owners_for_org(org_name)
-          Sem::API::Orgs.list_owners(org_name).map { |user| user.merge(:permission => "admin") }
+          Sem::API::Orgs.list_owners(org_name).map { |user| user.merge(:permission => "owner") }
         end
 
         def list_admins_for_org(org_name)
