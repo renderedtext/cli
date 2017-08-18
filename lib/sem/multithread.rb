@@ -6,14 +6,14 @@ module Sem
       def map(array, &block)
         chunks = array.each_slice(MAX_THREADS).to_a
 
-        chunks.map { |chunk| process_chunk(chunk, &block) }.flatten(1)
+        chunks.flat_map { |chunk| process_chunk(chunk, &block) }
       end
 
       private
 
-      def process_chunk(array, &block)
+      def process_chunk(array)
         threads = array.map do |element|
-          Thread.new { Thread.current[:output] = block.call(element) }
+          Thread.new { Thread.current[:output] = yield(element) }
         end
 
         threads.map do |thread|
