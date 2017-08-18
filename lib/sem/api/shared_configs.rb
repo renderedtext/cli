@@ -48,13 +48,27 @@ module Sem
         client.shared_configs
       end
 
-      def self.to_hash(configs)
+      def self.to_hash(config)
         {
-          :id => configs.id,
-          :name => configs.name,
-          :config_files => client.config_files.list_for_shared_config(configs.id).to_a.size,
-          :env_vars => client.env_vars.list_for_shared_config(configs.id).to_a.size
+          :id => config.id,
+          :name => config.name,
+          :config_files => config_files_count(config.id),
+          :env_vars => env_vars_count(config.id),
+          :created_at => config.created_at,
+          :updated_at => config.updated_at
         }
+      end
+
+      class << self
+        private
+
+        def config_files_count(config_id)
+          client.config_files.list_for_shared_config(config_id).to_a.size
+        end
+
+        def env_vars_count(config_id)
+          client.env_vars.list_for_shared_config(config_id).to_a.size
+        end
       end
     end
   end

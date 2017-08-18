@@ -13,9 +13,24 @@ describe Sem::API::SharedConfigs do
 
   let(:instance_id) { 0 }
   let(:instance_name) { "config" }
-  let(:instance_hash) { { :id => instance_id } }
+  let(:instance_hash) do
+    {
+      :id => instance_id,
+      :name => instance_name,
+      :config_files => 1,
+      :env_vars => 2,
+      :created_at => 123,
+      :updated_at => 456
+    }
+  end
 
-  let(:instance) { instance_double(SemaphoreClient::Model::SharedConfig, :id => instance_id, :name => instance_name) }
+  let(:instance) do
+    instance_double(SemaphoreClient::Model::SharedConfig,
+                    :id => instance_id,
+                    :name => instance_name,
+                    :created_at => 123,
+                    :updated_at => 456)
+  end
 
   before do
     allow(described_class).to receive(:client).and_return(client)
@@ -204,7 +219,7 @@ describe Sem::API::SharedConfigs do
     it "returns the hash" do
       return_value = described_class.to_hash(instance)
 
-      expect(return_value).to eql(:id => 0, :name => "config", :config_files => 1, :env_vars => 2)
+      expect(return_value).to eql(instance_hash)
     end
   end
 end
