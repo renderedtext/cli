@@ -66,29 +66,24 @@ describe Sem::CLI::Orgs do
   end
 
   describe "#members" do
-    let(:user_1) do
-      { :id => "ijovan", :permission => "write" }
-    end
-
-    let(:user_2) do
-      { :id => "shiroyasha", :permission => "admin" }
-    end
+    let(:user_1) { { :id => "ijovan", :permission => "write" } }
+    let(:user_2) { { :id => "shiroyasha", :permission => "admin" } }
 
     before do
-      allow(Sem::API::Orgs).to receive(:list_users).and_return([user_1, user_2])
-      allow(Sem::API::Orgs).to receive(:list_admins).and_return([user_2])
-      allow(Sem::API::Orgs).to receive(:list_owners).and_return([user_2])
+      allow(Sem::API::UsersWithPermissions).to receive(:list_for_org).and_return([user_1, user_2])
+      allow(Sem::API::UsersWithPermissions).to receive(:list_admins_for_org).and_return([user_2])
+      allow(Sem::API::UsersWithPermissions).to receive(:list_owners_for_org).and_return([user_2])
     end
 
     it "calls the API" do
-      expect(Sem::API::Orgs).to receive(:list_users).with("renderedtext")
+      expect(Sem::API::UsersWithPermissions).to receive(:list_for_org).with("renderedtext")
 
       sem_run("orgs:members renderedtext")
     end
 
     context "admins option is true" do
       it "calls the API" do
-        expect(Sem::API::Orgs).to receive(:list_admins).with("renderedtext")
+        expect(Sem::API::UsersWithPermissions).to receive(:list_admins_for_org).with("renderedtext")
 
         sem_run("orgs:members renderedtext --admins")
       end
@@ -96,7 +91,7 @@ describe Sem::CLI::Orgs do
 
     context "owners option is true" do
       it "calls the API" do
-        expect(Sem::API::Orgs).to receive(:list_owners).with("renderedtext")
+        expect(Sem::API::UsersWithPermissions).to receive(:list_owners_for_org).with("renderedtext")
 
         sem_run("orgs:members renderedtext --owners true")
       end
@@ -106,9 +101,9 @@ describe Sem::CLI::Orgs do
       stdout, stderr = sem_run("orgs:members renderedtext")
 
       msg = [
-        "NAME",
-        "ijovan",
-        "shiroyasha"
+        "NAME        PERMISSION",
+        "ijovan      write",
+        "shiroyasha  admin"
       ]
 
       expect(stdout.strip).to eq(msg.join("\n"))
