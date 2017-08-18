@@ -8,19 +8,22 @@ module Sem
   require "sem/api"
   require "sem/views"
 
-  def start(args)
+  # Returns exit status as a number.
+  def self.start(args)
     Sem::CLI.start(args)
+
+    0
   rescue Sem::Errors::Auth::NoCredentials
     puts "[ERROR] You are not logged in."
     puts ""
-    puts "Please log in with '#{Sem.program_name} login --auth-token <token>'"
-    puts
-    exit 1
+    puts "Log in with '#{Sem::CLI.program_name} login --auth-token <token>'"
+
+    1
   rescue Sem::Errors::Auth::InvalidCredentils
-    puts "[ERROR] Your credentils are invalid."
+    puts "[ERROR] Your credentials are invalid."
     puts ""
-    puts "Please re-log in with '#{Sem.program_name} login --auth-token <token>'"
-    puts
-    exit 1
+    puts "Log in with '#{Sem.program_name} login --auth-token <token>'"
+
+    1
   end
 end
