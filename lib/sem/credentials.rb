@@ -15,5 +15,10 @@ module Sem
 
       File.read(PATH).strip
     end
+
+    def self.delete
+      FileUtils.rm_f(PATH)
+    end
+
   end
 end

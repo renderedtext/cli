@@ -52,4 +52,12 @@ describe Sem::Credentials do
       end
     end
   end
+
+  describe ".delete" do
+    it "deletes the file" do
+      expect(FileUtils).to receive(:rm_f).with(path)
+
+      described_class.delete
+    end
+  end
 end
