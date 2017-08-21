@@ -2,6 +2,15 @@ module Sem
   class Credentials
     PATH = File.expand_path("~/.sem/credentials").freeze
 
+    def self.valid?(auth_token)
+      client = SemaphoreClient.new(auth_token)
+      client.orgs.list!
+
+      true
+    rescue SemaphoreClient::Exceptions::RequestFailed
+      false
+    end
+
     def self.write(auth_token)
       dirname = File.dirname(PATH)
       FileUtils.mkdir_p(dirname)
@@ -15,5 +24,6 @@ module Sem
 
       File.read(PATH).strip
     end
+
   end
 end

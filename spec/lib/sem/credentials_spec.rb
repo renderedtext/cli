@@ -4,6 +4,32 @@ describe Sem::Credentials do
   let(:path) { File.expand_path(Sem::Credentials::PATH) }
   let(:auth_token) { "auth_token" }
 
+  describe ".valid?" do
+    before do
+      @credentials = "dragonite"
+      @orgs = instance_double(SemaphoreClient::Api::Org, :list! => nil)
+      @client = instance_double(SemaphoreClient, :orgs => @orgs)
+
+      allow(SemaphoreClient).to receive(:new).with(@credentials).and_return(@client)
+    end
+
+    context "listing orgs fails" do
+      before do
+        allow(@orgs).to receive(:list!).and_raise(SemaphoreClient::Exceptions::RequestFailed)
+      end
+
+      it "return false" do
+        expect(Sem::Credentials.valid?(@credentials)).to eq(false)
+      end
+    end
+
+    context "listing orgs succeds" do
+      it "return true" do
+        expect(Sem::Credentials.valid?(@credentials)).to eq(true)
+      end
+    end
+  end
+
   describe ".write" do
     before do
       allow(FileUtils).to receive(:mkdir_p)

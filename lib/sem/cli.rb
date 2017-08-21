@@ -8,10 +8,17 @@ module Sem
     require_relative "cli/shared_configs"
 
     desc "login", "log in to semaphore from the command line"
-    def login(auth_token)
-      Sem::Credentials.write(auth_token)
+    option :auth_token, :required => true
+    def login
+      auth_token = options[:auth_token]
 
-      puts "Your credentials have been saved to #{Sem::Credentials::PATH}"
+      if Sem::Credentials.valid?(auth_token)
+        Sem::Credentials.write(auth_token)
+
+        puts "Your credentials have been saved to #{Sem::Credentials::PATH}."
+      else
+        abort "[ERROR] Token is invalid!"
+      end
     end
 
     register "orgs", "manage organizations", Sem::CLI::Orgs

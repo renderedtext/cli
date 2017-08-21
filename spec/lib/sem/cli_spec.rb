@@ -5,21 +5,45 @@ describe Sem::CLI do
   describe "#login" do
     before { allow(Sem::Credentials).to receive(:write) }
 
-    it "writes the credentials" do
-      expect(Sem::Credentials).to receive(:write).with("123456")
+    context "when the credentials are valid" do
+      before { allow(Sem::Credentials).to receive(:valid?).and_return(true) }
 
-      sem_run("login 123456")
+      it "writes the credentials" do
+        expect(Sem::Credentials).to receive(:write).with("123456")
+
+        sem_run("login --auth_token 123456")
+      end
+
+      it "displays a success message" do
+        stdout, stderr = sem_run("login --auth_token 123456")
+
+        msg = [
+          "Your credentials have been saved to #{Sem::Credentials::PATH}."
+        ]
+
+        expect(stdout.strip).to eq(msg.join("\n"))
+        expect(stderr).to eq("")
+      end
     end
 
-    it "lists organizations" do
-      stdout, stderr = sem_run("login 123456")
+    context "not valid auth token" do
+      before { allow(Sem::Credentials).to receive(:valid?).and_return(false) }
 
-      msg = [
-        "Your credentials have been saved to #{Sem::Credentials::PATH}"
-      ]
+      it "writes an error to the output" do
+        _stdout, stderr = sem_run("login --auth_token 123456")
 
-      expect(stdout.strip).to eq(msg.join("\n"))
-      expect(stderr).to eq("")
+        msg = [
+          "[ERROR] Token is invalid!"
+        ]
+
+        expect(stderr.strip).to eq(msg.join("\n"))
+      end
+
+      it "does not save the auth token" do
+        expect(Sem::Credentials).to_not receive(:write).with("123456")
+
+        sem_run("login --auth_token 123456")
+      end
     end
   end
 
