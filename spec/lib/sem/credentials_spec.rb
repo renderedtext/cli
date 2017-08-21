@@ -4,6 +4,33 @@ describe Sem::Credentials do
   let(:path) { File.expand_path(Sem::Credentials::PATH) }
   let(:auth_token) { "auth_token" }
 
+  describe ".valid?" do
+    before do
+      @credentials = "dragonite"
+      @client = instance_double(SemaphoreClient::HttpClient)
+      @org_client = instance_double(SemaphoreClient::Api::Org, :list! => nil)
+
+      allow(SemaphoreClient::HttpClient).to receive(:new).with(@credentials).and_return(@client)
+      allow(SemaphoreClient::Api::Org).to receive(:new).with(@client).and_return(@org_client)
+    end
+
+    context "listing orgs fails" do
+      before do
+        allow(@org_client).to receive(:list!).and_raise(SemaphoreClient::Exceptions::RequestFailed)
+      end
+
+      it "return false" do
+        expect(Sem::Credentials.valid?(@credentials)).to eq(false)
+      end
+    end
+
+    context "listing orgs succeds" do
+      it "return true" do
+        expect(Sem::Credentials.valid?(@credentials)).to eq(true)
+      end
+    end
+  end
+
   describe ".write" do
     before do
       allow(FileUtils).to receive(:mkdir_p)
@@ -50,14 +77,6 @@ describe Sem::Credentials do
       it "raises the NoCredentials error" do
         expect { described_class.read }.to raise_exception(Sem::Errors::Auth::NoCredentials)
       end
-    end
-  end
-
-  describe ".delete" do
-    it "deletes the file" do
-      expect(FileUtils).to receive(:rm_f).with(path)
-
-      described_class.delete
     end
   end
 end

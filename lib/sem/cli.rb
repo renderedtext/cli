@@ -12,15 +12,13 @@ module Sem
     def login
       auth_token = options[:auth_token]
 
-      Sem::Credentials.write(auth_token)
+      if Sem::Credentials.valid?(auth_token)
+        Sem::Credentials.write(auth_token)
 
-      orgs = Sem::API::Orgs.list
-
-      puts "Your credentials have been saved to #{Sem::Credentials::PATH}."
-    rescue StandardError => e # TODO: not appropriate error level
-      Sem::Credentials.delete
-
-      abort "[ERROR] Token is invalid!"
+        puts "Your credentials have been saved to #{Sem::Credentials::PATH}."
+      else
+        abort "[ERROR] Token is invalid!"
+      end
     end
 
     register "orgs", "manage organizations", Sem::CLI::Orgs
