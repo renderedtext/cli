@@ -4,30 +4,30 @@ describe Sem::CLI do
 
   describe "#login" do
     before { allow(Sem::Credentials).to receive(:write) }
-    before { allow(Sem::Credentials).to receive(:delete) }
-    before { allow(Sem::API::Orgs).to receive(:list) }
 
-    it "writes the credentials" do
-      expect(Sem::Credentials).to receive(:write).with("123456")
+    context "when the credentials are valid" do
+      before { allow(Sem::Credentials).to receive(:valid?).and_return(true) }
 
-      sem_run("login --auth_token 123456")
-    end
+      it "writes the credentials" do
+        expect(Sem::Credentials).to receive(:write).with("123456")
 
-    it "displays a success message" do
-      stdout, stderr = sem_run("login --auth_token 123456")
+        sem_run("login --auth_token 123456")
+      end
 
-      msg = [
-        "Your credentials have been saved to #{Sem::Credentials::PATH}."
-      ]
+      it "displays a success message" do
+        stdout, stderr = sem_run("login --auth_token 123456")
 
-      expect(stdout.strip).to eq(msg.join("\n"))
-      expect(stderr).to eq("")
+        msg = [
+          "Your credentials have been saved to #{Sem::Credentials::PATH}."
+        ]
+
+        expect(stdout.strip).to eq(msg.join("\n"))
+        expect(stderr).to eq("")
+      end
     end
 
     context "not valid auth token" do
-      before do
-        allow(Sem::API::Orgs).to receive(:list).and_raise("exception")
-      end
+      before { allow(Sem::Credentials).to receive(:valid?).and_return(false) }
 
       it "writes an error to the output" do
         stdout, stderr = sem_run("login --auth_token 123456")
@@ -40,8 +40,7 @@ describe Sem::CLI do
       end
 
       it "does not save the auth token" do
-        expect(Sem::Credentials).to receive(:write).with("123456")
-        expect(Sem::Credentials).to receive(:delete)
+        expect(Sem::Credentials).to_not receive(:write).with("123456")
 
         sem_run("login --auth_token 123456")
       end
