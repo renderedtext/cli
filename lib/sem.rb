@@ -2,6 +2,7 @@ require "sem/version"
 require "dracula"
 require "semaphore_client"
 require "fileutils"
+require "pmap"
 
 module Sem
   require "sem/errors"
