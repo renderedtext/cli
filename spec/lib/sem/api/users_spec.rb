@@ -7,9 +7,9 @@ describe Sem::API::Users do
   let(:class_api) { instance_double(SemaphoreClient::Api::User) }
   let(:client) { instance_double(SemaphoreClient, :users => class_api) }
 
-  let(:instance_path) { "user" }
+  let(:instance_name) { "user" }
   let(:org_name) { "org" }
-  let(:team_path) { "org/team" }
+  let(:team_name) { "team" }
 
   let(:instance_id) { 0 }
   let(:instance_hash) { { :id => instance_id } }
@@ -52,7 +52,7 @@ describe Sem::API::Users do
   end
 
   describe ".info" do
-    let(:instance_hash_0) { { :id => instance_path } }
+    let(:instance_hash_0) { { :id => instance_name } }
     let(:instance_hash_1) { { :id => "user_1" } }
 
     before { allow(described_class).to receive(:list).and_return([instance_hash_0, instance_hash_1]) }
@@ -60,13 +60,21 @@ describe Sem::API::Users do
     it "calls list on the described class" do
       expect(described_class).to receive(:list)
 
-      described_class.info(instance_path)
+      described_class.info(instance_name)
     end
 
     it "returns the selected instance" do
-      return_value = described_class.info(instance_path)
+      return_value = described_class.info(instance_name)
 
       expect(return_value).to eql(instance_hash_0)
+    end
+
+    context "org_name included in the call" do
+      it "returns the selected instance" do
+        return_value = described_class.info(org_name, instance_name)
+
+        expect(return_value).to eql(instance_hash_0)
+      end
     end
   end
 

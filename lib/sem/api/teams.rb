@@ -9,9 +9,7 @@ module Sem
         org_names.map { |name| list_for_org(name) }.flatten
       end
 
-      def self.info(path)
-        org_name, team_name = path.split("/")
-
+      def self.info(org_name, team_name)
         list_for_org(org_name).find { |team| team[:name] == team_name }
       end
 
@@ -21,16 +19,16 @@ module Sem
         to_hash(team)
       end
 
-      def self.update(path, args)
-        team = info(path)
+      def self.update(org_name, team_name, args)
+        team = info(org_name, team_name)
 
         team = api.update(team[:id], args)
 
         to_hash(team)
       end
 
-      def self.delete(path)
-        id = info(path)[:id]
+      def self.delete(org_name, team_name)
+        id = info(org_name, team_name)[:id]
 
         api.delete(id)
       end

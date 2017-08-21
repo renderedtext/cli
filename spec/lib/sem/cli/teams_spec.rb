@@ -48,7 +48,7 @@ describe Sem::CLI::Teams do
     before { allow(Sem::API::Teams).to receive(:info).and_return(team) }
 
     it "calls the API" do
-      expect(Sem::API::Teams).to receive(:info).with("renderedtext/developers")
+      expect(Sem::API::Teams).to receive(:info).with("renderedtext", "developers")
 
       sem_run("teams:info renderedtext/developers")
     end
@@ -100,7 +100,7 @@ describe Sem::CLI::Teams do
     before { allow(Sem::API::Teams).to receive(:update).and_return(team) }
 
     it "calls the API" do
-      expect(Sem::API::Teams).to receive(:update).with("renderedtext/admins", :name => "developers")
+      expect(Sem::API::Teams).to receive(:update).with("renderedtext", "admins", :name => "developers")
 
       sem_run("teams:rename renderedtext/admins renderedtext/developers")
     end
@@ -126,7 +126,7 @@ describe Sem::CLI::Teams do
     before { allow(Sem::API::Teams).to receive(:update).and_return(team) }
 
     it "calls the API" do
-      expect(Sem::API::Teams).to receive(:update).with("renderedtext/developers", :permission => "admin")
+      expect(Sem::API::Teams).to receive(:update).with("renderedtext", "developers", :permission => "admin")
 
       sem_run("teams:set-permission renderedtext/developers admin")
     end
@@ -152,7 +152,7 @@ describe Sem::CLI::Teams do
     before { allow(Sem::API::Teams).to receive(:delete) }
 
     it "calls the API" do
-      expect(Sem::API::Teams).to receive(:delete).with("renderedtext/old-developers")
+      expect(Sem::API::Teams).to receive(:delete).with("renderedtext", "old-developers")
 
       sem_run("teams:delete renderedtext/old-developers")
     end
@@ -177,7 +177,7 @@ describe Sem::CLI::Teams do
       before { allow(Sem::API::Users).to receive(:list_for_team).and_return([user_0, user_1]) }
 
       it "calls the users API" do
-        expect(Sem::API::Users).to receive(:list_for_team).with("renderedtext/cli")
+        expect(Sem::API::Users).to receive(:list_for_team).with("renderedtext", "cli")
 
         sem_run("teams:members:list renderedtext/cli")
       end
@@ -200,7 +200,7 @@ describe Sem::CLI::Teams do
       before { allow(Sem::API::Users).to receive(:add_to_team) }
 
       it "calls the users API" do
-        expect(Sem::API::Users).to receive(:add_to_team).with("renderedtext/developers", "ijovan")
+        expect(Sem::API::Users).to receive(:add_to_team).with("renderedtext", "developers", "ijovan")
 
         sem_run("teams:members:add renderedtext/developers ijovan")
       end
@@ -217,7 +217,7 @@ describe Sem::CLI::Teams do
       before { allow(Sem::API::Users).to receive(:remove_from_team) }
 
       it "calls the users API" do
-        expect(Sem::API::Users).to receive(:remove_from_team).with("renderedtext/developers", "ijovan")
+        expect(Sem::API::Users).to receive(:remove_from_team).with("renderedtext", "developers", "ijovan")
 
         sem_run("teams:members:remove renderedtext/developers ijovan")
       end
@@ -239,7 +239,7 @@ describe Sem::CLI::Teams do
       before { allow(Sem::API::Projects).to receive(:list_for_team).and_return([project_0, project_1]) }
 
       it "calls the projects API" do
-        expect(Sem::API::Projects).to receive(:list_for_team).with("renderedtext/cli")
+        expect(Sem::API::Projects).to receive(:list_for_team).with("renderedtext", "cli")
 
         sem_run("teams:projects:list renderedtext/cli")
       end
@@ -262,7 +262,7 @@ describe Sem::CLI::Teams do
       before { allow(Sem::API::Projects).to receive(:add_to_team) }
 
       it "calls the projects API" do
-        expect(Sem::API::Projects).to receive(:add_to_team).with("renderedtext/developers", "renderedtext/cli")
+        expect(Sem::API::Projects).to receive(:add_to_team).with("renderedtext", "developers", "cli")
 
         sem_run("teams:projects:add renderedtext/developers renderedtext/cli")
       end
@@ -279,7 +279,7 @@ describe Sem::CLI::Teams do
       before { allow(Sem::API::Projects).to receive(:remove_from_team) }
 
       it "calls the projects API" do
-        expect(Sem::API::Projects).to receive(:remove_from_team).with("renderedtext/developers", "renderedtext/api")
+        expect(Sem::API::Projects).to receive(:remove_from_team).with("renderedtext", "developers", "api")
 
         sem_run("teams:projects:remove renderedtext/developers renderedtext/api")
       end
@@ -316,7 +316,7 @@ describe Sem::CLI::Teams do
       before { allow(Sem::API::SharedConfigs).to receive(:list_for_team).and_return([config_0, config_1]) }
 
       it "calls the configs API" do
-        expect(Sem::API::SharedConfigs).to receive(:list_for_team).with("renderedtext/aws-tokens")
+        expect(Sem::API::SharedConfigs).to receive(:list_for_team).with("renderedtext", "aws-tokens")
 
         sem_run("teams:shared-configs:list renderedtext/aws-tokens")
       end
@@ -339,7 +339,7 @@ describe Sem::CLI::Teams do
       before { allow(Sem::API::SharedConfigs).to receive(:add_to_team) }
 
       it "calls the projects API" do
-        expect(Sem::API::SharedConfigs).to receive(:add_to_team).with("rt/developers", "rt/aws-tokens")
+        expect(Sem::API::SharedConfigs).to receive(:add_to_team).with("rt", "developers", "aws-tokens")
 
         sem_run("teams:shared-configs:add rt/developers rt/aws-tokens")
       end
@@ -356,7 +356,7 @@ describe Sem::CLI::Teams do
       before { allow(Sem::API::SharedConfigs).to receive(:remove_from_team) }
 
       it "calls the projects API" do
-        expect(Sem::API::SharedConfigs).to receive(:remove_from_team).with("rt/developers", "rt/tokens")
+        expect(Sem::API::SharedConfigs).to receive(:remove_from_team).with("rt", "developers", "tokens")
 
         sem_run("teams:shared-configs:remove rt/developers rt/tokens")
       end

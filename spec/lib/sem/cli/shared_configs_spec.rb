@@ -49,7 +49,7 @@ describe Sem::CLI::SharedConfigs do
     before { allow(Sem::API::SharedConfigs).to receive(:info).and_return(shared_config) }
 
     it "calls the API" do
-      expect(Sem::API::SharedConfigs).to receive(:info).with("renderedtext/aws-tokens")
+      expect(Sem::API::SharedConfigs).to receive(:info).with("renderedtext", "aws-tokens")
 
       sem_run("shared-configs:info renderedtext/aws-tokens")
     end
@@ -101,7 +101,7 @@ describe Sem::CLI::SharedConfigs do
     before { allow(Sem::API::SharedConfigs).to receive(:update).and_return(shared_config) }
 
     it "calls the API" do
-      expect(Sem::API::SharedConfigs).to receive(:update).with("renderedtext/tokens", :name => "aws-tokens")
+      expect(Sem::API::SharedConfigs).to receive(:update).with("renderedtext", "tokens", :name => "aws-tokens")
 
       sem_run("shared-configs:rename renderedtext/tokens renderedtext/aws-tokens")
     end
@@ -127,7 +127,7 @@ describe Sem::CLI::SharedConfigs do
     before { allow(Sem::API::SharedConfigs).to receive(:delete) }
 
     it "calls the API" do
-      expect(Sem::API::SharedConfigs).to receive(:delete).with("renderedtext/tokens")
+      expect(Sem::API::SharedConfigs).to receive(:delete).with("renderedtext", "tokens")
 
       sem_run("shared-configs:delete renderedtext/tokens")
     end
@@ -162,7 +162,7 @@ describe Sem::CLI::SharedConfigs do
       before { allow(Sem::API::SharedConfigs).to receive(:list_files).and_return([file_0, file_1]) }
 
       it "calls the configs API" do
-        expect(Sem::API::SharedConfigs).to receive(:list_files).with("renderedtext/tokens")
+        expect(Sem::API::SharedConfigs).to receive(:list_files).with("renderedtext", "tokens")
 
         sem_run("shared-configs:files:list renderedtext/tokens")
       end
@@ -196,7 +196,8 @@ describe Sem::CLI::SharedConfigs do
       end
 
       it "calls the projects API" do
-        expect(Sem::API::Files).to receive(:add_to_shared_config).with("renderedtext/tokens",
+        expect(Sem::API::Files).to receive(:add_to_shared_config).with("renderedtext",
+                                                                       "tokens",
                                                                        :path => "secrets.yml",
                                                                        :content => content)
 
@@ -215,7 +216,7 @@ describe Sem::CLI::SharedConfigs do
       before { allow(Sem::API::Files).to receive(:remove_from_shared_config) }
 
       it "calls the projects API" do
-        expect(Sem::API::Files).to receive(:remove_from_shared_config).with("renderedtext/tokens", "secrets.yml")
+        expect(Sem::API::Files).to receive(:remove_from_shared_config).with("renderedtext", "tokens", "secrets.yml")
 
         sem_run("shared-configs:files:remove renderedtext/tokens secrets.yml")
       end
@@ -254,7 +255,7 @@ describe Sem::CLI::SharedConfigs do
       before { allow(Sem::API::SharedConfigs).to receive(:list_env_vars).and_return([env_var_0, env_var_1]) }
 
       it "calls the configs API" do
-        expect(Sem::API::SharedConfigs).to receive(:list_env_vars).with("renderedtext/tokens")
+        expect(Sem::API::SharedConfigs).to receive(:list_env_vars).with("renderedtext", "tokens")
 
         sem_run("shared-configs:env-vars:list renderedtext/tokens")
       end
@@ -277,7 +278,8 @@ describe Sem::CLI::SharedConfigs do
       before { allow(Sem::API::EnvVars).to receive(:add_to_shared_config) }
 
       it "calls the projects API" do
-        expect(Sem::API::EnvVars).to receive(:add_to_shared_config).with("rt/tokens",
+        expect(Sem::API::EnvVars).to receive(:add_to_shared_config).with("rt",
+                                                                         "tokens",
                                                                          :name => "AWS_CLIENT_ID",
                                                                          :content => "3412341234123")
 
@@ -296,7 +298,7 @@ describe Sem::CLI::SharedConfigs do
       before { allow(Sem::API::EnvVars).to receive(:remove_from_shared_config) }
 
       it "calls the projects API" do
-        expect(Sem::API::EnvVars).to receive(:remove_from_shared_config).with("renderedtext/tokens", "AWS_CLIENT_ID")
+        expect(Sem::API::EnvVars).to receive(:remove_from_shared_config).with("renderedtext", "tokens", "AWS_CLIENT_ID")
 
         sem_run("shared-configs:env-vars:remove renderedtext/tokens AWS_CLIENT_ID")
       end

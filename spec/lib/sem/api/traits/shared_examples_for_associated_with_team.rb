@@ -23,25 +23,25 @@ shared_examples "associated_with_team" do
     end
 
     it "calls info on sem_api_teams" do
-      expect(Sem::API::Teams).to receive(:info).with(team_path)
+      expect(Sem::API::Teams).to receive(:info).with(org_name, team_name)
 
-      described_class.list_for_team(team_path)
+      described_class.list_for_team(org_name, team_name)
     end
 
     it "calls list_for_team on the class_api" do
       expect(class_api).to receive(:list_for_team).with(team_id)
 
-      described_class.list_for_team(team_path)
+      described_class.list_for_team(org_name, team_name)
     end
 
     it "converts the instances to instance hashes" do
       expect(described_class).to receive(:to_hash).with(instance)
 
-      described_class.list_for_team(team_path)
+      described_class.list_for_team(org_name, team_name)
     end
 
     it "returns the instance hashes" do
-      return_value = described_class.list_for_team(team_path)
+      return_value = described_class.list_for_team(org_name, team_name)
 
       expect(return_value).to eql([instance_hash])
     end
@@ -58,21 +58,21 @@ shared_examples "associated_with_team" do
     end
 
     it "calls info on the described class" do
-      expect(described_class).to receive(:info).with(instance_path)
+      expect(described_class).to receive(:info).with(org_name, instance_name)
 
-      described_class.add_to_team(team_path, instance_path)
+      described_class.add_to_team(org_name, team_name, instance_name)
     end
 
     it "calls info on sem_api_teams" do
-      expect(Sem::API::Teams).to receive(:info).with(team_path)
+      expect(Sem::API::Teams).to receive(:info).with(org_name, team_name)
 
-      described_class.add_to_team(team_path, instance_path)
+      described_class.add_to_team(org_name, team_name, instance_name)
     end
 
     it "calls attach_to_team on the class_api" do
       expect(class_api).to receive(:attach_to_team).with(instance_id, team_id)
 
-      described_class.add_to_team(team_path, instance_path)
+      described_class.add_to_team(org_name, team_name, instance_name)
     end
   end
 
@@ -87,21 +87,21 @@ shared_examples "associated_with_team" do
     end
 
     it "calls info on the described class" do
-      expect(described_class).to receive(:info).with(instance_path)
+      expect(described_class).to receive(:info).with(org_name, instance_name)
 
-      described_class.remove_from_team(team_path, instance_path)
+      described_class.remove_from_team(org_name, team_name, instance_name)
     end
 
     it "calls info on sem_api_teams" do
-      expect(Sem::API::Teams).to receive(:info).with(team_path)
+      expect(Sem::API::Teams).to receive(:info).with(org_name, team_name)
 
-      described_class.remove_from_team(team_path, instance_path)
+      described_class.remove_from_team(org_name, team_name, instance_name)
     end
 
     it "calls detach_from_team on the class_api" do
       expect(class_api).to receive(:detach_from_team).with(instance_id, team_id)
 
-      described_class.remove_from_team(team_path, instance_path)
+      described_class.remove_from_team(org_name, team_name, instance_name)
     end
   end
 end

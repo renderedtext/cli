@@ -8,7 +8,6 @@ describe Sem::API::Teams do
 
   let(:org_name) { "org_0" }
   let(:instance_name) { "instance" }
-  let(:path) { "#{org_name}/#{instance_name}" }
 
   let(:instance_id) { 0 }
   let(:instance_hash) { { :id => instance_id } }
@@ -65,11 +64,11 @@ describe Sem::API::Teams do
     it "calls list_for_org on the described class" do
       expect(described_class).to receive(:list_for_org).with(org_name)
 
-      described_class.info(path)
+      described_class.info(org_name, instance_name)
     end
 
     it "returns the selected instance" do
-      return_value = described_class.info(path)
+      return_value = described_class.info(org_name, instance_name)
 
       expect(return_value).to eql(instance_hash_0)
     end
@@ -108,19 +107,19 @@ describe Sem::API::Teams do
     end
 
     it "calls info on the described class" do
-      expect(described_class).to receive(:info).with(path)
+      expect(described_class).to receive(:info).with(org_name, instance_name)
 
-      described_class.update(path, args)
+      described_class.update(org_name, instance_name, args)
     end
 
     it "calls delete on the class_api" do
       expect(class_api).to receive(:update).with(instance_id, args)
 
-      described_class.update(path, args)
+      described_class.update(org_name, instance_name, args)
     end
 
     it "returns the instance hash" do
-      return_value = described_class.update(path, args)
+      return_value = described_class.update(org_name, instance_name, args)
 
       expect(return_value).to eql(instance_hash)
     end
@@ -133,15 +132,15 @@ describe Sem::API::Teams do
     end
 
     it "calls info on the described class" do
-      expect(described_class).to receive(:info).with(path)
+      expect(described_class).to receive(:info).with(org_name, instance_name)
 
-      described_class.delete(path)
+      described_class.delete(org_name, instance_name)
     end
 
     it "calls delete on the class_api" do
       expect(class_api).to receive(:delete).with(instance_id)
 
-      described_class.delete(path)
+      described_class.delete(org_name, instance_name)
     end
   end
 

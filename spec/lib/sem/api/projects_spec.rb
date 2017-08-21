@@ -8,8 +8,7 @@ describe Sem::API::Projects do
   let(:client) { instance_double(SemaphoreClient, :projects => class_api) }
 
   let(:org_name) { "org" }
-  let(:instance_path) { "#{org_name}/project" }
-  let(:team_path) { "#{org_name}/team" }
+  let(:team_name) { "team" }
 
   let(:instance_id) { 0 }
   let(:instance_name) { "project" }
@@ -75,11 +74,11 @@ describe Sem::API::Projects do
     it "calls list_for_org on the described class" do
       expect(described_class).to receive(:list_for_org).with(org_name)
 
-      described_class.info(instance_path)
+      described_class.info(org_name, instance_name)
     end
 
     it "returns the selected instance" do
-      return_value = described_class.info(instance_path)
+      return_value = described_class.info(org_name, instance_name)
 
       expect(return_value).to eql(instance_hash_0)
     end

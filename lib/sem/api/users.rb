@@ -10,7 +10,9 @@ module Sem
         org_names.map { |name| list_for_org(name) }.flatten
       end
 
-      def self.info(name)
+      def self.info(*args)
+        name = args.count == 2 ? args[1] : args[0]
+
         list.find { |user| user[:id] == name }
       end
 
