@@ -7,16 +7,15 @@ describe Sem::Credentials do
   describe ".valid?" do
     before do
       @credentials = "dragonite"
-      @client = instance_double(SemaphoreClient::HttpClient)
-      @org_client = instance_double(SemaphoreClient::Api::Org, :list! => nil)
+      @orgs = instance_double(SemaphoreClient::Api::Org, :list! => nil)
+      @client = instance_double(SemaphoreClient, :orgs => @orgs)
 
-      allow(SemaphoreClient::HttpClient).to receive(:new).with(@credentials).and_return(@client)
-      allow(SemaphoreClient::Api::Org).to receive(:new).with(@client).and_return(@org_client)
+      allow(SemaphoreClient).to receive(:new).with(@credentials).and_return(@client)
     end
 
     context "listing orgs fails" do
       before do
-        allow(@org_client).to receive(:list!).and_raise(SemaphoreClient::Exceptions::RequestFailed)
+        allow(@orgs).to receive(:list!).and_raise(SemaphoreClient::Exceptions::RequestFailed)
       end
 
       it "return false" do

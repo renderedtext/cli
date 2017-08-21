@@ -19,7 +19,7 @@ def collect_output
   result = yield
 
   [fake_stdout.string.to_s, fake_stderr.string.to_s, result]
-rescue SystemExit => e
+rescue SystemExit
   [fake_stdout.string.to_s, fake_stderr.string.to_s, result]
 ensure
   $stdout = original_stdout

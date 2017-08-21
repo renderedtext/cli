@@ -3,8 +3,8 @@ module Sem
     PATH = File.expand_path("~/.sem/credentials").freeze
 
     def self.valid?(auth_token)
-      client = SemaphoreClient::HttpClient.new(auth_token)
-      SemaphoreClient::Api::Org.new(client).list!
+      client = SemaphoreClient.new(auth_token)
+      client.orgs.list!
 
       true
     rescue SemaphoreClient::Exceptions::RequestFailed

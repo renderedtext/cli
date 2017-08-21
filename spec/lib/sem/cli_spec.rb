@@ -30,7 +30,7 @@ describe Sem::CLI do
       before { allow(Sem::Credentials).to receive(:valid?).and_return(false) }
 
       it "writes an error to the output" do
-        stdout, stderr = sem_run("login --auth_token 123456")
+        _stdout, stderr = sem_run("login --auth_token 123456")
 
         msg = [
           "[ERROR] Token is invalid!"
