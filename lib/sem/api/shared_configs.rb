@@ -4,6 +4,8 @@ module Sem
       extend Traits::AssociatedWithTeam
       extend Traits::AssociatedWithOrg
 
+      PATH_PATTERN = "org/shared_config".freeze
+
       def self.list
         org_names = Orgs.list.map { |org| org[:username] }
 
@@ -11,6 +13,8 @@ module Sem
       end
 
       def self.info(path)
+        check_path(path)
+
         org_name, config_name = path.split("/")
 
         list_for_org(org_name).find { |config| config[:name] == config_name }
@@ -23,6 +27,8 @@ module Sem
       end
 
       def self.update(path, args)
+        check_path(path)
+
         shared_config = info(path)
 
         shared_config = api.update(shared_config[:id], args)
@@ -31,6 +37,8 @@ module Sem
       end
 
       def self.delete(path)
+        check_path(path)
+
         id = info(path)[:id]
 
         api.delete(id)
@@ -42,6 +50,10 @@ module Sem
 
       def self.list_files(path)
         Sem::API::Files.list_for_shared_config(path)
+      end
+
+      def self.check_path(path)
+        check_path_format(path, PATH_PATTERN)
       end
 
       def self.api

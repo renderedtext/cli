@@ -20,4 +20,18 @@ describe Sem::API::Base do
 
     after { described_class.instance_variable_set(:@client, nil) }
   end
+
+  describe ".check_path_length" do
+    context "path format is correct" do
+      it "doesn't raise an exception" do
+        expect { described_class.check_path_format("org/team", "org/team") }.not_to raise_exception
+      end
+    end
+
+    context "path format is not correct" do
+      it "raises an exception" do
+        expect { described_class.check_path_format("team", "org/team") }.to raise_exception(Sem::Errors::InvalidPath)
+      end
+    end
+  end
 end

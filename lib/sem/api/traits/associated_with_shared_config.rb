@@ -3,6 +3,8 @@ module Sem
     module Traits
       module AssociatedWithSharedConfig
         def list_for_shared_config(shared_config_path)
+          Sem::API::SharedConfigs.check_path(shared_config_path)
+
           shared_config = SharedConfigs.info(shared_config_path)
 
           instances = api.list_for_shared_config(shared_config[:id])
@@ -11,12 +13,16 @@ module Sem
         end
 
         def add_to_shared_config(shared_config_path, params)
+          Sem::API::SharedConfigs.check_path(shared_config_path)
+
           shared_config = SharedConfigs.info(shared_config_path)
 
           api.create_for_shared_config(shared_config[:id], params)
         end
 
         def remove_from_shared_config(shared_config_path, instance_name)
+          Sem::API::SharedConfigs.check_path(shared_config_path)
+
           instances = list_for_shared_config(shared_config_path)
 
           selected_instance = instances.find { |instance| instance[:name] == instance_name }

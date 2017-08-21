@@ -3,6 +3,8 @@ module Sem
     class Teams < Base
       extend Traits::AssociatedWithOrg
 
+      PATH_PATTERN = "org/team".freeze
+
       def self.list
         org_names = Sem::API::Orgs.list.map { |org| org[:username] }
 
@@ -10,6 +12,8 @@ module Sem
       end
 
       def self.info(path)
+        check_path(path)
+
         org_name, team_name = path.split("/")
 
         list_for_org(org_name).find { |team| team[:name] == team_name }
@@ -22,6 +26,8 @@ module Sem
       end
 
       def self.update(path, args)
+        check_path(path)
+
         team = info(path)
 
         team = api.update(team[:id], args)
@@ -30,9 +36,15 @@ module Sem
       end
 
       def self.delete(path)
+        check_path(path)
+
         id = info(path)[:id]
 
         api.delete(id)
+      end
+
+      def self.check_path(path)
+        check_path_format(path, PATH_PATTERN)
       end
 
       def self.api

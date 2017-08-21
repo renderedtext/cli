@@ -198,6 +198,20 @@ describe Sem::API::Orgs do
     end
   end
 
+  describe ".check_path" do
+    context "path format is correct" do
+      it "doesn't raise an exception" do
+        expect { described_class.check_path("org") }.not_to raise_exception
+      end
+    end
+
+    context "path format isn't correct" do
+      it "raises an exception" do
+        expect { described_class.check_path("org/org") }.to raise_exception(Sem::Errors::InvalidPath)
+      end
+    end
+  end
+
   describe ".api" do
     it "returns the API from the client" do
       return_value = described_class.api
