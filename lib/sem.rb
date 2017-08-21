@@ -26,6 +26,10 @@ module Sem
       on_invalid_credentials
 
       1
+    rescue Sem::Errors::InvalidPath => e
+      on_invalid_path(e)
+
+      1
     rescue StandardError => e
       on_unhandled_error(e)
 
@@ -44,6 +48,12 @@ module Sem
       puts "[ERROR] Your credentials are invalid."
       puts ""
       puts "Log in with '#{Sem::CLI.program_name} login --auth-token <token>'"
+    end
+
+    def on_invalid_path(exception)
+      puts "[ERROR] One of the paths you provided was invalid."
+      puts ""
+      puts "The correct path format is \"#{exception.message}.\""
     end
 
     def on_unhandled_error(exception)

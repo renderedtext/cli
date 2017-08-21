@@ -3,6 +3,8 @@ module Sem
     module Traits
       module AssociatedWithTeam
         def list_for_team(team_path)
+          Sem::API::Teams.check_path(team_path)
+
           team = Teams.info(team_path)
 
           instances = api.list_for_team(team[:id])
@@ -11,6 +13,9 @@ module Sem
         end
 
         def add_to_team(team_path, instance_path)
+          check_path(instance_path)
+          Sem::API::Teams.check_path(team_path)
+
           instance = info(instance_path)
           team = Teams.info(team_path)
 
@@ -18,6 +23,9 @@ module Sem
         end
 
         def remove_from_team(team_path, instance_path)
+          check_path(instance_path)
+          Sem::API::Teams.check_path(team_path)
+
           instance = info(instance_path)
           team = Teams.info(team_path)
 

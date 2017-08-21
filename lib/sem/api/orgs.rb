@@ -1,14 +1,18 @@
 module Sem
   module API
     class Orgs < Base
+      PATH_PATTERN = "org".freeze
+
       def self.list
         orgs = api.list
 
         orgs.map { |org| to_hash(org) }
       end
 
-      def self.info(name)
-        org = api.get(name)
+      def self.info(path)
+        check_path(path)
+
+        org = api.get(path)
 
         to_hash(org)
       end
@@ -35,6 +39,10 @@ module Sem
         owners = client.users.list_for_team(owners_team[:id])
 
         owners.map { |owner| Sem::API::Users.to_hash(owner) }
+      end
+
+      def self.check_path(path)
+        check_path_format(path, PATH_PATTERN)
       end
 
       def self.api

@@ -4,6 +4,8 @@ module Sem
       extend Traits::AssociatedWithOrg
       extend Traits::AssociatedWithTeam
 
+      PATH_PATTERN = "org/project".freeze
+
       def self.list
         org_names = Orgs.list.map { |org| org[:username] }
 
@@ -11,9 +13,15 @@ module Sem
       end
 
       def self.info(path)
+        check_path(path)
+
         org_name, project_name = path.split("/")
 
         list_for_org(org_name).find { |project| project[:name] == project_name }
+      end
+
+      def self.check_path(path)
+        check_path_format(path, PATH_PATTERN)
       end
 
       def self.api
