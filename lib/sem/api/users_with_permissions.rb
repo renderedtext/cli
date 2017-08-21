@@ -31,11 +31,11 @@ module Sem
         end
 
         def users_for_team_groups(groups)
-          groups.map { |teams| users_for_teams(teams) }.flatten
+          groups.pmap { |teams| users_for_teams(teams) }.flatten
         end
 
         def users_for_teams(teams)
-          teams.map { |team| users_for_team(team) }.flatten.uniq
+          teams.pmap { |team| users_for_team(team) }.flatten.uniq
         end
 
         def users_for_team(team)
