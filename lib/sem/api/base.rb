@@ -3,9 +3,9 @@ module Sem
     class Base
       class << self
         def client
-          @client ||= SemaphoreClient.new(
-            Sem::Configuration.auth_token,
-            Sem::Configuration.api_url
+          @client ||= SemaphoreClient.new(Sem::Configuration.auth_token,
+            :api_url => Sem::Configuration.api_url,
+            :verbose => true
           )
         end
 
