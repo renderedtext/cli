@@ -18,7 +18,7 @@ module Sem
         client.projects
       end
 
-      def self.to_hash(project)
+      def self.to_hash(project, _args = {})
         {
           :id => project.id,
           :name => project.name,

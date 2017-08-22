@@ -4,7 +4,7 @@ class Sem::Views::Teams < Sem::Views::Base
     header = ["ID", "NAME", "PERMISSION", "MEMBERS"]
 
     body = teams.map do |team|
-      [team[:id], team[:name], team[:permission], "#{team[:members]} members"]
+      [team[:id], "#{team[:org]}/#{team[:name]}", team[:permission], "#{team[:members]} members"]
     end
 
     print_table [header, *body]
@@ -13,7 +13,7 @@ class Sem::Views::Teams < Sem::Views::Base
   def self.info(team)
     print_table [
       ["ID", team[:id]],
-      ["Name", team[:name]],
+      ["Name", "#{team[:org]}/#{team[:name]}"],
       ["Permission", team[:permission]],
       ["Members", "#{team[:members]} members"],
       ["Created", team[:created_at]],

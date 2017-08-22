@@ -169,13 +169,14 @@ describe Sem::API::Teams do
     end
 
     it "returns the hash" do
-      return_value = described_class.to_hash(instance)
+      return_value = described_class.to_hash(instance, :org => org_name)
 
       expect(return_value).to eql(
         :id => instance_id,
         :name => instance.name,
         :permission => instance.permission,
         :members => "2",
+        :org => org_name,
         :created_at => instance.created_at,
         :updated_at => instance.updated_at
       )

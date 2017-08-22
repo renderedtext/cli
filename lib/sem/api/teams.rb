@@ -37,12 +37,13 @@ module Sem
         client.teams
       end
 
-      def self.to_hash(team)
+      def self.to_hash(team, args = {})
         {
           :id => team.id,
           :name => team.name,
           :permission => team.permission,
           :members => client.users.list_for_team(team.id).count.to_s,
+          :org => args[:org],
           :created_at => team.created_at,
           :updated_at => team.updated_at
         }

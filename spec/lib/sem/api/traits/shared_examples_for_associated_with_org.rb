@@ -19,7 +19,7 @@ shared_examples "associated_with_org" do
     end
 
     it "converts the instances to instance hashes" do
-      expect(described_class).to receive(:to_hash).with(instance)
+      expect(described_class).to receive(:to_hash).with(instance, :org => org_name)
 
       described_class.list_for_org(org_name)
     end

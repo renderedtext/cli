@@ -20,7 +20,7 @@ module Sem
         client.users
       end
 
-      def self.to_hash(user)
+      def self.to_hash(user, _args = {})
         { :id => user.username }
       end
     end
