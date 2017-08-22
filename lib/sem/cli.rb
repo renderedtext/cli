@@ -12,10 +12,10 @@ module Sem
     def login
       auth_token = options[:auth_token]
 
-      if Sem::Credentials.valid?(auth_token)
-        Sem::Credentials.write(auth_token)
+      if Sem::Configuration.valid_auth_token?(auth_token)
+        Sem::Configuration.export_auth_token(auth_token)
 
-        puts "Your credentials have been saved to #{Sem::Credentials::PATH}."
+        puts "Your credentials have been saved to #{Sem::Configuration::CREDENTIALS_PATH}."
       else
         abort "[ERROR] Token is invalid!"
       end

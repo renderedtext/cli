@@ -3,13 +3,13 @@ require "spec_helper"
 describe Sem::CLI do
 
   describe "#login" do
-    before { allow(Sem::Credentials).to receive(:write) }
+    before { allow(Sem::Configuration).to receive(:export_auth_token) }
 
-    context "when the credentials are valid" do
-      before { allow(Sem::Credentials).to receive(:valid?).and_return(true) }
+    context "when the auth token is valid" do
+      before { allow(Sem::Configuration).to receive(:valid_auth_token?).and_return(true) }
 
-      it "writes the credentials" do
-        expect(Sem::Credentials).to receive(:write).with("123456")
+      it "sets the auth token" do
+        expect(Sem::Configuration).to receive(:export_auth_token).with("123456")
 
         sem_run("login --auth_token 123456")
       end
@@ -18,7 +18,7 @@ describe Sem::CLI do
         stdout, stderr = sem_run("login --auth_token 123456")
 
         msg = [
-          "Your credentials have been saved to #{Sem::Credentials::PATH}."
+          "Your credentials have been saved to #{Sem::Configuration::CREDENTIALS_PATH}."
         ]
 
         expect(stdout.strip).to eq(msg.join("\n"))
@@ -26,8 +26,8 @@ describe Sem::CLI do
       end
     end
 
-    context "not valid auth token" do
-      before { allow(Sem::Credentials).to receive(:valid?).and_return(false) }
+    context "invalid auth token" do
+      before { allow(Sem::Configuration).to receive(:valid_auth_token?).and_return(false) }
 
       it "writes an error to the output" do
         _stdout, stderr = sem_run("login --auth_token 123456")
@@ -39,8 +39,8 @@ describe Sem::CLI do
         expect(stderr.strip).to eq(msg.join("\n"))
       end
 
-      it "does not save the auth token" do
-        expect(Sem::Credentials).to_not receive(:write).with("123456")
+      it "does not set the auth token" do
+        expect(Sem::Configuration).to_not receive(:export_auth_token).with("123456")
 
         sem_run("login --auth_token 123456")
       end
