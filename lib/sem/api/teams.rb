@@ -38,11 +38,13 @@ module Sem
       end
 
       def self.to_hash(team)
+        return if team.nil?
+
         {
           :id => team.id,
           :name => team.name,
           :permission => team.permission,
-          :members => client.users.list_for_team(team.id).count.to_s,
+          :members => client.users.list_for_team(team.id).to_a.size.to_s,
           :created_at => team.created_at,
           :updated_at => team.updated_at
         }

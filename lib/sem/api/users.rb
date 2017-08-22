@@ -21,6 +21,8 @@ module Sem
       end
 
       def self.to_hash(user)
+        return if user.nil?
+
         { :id => user.username }
       end
     end

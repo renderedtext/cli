@@ -7,11 +7,13 @@ module Sem
         client.config_files
       end
 
-      def self.to_hash(files)
+      def self.to_hash(file)
+        return if file.nil?
+
         {
-          :id => files.id,
-          :name => files.path,
-          :encrypted? => files.encrypted
+          :id => file.id,
+          :name => file.path,
+          :encrypted? => file.encrypted
         }
       end
     end

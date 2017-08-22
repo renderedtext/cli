@@ -47,6 +47,8 @@ module Sem
       end
 
       def self.to_hash(shared_config)
+        return if shared_config.nil?
+
         {
           :id => shared_config.id,
           :name => shared_config.name,

@@ -19,6 +19,8 @@ module Sem
       end
 
       def self.to_hash(project)
+        return if project.nil?
+
         {
           :id => project.id,
           :name => project.name,

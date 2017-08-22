@@ -24,7 +24,7 @@ module Sem
       def self.list_admins(name)
         admin_teams = list_teams(name).select { |team| team[:permission] == "admin" }
 
-        admins = admin_teams.map { |team| client.users.list_for_team(team[:id]) }.flatten
+        admins = admin_teams.map { |team| client.users.list_for_team(team[:id]).to_a }.flatten
 
         admins.map { |admin| Sem::API::Users.to_hash(admin) }
       end
@@ -32,7 +32,7 @@ module Sem
       def self.list_owners(name)
         owners_team = list_teams(name).find { |team| team[:name] == "Owners" }
 
-        owners = client.users.list_for_team(owners_team[:id])
+        owners = client.users.list_for_team(owners_team[:id]).to_a
 
         owners.map { |owner| Sem::API::Users.to_hash(owner) }
       end
@@ -42,6 +42,8 @@ module Sem
       end
 
       def self.to_hash(org)
+        return if org.nil?
+
         {
           :id => org.id,
           :username => org.username,

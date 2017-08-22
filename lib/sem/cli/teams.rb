@@ -11,7 +11,7 @@ class Sem::CLI::Teams < Dracula
   def info(srn)
     org_name, team_name = Sem::SRN.parse_team(srn)
 
-    team = Sem::API::Teams.info(org_name, team_name)
+    team = Sem::API::Teams.info(org_name, team_name).to_h
 
     Sem::Views::Teams.info(team)
   end

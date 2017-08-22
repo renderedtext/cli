@@ -11,7 +11,7 @@ class Sem::CLI::Projects < Dracula
   def info(srn)
     org_name, project_name = Sem::SRN.parse_project(srn)
 
-    project = Sem::API::Projects.info(org_name, project_name)
+    project = Sem::API::Projects.info(org_name, project_name).to_h
 
     Sem::Views::Projects.info(project)
   end

@@ -11,7 +11,7 @@ class Sem::CLI::Orgs < Dracula
   def info(srn)
     org_name = Sem::SRN.parse_org(srn).first
 
-    org = Sem::API::Orgs.info(org_name)
+    org = Sem::API::Orgs.info(org_name).to_h
 
     Sem::Views::Orgs.info(org)
   end
