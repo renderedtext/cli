@@ -9,9 +9,11 @@ describe Sem::API::Base do
     let(:client) { instance_double(SemaphoreClient) }
 
     before do
+      options = { :api_url => api_url, :verbose => (Sem.log_level == Sem::LOG_LEVEL_TRACE) }
+
       allow(Sem::Configuration).to receive(:auth_token).and_return(auth_token)
       allow(Sem::Configuration).to receive(:api_url).and_return(api_url)
-      allow(SemaphoreClient).to receive(:new).with(auth_token, api_url).and_return(client)
+      allow(SemaphoreClient).to receive(:new).with(auth_token, options).and_return(client)
     end
 
     it "returns the client" do

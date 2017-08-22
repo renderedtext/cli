@@ -4,9 +4,9 @@ module Sem
       class << self
         def client
           @client ||= SemaphoreClient.new(Sem::Configuration.auth_token,
-            :api_url => Sem::Configuration.api_url,
-            :verbose => true
-          )
+                                          :api_url => Sem::Configuration.api_url,
+                                          :verbose => (Sem.log_level == Sem::LOG_LEVEL_TRACE)
+                                         )
         end
 
         def raise_not_found(resource, path)
