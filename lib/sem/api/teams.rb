@@ -7,7 +7,7 @@ module Sem
         def list
           org_names = Sem::API::Orgs.list.map { |org| org[:username] }
 
-          org_names.map { |name| list_for_org(name) }.flatten
+          org_names.pmap { |name| list_for_org(name) }.flatten
         end
 
         def info(org_name, team_name)
