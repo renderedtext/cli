@@ -3,7 +3,7 @@ module Sem
     module Traits
       module AssociatedWithOrg
         def list_for_org(org_name)
-          instances = api.list_for_org(org_name)
+          instances = api.list_for_org(org_name).to_a
 
           instances.map { |instance| to_hash(instance).merge(:org => org_name) }
         end

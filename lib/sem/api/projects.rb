@@ -4,27 +4,33 @@ module Sem
       extend Traits::AssociatedWithOrg
       extend Traits::AssociatedWithTeam
 
-      def self.list
-        org_names = Orgs.list.map { |org| org[:username] }
+      class << self
+        def list
+          org_names = Orgs.list.map { |org| org[:username] }
 
-        org_names.map { |name| list_for_org(name) }.flatten
-      end
+          org_names.map { |name| list_for_org(name) }.flatten
+        end
 
-      def self.info(org_name, project_name)
-        list_for_org(org_name).find { |project| project[:name] == project_name }
-      end
+        def info(org_name, project_name)
+          selected_project = list_for_org(org_name).find { |project| project[:name] == project_name }
 
-      def self.api
-        client.projects
-      end
+          raise_not_found("Project", [org_name, project_name]) if selected_project.nil?
 
-      def self.to_hash(project)
-        {
-          :id => project.id,
-          :name => project.name,
-          :created_at => project.created_at,
-          :updated_at => project.updated_at
-        }
+          selected_project
+        end
+
+        def api
+          client.projects
+        end
+
+        def to_hash(project)
+          {
+            :id => project.id,
+            :name => project.name,
+            :created_at => project.created_at,
+            :updated_at => project.updated_at
+          }
+        end
       end
     end
   end

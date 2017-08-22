@@ -76,6 +76,17 @@ describe Sem::API::Users do
         expect(return_value).to eql(instance_hash_0)
       end
     end
+
+    context "resource not found" do
+      before { allow(described_class).to receive(:list).and_return([]) }
+
+      it "raises an exception" do
+        expected_message = "User #{instance_name} not found."
+
+        expect { described_class.info(instance_name) }.to raise_exception(Sem::Errors::ResourceNotFound,
+                                                                          expected_message)
+      end
+    end
   end
 
   describe ".api" do

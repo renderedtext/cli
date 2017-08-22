@@ -19,6 +19,10 @@ module Sem
       Sem::CLI.start(args)
 
       0
+    rescue Sem::Errors::ResourceNotFound => e
+      on_resource_not_found(e)
+
+      1
     rescue Sem::Errors::InvalidSRN => e
       on_invalid_srn(e)
 
@@ -38,6 +42,12 @@ module Sem
     end
 
     private
+
+    def on_resource_not_found(exception)
+      puts "[ERROR] Resource not found."
+      puts ""
+      puts exception.message
+    end
 
     def on_invalid_srn(exception)
       puts "[ERROR] Invalid parameter."

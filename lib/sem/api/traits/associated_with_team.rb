@@ -5,7 +5,7 @@ module Sem
         def list_for_team(org_name, team_name)
           team = Teams.info(org_name, team_name)
 
-          instances = api.list_for_team(team[:id])
+          instances = api.list_for_team(team[:id]).to_a
 
           instances.map { |instance| to_hash(instance) }
         end

@@ -11,7 +11,7 @@ class Sem::CLI::SharedConfigs < Dracula
   def info(srn)
     org_name, shared_config_name = Sem::SRN.parse_shared_config(srn)
 
-    shared_config = Sem::API::SharedConfigs.info(org_name, shared_config_name)
+    shared_config = Sem::API::SharedConfigs.info(org_name, shared_config_name).to_h
 
     Sem::Views::SharedConfigs.info(shared_config)
   end
