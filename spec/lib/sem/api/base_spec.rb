@@ -5,11 +5,13 @@ describe Sem::API::Base do
 
   describe ".client" do
     let(:auth_token) { "auth_token" }
+    let(:api_url) { "api_url" }
     let(:client) { instance_double(SemaphoreClient) }
 
     before do
-      allow(Sem::Credentials).to receive(:read).and_return(auth_token)
-      allow(SemaphoreClient).to receive(:new).with(auth_token).and_return(client)
+      allow(Sem::Configuration).to receive(:auth_token).and_return(auth_token)
+      allow(Sem::Configuration).to receive(:api_url).and_return(api_url)
+      allow(SemaphoreClient).to receive(:new).with(auth_token, api_url).and_return(client)
     end
 
     it "returns the client" do

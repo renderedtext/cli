@@ -22,6 +22,10 @@ Formats for individual resources are the following:
 - Project: `organization_name/project_name`
 - Shared Configuration: `organization_name/shared_configuration_name`
 
+## Using custom API URL
+
+Create a file at `~/.sem/api_url` containing only the custom url.
+
 ## Issues
 
 For problems directly related to the CLI, [add an issue on GitHub](https://github.com/renderedtext/cli/issues/new).

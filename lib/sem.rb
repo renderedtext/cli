@@ -6,7 +6,7 @@ require "pmap"
 
 module Sem
   require "sem/errors"
-  require "sem/credentials"
+  require "sem/configuration"
   require "sem/srn"
   require "sem/cli"
   require "sem/api"
