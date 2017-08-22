@@ -8,8 +8,10 @@ class Sem::CLI::Teams < Dracula
   end
 
   desc "info", "show information about a team"
-  def info(name)
-    team = Sem::API::Teams.info(name)
+  def info(srn)
+    org_name, team_name = Sem::SRN.parse_team(srn)
+
+    team = Sem::API::Teams.info(org_name, team_name)
 
     Sem::Views::Teams.info(team)
   end
@@ -18,8 +20,8 @@ class Sem::CLI::Teams < Dracula
   option :permission, :default => "read",
                       :aliases => "-p",
                       :desc => "Permission level of the team in the organization"
-  def create(name)
-    org_name, team_name = name.split("/")
+  def create(srn)
+    org_name, team_name = Sem::SRN.parse_team(srn)
 
     team = Sem::API::Teams.create(org_name,
                                   :name => team_name,
@@ -29,94 +31,121 @@ class Sem::CLI::Teams < Dracula
   end
 
   desc "rename", "change the name of the team"
-  def rename(old_name, new_name)
-    _, name = new_name.split("/")
+  def rename(old_srn, new_srn)
+    org_name, old_name = Sem::SRN.parse_team(old_srn)
+    _, new_name = Sem::SRN.parse_team(new_srn)
 
-    team = Sem::API::Teams.update(old_name, :name => name)
+    team = Sem::API::Teams.update(org_name, old_name, :name => new_name)
 
     Sem::Views::Teams.info(team)
   end
 
   desc "set-permission", "set the permission level of the team"
-  def set_permission(team_name, permission)
-    team = Sem::API::Teams.update(team_name, :permission => permission)
+  def set_permission(srn, permission)
+    org_name, team_name = Sem::SRN.parse_team(srn)
+
+    team = Sem::API::Teams.update(org_name, team_name, :permission => permission)
 
     Sem::Views::Teams.info(team)
   end
 
   desc "delete", "removes a team from your organization"
-  def delete(name)
-    Sem::API::Teams.delete(name)
+  def delete(srn)
+    org_name, team_name = Sem::SRN.parse_team(srn)
 
-    puts "Deleted team #{name}"
+    Sem::API::Teams.delete(org_name, team_name)
+
+    puts "Deleted team #{org_name}/#{team_name}"
   end
 
   class Members < Dracula
     desc "list", "lists members of the team"
-    def list(team_name)
-      members = Sem::API::Users.list_for_team(team_name)
+    def list(team_srn)
+      org_name, team_name = Sem::SRN.parse_team(team_srn)
+
+      members = Sem::API::Users.list_for_team(org_name, team_name)
 
       Sem::Views::Users.list(members)
     end
 
     desc "add", "add a user to the team"
-    def add(team_name, username)
-      Sem::API::Users.add_to_team(team_name, username)
+    def add(team_srn, user_srn)
+      org_name, team_name = Sem::SRN.parse_team(team_srn)
 
-      puts "User #{username} added to the team."
+      Sem::API::Users.add_to_team(org_name, team_name, user_srn)
+
+      puts "User #{user_srn} added to the team."
     end
 
     desc "remove", "removes a user from the team"
-    def remove(team_name, username)
-      Sem::API::Users.remove_from_team(team_name, username)
+    def remove(team_srn, user_srn)
+      org_name, team_name = Sem::SRN.parse_team(team_srn)
 
-      puts "User #{username} removed from the team."
+      Sem::API::Users.remove_from_team(org_name, team_name, user_srn)
+
+      puts "User #{user_srn} removed from the team."
     end
   end
 
   class Projects < Dracula
     desc "list", "lists projects in a team"
-    def list(team_name)
-      projects = Sem::API::Projects.list_for_team(team_name)
+    def list(team_srn)
+      org_name, team_name = Sem::SRN.parse_team(team_srn)
+
+      projects = Sem::API::Projects.list_for_team(org_name, team_name)
 
       Sem::Views::Projects.list(projects)
     end
 
     desc "add", "add a project to a team"
-    def add(team_name, project_name)
-      Sem::API::Projects.add_to_team(team_name, project_name)
+    def add(team_srn, project_srn)
+      org_name, team_name = Sem::SRN.parse_team(team_srn)
+      _, project_name = Sem::SRN.parse_project(project_srn)
 
-      puts "Project #{project_name} added to the team."
+      Sem::API::Projects.add_to_team(org_name, team_name, project_name)
+
+      puts "Project #{org_name}/#{project_name} added to the team."
     end
 
     desc "remove", "removes a project from the team"
-    def remove(team_name, project_name)
-      Sem::API::Projects.remove_from_team(team_name, project_name)
+    def remove(team_srn, project_srn)
+      org_name, team_name = Sem::SRN.parse_team(team_srn)
+      _, project_name = Sem::SRN.parse_project(project_srn)
 
-      puts "Project #{project_name} removed from the team."
+      Sem::API::Projects.remove_from_team(org_name, team_name, project_name)
+
+      puts "Project #{org_name}/#{project_name} removed from the team."
     end
   end
 
   class SharedConfigs < Dracula
     desc "list", "list shared configurations in a team"
-    def list(team_name)
-      configs = Sem::API::SharedConfigs.list_for_team(team_name)
+    def list(team_srn)
+      org_name, team_name = team_srn.split("/")
+
+      configs = Sem::API::SharedConfigs.list_for_team(org_name, team_name)
 
       Sem::Views::SharedConfigs.list(configs)
     end
 
     desc "add", "add a shared configuration to a team"
-    def add(team_name, shared_config_name)
-      Sem::API::SharedConfigs.add_to_team(team_name, shared_config_name)
+    def add(team_srn, shared_config_srn)
+      org_name, team_name = team_srn.split("/")
+      _, shared_config_name = shared_config_srn.split("/")
 
-      puts "Shared Configuration #{shared_config_name} added to the team."
+      Sem::API::SharedConfigs.add_to_team(org_name, team_name, shared_config_name)
+
+      puts "Shared Configuration #{org_name}/#{shared_config_name} added to the team."
     end
 
     desc "remove", "removes a project from the team"
-    def remove(team_name, shared_config_name)
-      Sem::API::SharedConfigs.remove_from_team(team_name, shared_config_name)
+    def remove(team_srn, shared_config_srn)
+      org_name, team_name = team_srn.split("/")
+      _, shared_config_name = shared_config_srn.split("/")
 
-      puts "Shared Configuration #{shared_config_name} removed from the team."
+      Sem::API::SharedConfigs.remove_from_team(org_name, team_name, shared_config_name)
+
+      puts "Shared Configuration #{org_name}/#{shared_config_name} removed from the team."
     end
   end
 

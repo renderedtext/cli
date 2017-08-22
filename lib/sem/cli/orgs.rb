@@ -8,7 +8,9 @@ class Sem::CLI::Orgs < Dracula
   end
 
   desc "info", "shows detailed information about an organization"
-  def info(org_name)
+  def info(srn)
+    org_name = Sem::SRN.parse_org(srn).first
+
     org = Sem::API::Orgs.info(org_name)
 
     Sem::Views::Orgs.info(org)
@@ -27,7 +29,9 @@ class Sem::CLI::Orgs < Dracula
          :default => false,
          :type => :boolean,
          :desc => "list only owners in the organization"
-  def members(org_name)
+  def members(org_srn)
+    org_name = Sem::SRN.parse_org(org_srn).first
+
     raise "Not Implemented" if options[:with_2fa]
 
     users =

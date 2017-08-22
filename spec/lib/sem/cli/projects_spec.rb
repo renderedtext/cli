@@ -39,7 +39,7 @@ describe Sem::CLI::Projects do
     before { allow(Sem::API::Projects).to receive(:info).and_return(project) }
 
     it "calls the API" do
-      expect(Sem::API::Projects).to receive(:info).with("renderedtext/cli")
+      expect(Sem::API::Projects).to receive(:info).with("renderedtext", "cli")
 
       sem_run("projects:info renderedtext/cli")
     end

@@ -8,8 +8,7 @@ describe Sem::API::SharedConfigs do
   let(:client) { instance_double(SemaphoreClient, :shared_configs => class_api) }
 
   let(:org_name) { "org" }
-  let(:instance_path) { "#{org_name}/config" }
-  let(:team_path) { "#{org_name}/team" }
+  let(:team_name) { "team" }
 
   let(:instance_id) { 0 }
   let(:instance_name) { "config" }
@@ -77,11 +76,11 @@ describe Sem::API::SharedConfigs do
     it "calls list_for_org on the described class" do
       expect(described_class).to receive(:list_for_org).with(org_name)
 
-      described_class.info(instance_path)
+      described_class.info(org_name, instance_name)
     end
 
     it "returns the selected instance" do
-      return_value = described_class.info(instance_path)
+      return_value = described_class.info(org_name, instance_name)
 
       expect(return_value).to eql(instance_hash_0)
     end
@@ -120,19 +119,19 @@ describe Sem::API::SharedConfigs do
     end
 
     it "calls info on the described class" do
-      expect(described_class).to receive(:info).with(instance_path)
+      expect(described_class).to receive(:info).with(org_name, instance_name)
 
-      described_class.update(instance_path, args)
+      described_class.update(org_name, instance_name, args)
     end
 
     it "calls delete on the class_api" do
       expect(class_api).to receive(:update).with(instance_id, args)
 
-      described_class.update(instance_path, args)
+      described_class.update(org_name, instance_name, args)
     end
 
     it "returns the instance hash" do
-      return_value = described_class.update(instance_path, args)
+      return_value = described_class.update(org_name, instance_name, args)
 
       expect(return_value).to eql(instance_hash)
     end
@@ -145,15 +144,15 @@ describe Sem::API::SharedConfigs do
     end
 
     it "calls info on the described class" do
-      expect(described_class).to receive(:info).with(instance_path)
+      expect(described_class).to receive(:info).with(org_name, instance_name)
 
-      described_class.delete(instance_path)
+      described_class.delete(org_name, instance_name)
     end
 
     it "calls delete on the class_api" do
       expect(class_api).to receive(:delete).with(instance_id)
 
-      described_class.delete(instance_path)
+      described_class.delete(org_name, instance_name)
     end
   end
 
@@ -163,13 +162,13 @@ describe Sem::API::SharedConfigs do
     before { allow(Sem::API::EnvVars).to receive(:list_for_shared_config).and_return([env_var_hash]) }
 
     it "calls the env_vars api" do
-      expect(Sem::API::EnvVars).to receive(:list_for_shared_config).with(instance_path)
+      expect(Sem::API::EnvVars).to receive(:list_for_shared_config).with(org_name, instance_name)
 
-      described_class.list_env_vars(instance_path)
+      described_class.list_env_vars(org_name, instance_name)
     end
 
     it "returns the env_vars" do
-      return_value = described_class.list_env_vars(instance_path)
+      return_value = described_class.list_env_vars(org_name, instance_name)
 
       expect(return_value).to eql([env_var_hash])
     end
@@ -181,13 +180,13 @@ describe Sem::API::SharedConfigs do
     before { allow(Sem::API::Files).to receive(:list_for_shared_config).and_return([file_hash]) }
 
     it "calls the files api" do
-      expect(Sem::API::Files).to receive(:list_for_shared_config).with(instance_path)
+      expect(Sem::API::Files).to receive(:list_for_shared_config).with(org_name, instance_name)
 
-      described_class.list_files(instance_path)
+      described_class.list_files(org_name, instance_name)
     end
 
     it "returns the files" do
-      return_value = described_class.list_files(instance_path)
+      return_value = described_class.list_files(org_name, instance_name)
 
       expect(return_value).to eql([file_hash])
     end

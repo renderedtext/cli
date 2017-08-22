@@ -10,9 +10,7 @@ module Sem
         org_names.map { |name| list_for_org(name) }.flatten
       end
 
-      def self.info(path)
-        org_name, project_name = path.split("/")
-
+      def self.info(org_name, project_name)
         list_for_org(org_name).find { |project| project[:name] == project_name }
       end
 

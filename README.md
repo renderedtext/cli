@@ -10,6 +10,18 @@ The Semaphore CLI is used to manage Semaphore projects from the command line.
 
 For more info about Semaphore see <https://www.semaphoreci.com>
 
+## Semaphore Resource Name (SRN)
+
+SRN is a way of identifying Semaphore resources. This CLI uses SRNs as arguments
+for all actions.
+
+Formats for individual resources are the following:
+
+- Organization: `organization_name`
+- Team: `organization_name/team_name`
+- Project: `organization_name/project_name`
+- Shared Configuration: `organization_name/shared_configuration_name`
+
 ## Issues
 
 For problems directly related to the CLI, [add an issue on GitHub](https://github.com/renderedtext/cli/issues/new).
