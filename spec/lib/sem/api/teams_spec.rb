@@ -72,6 +72,15 @@ describe Sem::API::Teams do
 
       expect(return_value).to eql(instance_hash_0)
     end
+
+    context "resource not found" do
+      before { allow(described_class).to receive(:list_for_org).and_return([]) }
+
+      it "raises an exception" do
+        expect { described_class.info(org_name, instance_name) }.to raise_exception(Sem::Errors::ResourceNotFound,
+                                                                                    "#{org_name}/#{instance_name}")
+      end
+    end
   end
 
   describe ".create" do

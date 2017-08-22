@@ -3,51 +3,59 @@ module Sem
     class Teams < Base
       extend Traits::AssociatedWithOrg
 
-      def self.list
-        org_names = Sem::API::Orgs.list.map { |org| org[:username] }
+      class << self
+        def list
+          org_names = Sem::API::Orgs.list.map { |org| org[:username] }
 
-        org_names.map { |name| list_for_org(name) }.flatten
-      end
+          org_names.map { |name| list_for_org(name) }.flatten
+        end
 
-      def self.info(org_name, team_name)
-        list_for_org(org_name).find { |team| team[:name] == team_name }
-      end
+        def info(org_name, team_name)
+          selected_team = list_for_org(org_name).find { |team| team[:name] == team_name }
 
-      def self.create(org_name, args)
-        team = api.create_for_org(org_name, args)
+          raise_not_found([org_name, team_name]) if selected_team.nil?
 
-        to_hash(team)
-      end
+          selected_team
+        end
 
-      def self.update(org_name, team_name, args)
-        team = info(org_name, team_name)
+        def create(org_name, args)
+          team = api.create_for_org(org_name, args)
 
-        team = api.update(team[:id], args)
+          to_hash(team)
+        end
 
-        to_hash(team)
-      end
+        def update(org_name, team_name, args)
+          team = info(org_name, team_name)
 
-      def self.delete(org_name, team_name)
-        id = info(org_name, team_name)[:id]
+          raise_not_found([org_name, team_name]) if team.nil?
 
-        api.delete(id)
-      end
+          team = api.update(team[:id], args)
 
-      def self.api
-        client.teams
-      end
+          to_hash(team)
+        end
 
-      def self.to_hash(team)
-        return if team.nil?
+        def delete(org_name, team_name)
+          team = info(org_name, team_name)
 
-        {
-          :id => team.id,
-          :name => team.name,
-          :permission => team.permission,
-          :members => client.users.list_for_team(team.id).to_a.size.to_s,
-          :created_at => team.created_at,
-          :updated_at => team.updated_at
-        }
+          raise_not_found([org_name, team_name]) if team.nil?
+
+          api.delete(team[:id])
+        end
+
+        def api
+          client.teams
+        end
+
+        def to_hash(team)
+          {
+            :id => team.id,
+            :name => team.name,
+            :permission => team.permission,
+            :members => client.users.list_for_team(team.id).to_a.size.to_s,
+            :created_at => team.created_at,
+            :updated_at => team.updated_at
+          }
+        end
       end
     end
   end

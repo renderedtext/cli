@@ -21,6 +21,8 @@ module Sem
 
           selected_instance = instances.find { |instance| instance[:name] == instance_name }
 
+          raise_not_found([org_name, instance_name]) if selected_instance.nil?
+
           api.delete(selected_instance[:id])
         end
       end

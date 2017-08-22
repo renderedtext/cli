@@ -1,11 +1,17 @@
 module Sem
   module API
     class Base
-      def self.client
-        @client ||= SemaphoreClient.new(
-          Sem::Configuration.auth_token,
-          Sem::Configuration.api_url
-        )
+      class << self
+        def client
+          @client ||= SemaphoreClient.new(
+            Sem::Configuration.auth_token,
+            Sem::Configuration.api_url
+          )
+        end
+
+        def raise_not_found(path)
+          raise Sem::Errors::ResourceNotFound, path.join("/")
+        end
       end
     end
   end
