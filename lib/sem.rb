@@ -46,7 +46,7 @@ module Sem
     def on_resource_not_found(exception)
       puts "[ERROR] Resource not found."
       puts ""
-      puts "Resource not found: #{exception.message}"
+      puts exception.message
     end
 
     def on_invalid_srn(exception)

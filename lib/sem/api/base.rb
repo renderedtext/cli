@@ -9,8 +9,8 @@ module Sem
           )
         end
 
-        def raise_not_found(path)
-          raise Sem::Errors::ResourceNotFound, path.join("/")
+        def raise_not_found(resource, path)
+          raise Sem::Errors::ResourceNotFound, "#{resource} #{path.join("/")} not found."
         end
       end
     end

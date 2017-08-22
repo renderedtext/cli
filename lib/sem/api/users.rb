@@ -16,7 +16,7 @@ module Sem
 
           selected_user = list.find { |user| user[:id] == name }
 
-          raise_not_found([name]) if selected_user.nil?
+          raise_not_found("User", [name]) if selected_user.nil?
 
           selected_user
         end

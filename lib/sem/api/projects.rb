@@ -14,7 +14,7 @@ module Sem
         def info(org_name, project_name)
           selected_project = list_for_org(org_name).find { |project| project[:name] == project_name }
 
-          raise_not_found([org_name, project_name]) if selected_project.nil?
+          raise_not_found("Project", [org_name, project_name]) if selected_project.nil?
 
           selected_project
         end

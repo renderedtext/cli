@@ -16,7 +16,7 @@ module Sem
             shared_config[:name] == shared_config_name
           end
 
-          raise_not_found([org_name, shared_config_name]) if selected_shared_config.nil?
+          raise_not_found("Shared Configuration", [org_name, shared_config_name]) if selected_shared_config.nil?
 
           selected_shared_config
         end
@@ -30,7 +30,7 @@ module Sem
         def update(org_name, shared_config_name, args)
           shared_config = info(org_name, shared_config_name)
 
-          raise_not_found([org_name, shared_config_name]) if shared_config.nil?
+          raise_not_found("Shared Configuration", [org_name, shared_config_name]) if shared_config.nil?
 
           shared_config = api.update(shared_config[:id], args)
 
@@ -40,7 +40,7 @@ module Sem
         def delete(org_name, shared_config_name)
           shared_config = info(org_name, shared_config_name)
 
-          raise_not_found([org_name, shared_config_name]) if shared_config.nil?
+          raise_not_found("Shared Configuration", [org_name, shared_config_name]) if shared_config.nil?
 
           api.delete(shared_config[:id])
         end

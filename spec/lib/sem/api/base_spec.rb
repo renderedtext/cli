@@ -25,8 +25,10 @@ describe Sem::API::Base do
 
   describe ".raise_not_found" do
     it "raises the exception with the resource path" do
-      expect { described_class.raise_not_found(["org", "team"]) }.to raise_exception(Sem::Errors::ResourceNotFound,
-                                                                                     "org/team")
+      expect { described_class.raise_not_found("Resource", ["org", "team"]) }.to raise_exception(
+        Sem::Errors::ResourceNotFound,
+        "Resource org/team not found."
+      )
     end
   end
 end

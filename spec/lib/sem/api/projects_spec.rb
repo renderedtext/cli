@@ -87,8 +87,10 @@ describe Sem::API::Projects do
       before { allow(described_class).to receive(:list_for_org).and_return([]) }
 
       it "raises an exception" do
+        expected_message = "Project #{org_name}/#{instance_name} not found."
+
         expect { described_class.info(org_name, instance_name) }.to raise_exception(Sem::Errors::ResourceNotFound,
-                                                                                    "#{org_name}/#{instance_name}")
+                                                                                    expected_message)
       end
     end
   end

@@ -13,7 +13,7 @@ module Sem
         def info(org_name, team_name)
           selected_team = list_for_org(org_name).find { |team| team[:name] == team_name }
 
-          raise_not_found([org_name, team_name]) if selected_team.nil?
+          raise_not_found("Team", [org_name, team_name]) if selected_team.nil?
 
           selected_team
         end
@@ -27,7 +27,7 @@ module Sem
         def update(org_name, team_name, args)
           team = info(org_name, team_name)
 
-          raise_not_found([org_name, team_name]) if team.nil?
+          raise_not_found("Team", [org_name, team_name]) if team.nil?
 
           team = api.update(team[:id], args)
 
@@ -37,7 +37,7 @@ module Sem
         def delete(org_name, team_name)
           team = info(org_name, team_name)
 
-          raise_not_found([org_name, team_name]) if team.nil?
+          raise_not_found("Team", [org_name, team_name]) if team.nil?
 
           api.delete(team[:id])
         end
