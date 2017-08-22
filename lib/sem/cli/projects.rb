@@ -8,8 +8,8 @@ class Sem::CLI::Projects < Dracula
   end
 
   desc "info", "shows detailed information about a project"
-  def info(path)
-    org_name, project_name = path.split("/")
+  def info(srn)
+    org_name, project_name = Sem::SRN.parse_project(srn)
 
     project = Sem::API::Projects.info(org_name, project_name)
 

@@ -7,6 +7,7 @@ require "pmap"
 module Sem
   require "sem/errors"
   require "sem/credentials"
+  require "sem/srn"
   require "sem/cli"
   require "sem/api"
   require "sem/views"
@@ -18,6 +19,10 @@ module Sem
       Sem::CLI.start(args)
 
       0
+    rescue Sem::Errors::InvalidSRN => e
+      on_invalid_srn(e)
+
+      1
     rescue Sem::Errors::Auth::NoCredentials
       on_no_credentials
 
@@ -33,6 +38,12 @@ module Sem
     end
 
     private
+
+    def on_invalid_srn(exception)
+      puts "[ERROR] Invalid parameter."
+      puts ""
+      puts exception.message
+    end
 
     def on_no_credentials
       puts "[ERROR] You are not logged in."

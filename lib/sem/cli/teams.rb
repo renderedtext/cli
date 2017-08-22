@@ -8,8 +8,8 @@ class Sem::CLI::Teams < Dracula
   end
 
   desc "info", "show information about a team"
-  def info(path)
-    org_name, team_name = path.split("/")
+  def info(srn)
+    org_name, team_name = Sem::SRN.parse_team(srn)
 
     team = Sem::API::Teams.info(org_name, team_name)
 
@@ -20,8 +20,8 @@ class Sem::CLI::Teams < Dracula
   option :permission, :default => "read",
                       :aliases => "-p",
                       :desc => "Permission level of the team in the organization"
-  def create(path)
-    org_name, team_name = path.split("/")
+  def create(srn)
+    org_name, team_name = Sem::SRN.parse_team(srn)
 
     team = Sem::API::Teams.create(org_name,
                                   :name => team_name,
@@ -31,9 +31,9 @@ class Sem::CLI::Teams < Dracula
   end
 
   desc "rename", "change the name of the team"
-  def rename(old_path, new_path)
-    org_name, old_name = old_path.split("/")
-    _, new_name = new_path.split("/")
+  def rename(old_srn, new_srn)
+    org_name, old_name = Sem::SRN.parse_team(old_srn)
+    _, new_name = Sem::SRN.parse_team(new_srn)
 
     team = Sem::API::Teams.update(org_name, old_name, :name => new_name)
 
@@ -41,8 +41,8 @@ class Sem::CLI::Teams < Dracula
   end
 
   desc "set-permission", "set the permission level of the team"
-  def set_permission(path, permission)
-    org_name, team_name = path.split("/")
+  def set_permission(srn, permission)
+    org_name, team_name = Sem::SRN.parse_team(srn)
 
     team = Sem::API::Teams.update(org_name, team_name, :permission => permission)
 
@@ -50,8 +50,8 @@ class Sem::CLI::Teams < Dracula
   end
 
   desc "delete", "removes a team from your organization"
-  def delete(path)
-    org_name, team_name = path.split("/")
+  def delete(srn)
+    org_name, team_name = Sem::SRN.parse_team(srn)
 
     Sem::API::Teams.delete(org_name, team_name)
 
@@ -60,8 +60,8 @@ class Sem::CLI::Teams < Dracula
 
   class Members < Dracula
     desc "list", "lists members of the team"
-    def list(team_path)
-      org_name, team_name = team_path.split("/")
+    def list(team_srn)
+      org_name, team_name = Sem::SRN.parse_team(team_srn)
 
       members = Sem::API::Users.list_for_team(org_name, team_name)
 
@@ -69,28 +69,28 @@ class Sem::CLI::Teams < Dracula
     end
 
     desc "add", "add a user to the team"
-    def add(team_path, username)
-      org_name, team_name = team_path.split("/")
+    def add(team_srn, user_srn)
+      org_name, team_name = Sem::SRN.parse_team(team_srn)
 
-      Sem::API::Users.add_to_team(org_name, team_name, username)
+      Sem::API::Users.add_to_team(org_name, team_name, user_srn)
 
-      puts "User #{username} added to the team."
+      puts "User #{user_srn} added to the team."
     end
 
     desc "remove", "removes a user from the team"
-    def remove(team_path, username)
-      org_name, team_name = team_path.split("/")
+    def remove(team_srn, user_srn)
+      org_name, team_name = Sem::SRN.parse_team(team_srn)
 
-      Sem::API::Users.remove_from_team(org_name, team_name, username)
+      Sem::API::Users.remove_from_team(org_name, team_name, user_srn)
 
-      puts "User #{username} removed from the team."
+      puts "User #{user_srn} removed from the team."
     end
   end
 
   class Projects < Dracula
     desc "list", "lists projects in a team"
-    def list(team_path)
-      org_name, team_name = team_path.split("/")
+    def list(team_srn)
+      org_name, team_name = Sem::SRN.parse_team(team_srn)
 
       projects = Sem::API::Projects.list_for_team(org_name, team_name)
 
@@ -98,9 +98,9 @@ class Sem::CLI::Teams < Dracula
     end
 
     desc "add", "add a project to a team"
-    def add(team_path, project_path)
-      org_name, team_name = team_path.split("/")
-      _, project_name = project_path.split("/")
+    def add(team_srn, project_srn)
+      org_name, team_name = Sem::SRN.parse_team(team_srn)
+      _, project_name = Sem::SRN.parse_project(project_srn)
 
       Sem::API::Projects.add_to_team(org_name, team_name, project_name)
 
@@ -108,9 +108,9 @@ class Sem::CLI::Teams < Dracula
     end
 
     desc "remove", "removes a project from the team"
-    def remove(team_path, project_path)
-      org_name, team_name = team_path.split("/")
-      _, project_name = project_path.split("/")
+    def remove(team_srn, project_srn)
+      org_name, team_name = Sem::SRN.parse_team(team_srn)
+      _, project_name = Sem::SRN.parse_project(project_srn)
 
       Sem::API::Projects.remove_from_team(org_name, team_name, project_name)
 
@@ -120,8 +120,8 @@ class Sem::CLI::Teams < Dracula
 
   class SharedConfigs < Dracula
     desc "list", "list shared configurations in a team"
-    def list(team_path)
-      org_name, team_name = team_path.split("/")
+    def list(team_srn)
+      org_name, team_name = team_srn.split("/")
 
       configs = Sem::API::SharedConfigs.list_for_team(org_name, team_name)
 
@@ -129,9 +129,9 @@ class Sem::CLI::Teams < Dracula
     end
 
     desc "add", "add a shared configuration to a team"
-    def add(team_path, shared_config_path)
-      org_name, team_name = team_path.split("/")
-      _, shared_config_name = shared_config_path.split("/")
+    def add(team_srn, shared_config_srn)
+      org_name, team_name = team_srn.split("/")
+      _, shared_config_name = shared_config_srn.split("/")
 
       Sem::API::SharedConfigs.add_to_team(org_name, team_name, shared_config_name)
 
@@ -139,9 +139,9 @@ class Sem::CLI::Teams < Dracula
     end
 
     desc "remove", "removes a project from the team"
-    def remove(team_path, shared_config_path)
-      org_name, team_name = team_path.split("/")
-      _, shared_config_name = shared_config_path.split("/")
+    def remove(team_srn, shared_config_srn)
+      org_name, team_name = team_srn.split("/")
+      _, shared_config_name = shared_config_srn.split("/")
 
       Sem::API::SharedConfigs.remove_from_team(org_name, team_name, shared_config_name)
 
