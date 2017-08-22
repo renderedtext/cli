@@ -4,7 +4,8 @@ describe Sem::Views::Teams do
   let(:team) do
     {
       :id => "3bc7ed43-ac8a-487e-b488-c38bc757a034",
-      :name => "renderedtext/developers",
+      :name => "developers",
+      :org => "renderedtext",
       :permission => "write",
       :members => "72",
       :created_at => "2017-08-01 13:14:40 +0200",
