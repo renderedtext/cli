@@ -59,6 +59,18 @@ describe Sem::Configuration do
     end
   end
 
+  describe ".logout" do
+    before do
+      allow(FileUtils).to receive(:rm_f)
+    end
+
+    it "removes the file by force" do
+      allow(FileUtils).to receive(:rm_f).with(Sem::Configuration::CREDENTIALS_PATH)
+
+      described_class.delete_auth_token
+    end
+  end
+
   describe ".auth_token" do
     context "credentials file exists" do
       before do
