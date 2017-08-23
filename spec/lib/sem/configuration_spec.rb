@@ -12,8 +12,9 @@ describe Sem::Configuration do
     let(:client) { instance_double(SemaphoreClient, :orgs => orgs_api) }
 
     before do
+      options = { :api_url => api_url, :verbose => false }
       allow(described_class).to receive(:api_url).and_return(api_url)
-      allow(SemaphoreClient).to receive(:new).with(auth_token, api_url).and_return(client)
+      allow(SemaphoreClient).to receive(:new).with(auth_token, options).and_return(client)
     end
 
     context "listing orgs fails" do
