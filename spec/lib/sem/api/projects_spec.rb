@@ -90,7 +90,7 @@ describe Sem::API::Projects do
       it "raises an exception" do
         expected_message = "Project #{org_name}/#{instance_name} not found."
 
-        expect { described_class.info(org_name, instance_name) }.to raise_exception(Sem::Errors::ResourceNotFound,
+        expect { described_class.info(org_name, instance_name) }.to raise_exception(Sem::Errors::Resource::NotFound,
                                                                                     expected_message)
       end
     end

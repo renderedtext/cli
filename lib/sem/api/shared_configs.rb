@@ -24,6 +24,8 @@ module Sem
         def create(org_name, args)
           shared_config = api.create_for_org(org_name, args)
 
+          raise_not_created("Shared Configuration", [org_name, args["name"]]) if shared_config.nil?
+
           to_hash(shared_config, org_name)
         end
 
@@ -33,6 +35,8 @@ module Sem
           raise_not_found("Shared Configuration", [org_name, shared_config_name]) if shared_config.nil?
 
           shared_config = api.update(shared_config[:id], args)
+
+          raise_not_updated("Shared Configuration", [org_name, shared_config_name]) if shared_config.nil?
 
           to_hash(shared_config, org_name)
         end
