@@ -7,7 +7,12 @@ module Sem
 
     class << self
       def valid_auth_token?(auth_token)
-        client = SemaphoreClient.new(auth_token, api_url)
+        client = SemaphoreClient.new(
+          auth_token,
+          :api_url => api_url,
+          :verbose => (Sem.log_level == Sem::LOG_LEVEL_TRACE)
+        )
+
         client.orgs.list!
 
         true
