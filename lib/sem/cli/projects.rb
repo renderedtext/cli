@@ -8,8 +8,8 @@ class Sem::CLI::Projects < Dracula
   end
 
   desc "info", "shows detailed information about a project"
-  def info(srn)
-    org_name, project_name = Sem::SRN.parse_project(srn)
+  def info(semaphore_resource_name)
+    org_name, project_name = Sem::SRN.parse_project(semaphore_resource_name)
 
     project = Sem::API::Projects.info(org_name, project_name).to_h
 

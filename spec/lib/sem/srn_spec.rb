@@ -75,4 +75,24 @@ describe Sem::SRN do
       end
     end
   end
+
+  describe ".parse_user" do
+    context "format is valid" do
+      it "returns the user name" do
+        return_value = described_class.parse_user("user")
+
+        expect(return_value).to eql(["user"])
+      end
+    end
+
+    context "format is invalid" do
+      it "raises an exception" do
+        expected_message = "Invalid format for user: \"\".\n" \
+          "Required format is: \"user\"."
+
+        expect { described_class.parse_user(nil) }.to raise_exception(Sem::Errors::InvalidSRN,
+                                                                      expected_message)
+      end
+    end
+  end
 end
