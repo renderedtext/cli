@@ -33,8 +33,8 @@ module Sem
       Sem::CLI.start(args)
 
       0
-    rescue Sem::Errors::ResourceNotFound => e
-      on_resource_not_found(e)
+    rescue Sem::Errors::Resource => e
+      on_resource_exception(e)
 
       1
     rescue Sem::Errors::InvalidSRN => e
@@ -57,8 +57,8 @@ module Sem
 
     private
 
-    def on_resource_not_found(exception)
-      puts "[ERROR] Resource not found."
+    def on_resource_exception(exception)
+      puts "[ERROR] Resource operation failed."
       puts ""
       puts exception.message
     end

@@ -89,7 +89,7 @@ describe Sem::API::Teams do
       it "raises an exception" do
         expected_message = "Team #{org_name}/#{instance_name} not found."
 
-        expect { described_class.info(org_name, instance_name) }.to raise_exception(Sem::Errors::ResourceNotFound,
+        expect { described_class.info(org_name, instance_name) }.to raise_exception(Sem::Errors::Resource::NotFound,
                                                                                     expected_message)
       end
     end
@@ -124,7 +124,7 @@ describe Sem::API::Teams do
 
     before do
       allow(described_class).to receive(:info).and_return(instance_hash)
-      allow(class_api).to receive(:update)
+      allow(class_api).to receive(:update).and_return(instance)
     end
 
     it "calls info on the described class" do
