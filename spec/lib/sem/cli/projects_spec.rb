@@ -84,4 +84,81 @@ describe Sem::CLI::Projects do
       expect(stderr).to eq("")
     end
   end
+
+  describe Sem::CLI::Projects::SharedConfigs do
+    describe "#list" do
+      let(:config_0) do
+        {
+          :id => "3bc7ed43-ac8a-487e-b488-c38bc757a034",
+          :name => "renderedtext/aws-tokens",
+          :config_files => 2,
+          :env_vars => 1
+        }
+      end
+
+      let(:config_1) do
+        {
+          :id => "fe3624cf-0cea-4d87-9dde-cb9ddacfefc0",
+          :name => "renderedtext/gemfury",
+          :config_files => 1,
+          :env_vars => 2
+        }
+      end
+
+      before { allow(Sem::API::SharedConfigs).to receive(:list_for_project).and_return([config_0, config_1]) }
+
+      it "calls the configs API" do
+        expect(Sem::API::SharedConfigs).to receive(:list_for_project).with("renderedtext", "prj1")
+
+        sem_run("projects:shared-configs:list renderedtext/prj1")
+      end
+
+      it "lists shared configurations on a project" do
+        stdout, stderr = sem_run("projects:shared-configs:list renderedtext/prj1")
+
+        msg = [
+          "ID                                    NAME                     CONFIG FILES  ENV VARS",
+          "3bc7ed43-ac8a-487e-b488-c38bc757a034  renderedtext/aws-tokens             2         1",
+          "fe3624cf-0cea-4d87-9dde-cb9ddacfefc0  renderedtext/gemfury                1         2"
+        ]
+
+        expect(stderr).to eq("")
+        expect(stdout.strip).to eq(msg.join("\n"))
+      end
+    end
+
+    describe "#add" do
+      before { allow(Sem::API::SharedConfigs).to receive(:add_to_project) }
+
+      it "calls the projects API" do
+        expect(Sem::API::SharedConfigs).to receive(:add_to_project).with("rt", "prj1", "aws-tokens")
+
+        sem_run("projects:shared-configs:add rt/prj1 rt/aws-tokens")
+      end
+
+      it "add a project to the team" do
+        stdout, stderr = sem_run("projects:shared-configs:add rt/prj1 rt/aws-tokens")
+
+        expect(stderr).to eq("")
+        expect(stdout.strip).to eq("Shared Configuration rt/aws-tokens added to the project.")
+      end
+    end
+
+    describe "#remove" do
+      before { allow(Sem::API::SharedConfigs).to receive(:remove_from_project) }
+
+      it "calls the projects API" do
+        expect(Sem::API::SharedConfigs).to receive(:remove_from_project).with("rt", "prj1", "tokens")
+
+        sem_run("projects:shared-configs:remove rt/prj1 rt/tokens")
+      end
+
+      it "removes a project from the team" do
+        stdout, stderr = sem_run("projects:shared-configs:remove rt/prj1 rt/aws-tokens")
+
+        expect(stderr).to eq("")
+        expect(stdout.strip).to eq("Shared Configuration rt/aws-tokens removed from the project.")
+      end
+    end
+  end
 end

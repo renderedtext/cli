@@ -109,6 +109,8 @@ class Sem::CLI::Teams < Dracula
       org_name, team_name = Sem::SRN.parse_team(team)
       _, project_name = Sem::SRN.parse_project(project)
 
+      # TODO org_name must be the same cc @ijovan
+
       Sem::API::Projects.add_to_team(org_name, team_name, project_name)
 
       puts "Project #{org_name}/#{project_name} added to the team."
@@ -118,6 +120,8 @@ class Sem::CLI::Teams < Dracula
     def remove(team, project)
       org_name, team_name = Sem::SRN.parse_team(team)
       _, project_name = Sem::SRN.parse_project(project)
+
+      # TODO org_name must be the same cc @ijovan
 
       Sem::API::Projects.remove_from_team(org_name, team_name, project_name)
 
@@ -140,15 +144,19 @@ class Sem::CLI::Teams < Dracula
       org_name, team_name = Sem::SRN.parse_team(team)
       _, shared_config_name = Sem::SRN.parse_shared_config(shared_config)
 
+      # TODO org_name must be the same cc @ijovan
+
       Sem::API::SharedConfigs.add_to_team(org_name, team_name, shared_config_name)
 
       puts "Shared Configuration #{org_name}/#{shared_config_name} added to the team."
     end
 
-    desc "remove", "removes a project from the team"
+    desc "remove", "removes a shared Configuration from the team"
     def remove(team, shared_config)
       org_name, team_name = Sem::SRN.parse_team(team)
       _, shared_config_name = Sem::SRN.parse_shared_config(shared_config)
+
+      # TODO org_name must be the same cc @ijovan
 
       Sem::API::SharedConfigs.remove_from_team(org_name, team_name, shared_config_name)
 
