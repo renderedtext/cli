@@ -4,14 +4,15 @@ describe Sem::CLI::Projects do
   let(:project) do
     {
       :id => "3bc7ed43-ac8a-487e-b488-c38bc757a034",
-      :name => "renderedtext/cli",
+      :name => "cli",
+      :org => "renderedtext",
       :created_at => "2017-08-01 13:14:40 +0200",
       :updated_at => "2017-08-02 13:14:40 +0200"
     }
   end
 
   describe "#list" do
-    let(:another_project) { { :id => "fe3624cf-0cea-4d87-9dde-cb9ddacfefc0", :name => "tb-render/api" } }
+    let(:another_project) { { :id => "fe3624cf-0cea-4d87-9dde-cb9ddacfefc0", :name => "api", :org => "tb-render" } }
 
     before { allow(Sem::API::Projects).to receive(:list).and_return([project, another_project]) }
 
