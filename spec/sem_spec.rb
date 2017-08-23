@@ -62,7 +62,7 @@ RSpec.describe Sem do
       msg = [
         "[PANIC] Unhandled error.",
         "",
-        "Well, this is emberassing. An unknown error was detected.",
+        "Well, this is embarrassing. An unknown error was detected.",
         "",
         "Exception:",
         "Haisenberg",

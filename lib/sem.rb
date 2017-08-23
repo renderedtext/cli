@@ -12,7 +12,6 @@ module Sem
   require "sem/cli"
   require "sem/api"
   require "sem/views"
-
   LOG_LEVEL_TRACE = :trace
   LOG_LEVEL_ERROR = :error
 
@@ -95,7 +94,7 @@ module Sem
     def on_unhandled_error(exception)
       puts "[PANIC] Unhandled error."
       puts ""
-      puts "Well, this is emberassing. An unknown error was detected."
+      puts "Well, this is embarrassing. An unknown error was detected."
       puts ""
       puts "Exception:"
       puts exception.message
