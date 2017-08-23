@@ -47,4 +47,27 @@ describe Sem::CLI do
     end
   end
 
+  describe "#logout" do
+    before do
+      allow(Sem::Configuration).to receive(:delete_auth_token)
+    end
+
+    it "displays a log out message" do
+      stdout, stderr = sem_run("logout")
+
+      msg = [
+        "Loged out."
+      ]
+
+      expect(stdout.strip).to eq(msg.join("\n"))
+      expect(stderr.strip).to eq("")
+    end
+
+    it "deletes the auth token from the system" do
+      expect(Sem::Configuration).to receive(:delete_auth_token)
+
+      sem_run("logout")
+    end
+  end
+
 end

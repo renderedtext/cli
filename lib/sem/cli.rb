@@ -21,6 +21,13 @@ module Sem
       end
     end
 
+    desc "logout", "log out from semaphore"
+    def logout
+      Sem::Configuration.delete_auth_token
+
+      puts "Loged out."
+    end
+
     register "orgs", "manage organizations", Sem::CLI::Orgs
     register "teams", "manage teams and team membership", Sem::CLI::Teams
     register "shared-configs", "manage shared configurations", Sem::CLI::SharedConfigs

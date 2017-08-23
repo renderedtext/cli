@@ -23,6 +23,10 @@ module Sem
         File.chmod(0o0600, CREDENTIALS_PATH)
       end
 
+      def delete_auth_token
+        FileUtils.rm_f(CREDENTIALS_PATH)
+      end
+
       def auth_token
         raise Sem::Errors::Auth::NoCredentials unless File.file?(CREDENTIALS_PATH)
 
