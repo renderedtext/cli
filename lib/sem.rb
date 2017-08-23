@@ -68,7 +68,7 @@ module Sem
     end
 
     def on_invalid_srn(exception)
-      puts "[ERROR] Invalid parameter."
+      puts "[ERROR] Invalid parameter formatting."
       puts ""
       puts exception.message
     end

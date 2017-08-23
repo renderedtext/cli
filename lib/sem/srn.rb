@@ -31,7 +31,7 @@ class Sem::SRN
       resource = format_tokens.last.split("_").tap(&:pop).join("_")
 
       if srn_tokens.count != format_tokens.count
-        message = "Invalid format for #{resource}: \"#{semaphore_resource_name}\".\n" \
+        message = "Invalid formatting for #{resource.upcase} parameter: \"#{semaphore_resource_name}\".\n" \
           "Required format is: \"#{format}\"."
 
         raise Sem::Errors::InvalidSRN, message
