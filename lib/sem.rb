@@ -37,6 +37,10 @@ module Sem
       on_resource_exception(e)
 
       1
+    rescue Sem::Errors::InvalidParameter => e
+      on_invalid_parameter(e)
+
+      1
     rescue Sem::Errors::InvalidSRN => e
       on_invalid_srn(e)
 
@@ -64,6 +68,12 @@ module Sem
     end
 
     def on_invalid_srn(exception)
+      puts "[ERROR] Invalid parameter."
+      puts ""
+      puts exception.message
+    end
+
+    def on_invalid_parameter(exception)
       puts "[ERROR] Invalid parameter."
       puts ""
       puts exception.message

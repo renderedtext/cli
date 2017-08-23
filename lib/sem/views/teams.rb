@@ -4,7 +4,7 @@ class Sem::Views::Teams < Sem::Views::Base
       header = ["ID", "NAME", "PERMISSION", "MEMBERS"]
 
       body = teams.map do |team|
-        [team[:id], "#{team[:org]}/#{team[:name]}", team[:permission], "#{team[:members]} members"]
+        [team[:id], "#{team[:org]}/#{team[:name]}", permission(team), "#{team[:members]} members"]
       end
 
       print_table [header, *body]
@@ -14,7 +14,7 @@ class Sem::Views::Teams < Sem::Views::Base
       print_table [
         ["ID", team[:id]],
         ["Name", name(team)],
-        ["Permission", team[:permission]],
+        ["Permission", permission(team)],
         ["Members", members(team)],
         ["Created", team[:created_at]],
         ["Updated", team[:updated_at]]
@@ -33,6 +33,12 @@ class Sem::Views::Teams < Sem::Views::Base
       return unless team[:members]
 
       "#{team[:members]} members"
+    end
+
+    def permission(team)
+      return "write" if team[:permission] == "edit"
+
+      team[:permission]
     end
   end
 end

@@ -42,6 +42,11 @@ class Sem::CLI::Teams < Dracula
 
   desc "set-permission", "set the permission level of the team"
   def set_permission(semaphore_resource_name, permission)
+    unless ["read", "write", "admin"].include?(permission)
+      raise Sem::Errors::InvalidParameter, "Permission \"#{permission}\" doesn't exist.\n" \
+        "Choose one of the following: read, write, admin."
+    end
+
     org_name, team_name = Sem::SRN.parse_team(semaphore_resource_name)
 
     team = Sem::API::Teams.update(org_name, team_name, :permission => permission)
