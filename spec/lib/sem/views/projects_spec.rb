@@ -4,7 +4,8 @@ describe Sem::Views::Projects do
   let(:project) do
     {
       :id => "3bc7ed43-ac8a-487e-b488-c38bc757a034",
-      :name => "renderedtext/cli",
+      :name => "cli",
+      :org => "renderedtext",
       :created_at => "2017-08-01 13:14:40 +0200",
       :updated_at => "2017-08-02 13:14:40 +0200"
     }
@@ -14,7 +15,7 @@ describe Sem::Views::Projects do
     it "returns the projects in table format" do
       expected_value = [
         ["ID", "NAME"],
-        [project[:id], project[:name]]
+        ["3bc7ed43-ac8a-487e-b488-c38bc757a034", "renderedtext/cli"]
       ]
 
       expect(Sem::Views::Projects).to receive(:print_table).with(expected_value)
