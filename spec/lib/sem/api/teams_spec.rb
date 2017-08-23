@@ -10,7 +10,17 @@ describe Sem::API::Teams do
   let(:instance_name) { "instance" }
 
   let(:instance_id) { 0 }
-  let(:instance_hash) { { :id => instance_id } }
+  let(:instance_hash) do
+    {
+      :id => instance_id,
+      :name => instance.name,
+      :org => org_name,
+      :permission => instance.permission,
+      :members => "2",
+      :created_at => instance.created_at,
+      :updated_at => instance.updated_at
+    }
+  end
 
   let(:instance) do
     instance_double(SemaphoreClient::Model::Team,
@@ -97,7 +107,7 @@ describe Sem::API::Teams do
     end
 
     it "converts the instance to instacen hash" do
-      expect(described_class).to receive(:to_hash).with(instance)
+      expect(described_class).to receive(:to_hash).with(instance, org_name)
 
       described_class.create(org_name, args)
     end
@@ -176,20 +186,13 @@ describe Sem::API::Teams do
     it "lists the users" do
       expect(users_api).to receive(:list_for_team).with(instance_id)
 
-      described_class.to_hash(instance)
+      described_class.to_hash(instance, org_name)
     end
 
     it "returns the hash" do
-      return_value = described_class.to_hash(instance)
+      return_value = described_class.to_hash(instance, org_name)
 
-      expect(return_value).to eql(
-        :id => instance_id,
-        :name => instance.name,
-        :permission => instance.permission,
-        :members => "2",
-        :created_at => instance.created_at,
-        :updated_at => instance.updated_at
-      )
+      expect(return_value).to eql(instance_hash)
     end
   end
 end

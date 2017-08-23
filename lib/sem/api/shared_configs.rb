@@ -24,7 +24,7 @@ module Sem
         def create(org_name, args)
           shared_config = api.create_for_org(org_name, args)
 
-          to_hash(shared_config)
+          to_hash(shared_config, org_name)
         end
 
         def update(org_name, shared_config_name, args)
@@ -34,7 +34,7 @@ module Sem
 
           shared_config = api.update(shared_config[:id], args)
 
-          to_hash(shared_config)
+          to_hash(shared_config, org_name)
         end
 
         def delete(org_name, shared_config_name)
@@ -57,10 +57,11 @@ module Sem
           client.shared_configs
         end
 
-        def to_hash(shared_config)
+        def to_hash(shared_config, org)
           {
             :id => shared_config.id,
             :name => shared_config.name,
+            :org => org,
             :config_files => config_files_count(shared_config.id),
             :env_vars => env_vars_count(shared_config.id),
             :created_at => shared_config.created_at,
