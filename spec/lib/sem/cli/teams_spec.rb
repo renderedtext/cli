@@ -14,35 +14,58 @@ describe Sem::CLI::Teams do
   end
 
   describe "#list" do
-    let(:another_team) do
-      {
-        :id => "fe3624cf-0cea-4d87-9dde-cb9ddacfefc0",
-        :name => "developers",
-        :org => "tb-render",
-        :permission => "admin",
-        :members => "3"
-      }
+    context "when the user has several teams" do
+      let(:another_team) do
+        {
+          :id => "fe3624cf-0cea-4d87-9dde-cb9ddacfefc0",
+          :name => "developers",
+          :org => "tb-render",
+          :permission => "admin",
+          :members => "3"
+        }
+      end
+
+      before { allow(Sem::API::Teams).to receive(:list).and_return([team, another_team]) }
+
+      it "calls the API" do
+        expect(Sem::API::Teams).to receive(:list)
+
+        sem_run("teams:list")
+      end
+
+      it "lists the teams" do
+        stdout, stderr = sem_run("teams:list")
+
+        msg = [
+          "ID                                    NAME                     PERMISSION  MEMBERS",
+          "3bc7ed43-ac8a-487e-b488-c38bc757a034  renderedtext/developers  write       72 members",
+          "fe3624cf-0cea-4d87-9dde-cb9ddacfefc0  tb-render/developers     admin       3 members"
+        ]
+
+        expect(stdout.strip).to eq(msg.join("\n"))
+        expect(stderr).to eq("")
+      end
     end
 
-    before { allow(Sem::API::Teams).to receive(:list).and_return([team, another_team]) }
+    context "when the user doesn't have any team" do
+      before { allow(Sem::API::Teams).to receive(:list).and_return([]) }
 
-    it "calls the API" do
-      expect(Sem::API::Teams).to receive(:list)
+      it "offers you to set up a team on sempaphore" do
+        stdout, stderr = sem_run("teams:list")
 
-      sem_run("teams:list")
-    end
+        msg = [
+          "You don't have any teams on Semaphore.",
+          "",
+          "Create your first team:",
+          "",
+          "  sem teams:create ORG_NAME/TEAM",
+          "",
+          ""
+        ]
 
-    it "lists the teams" do
-      stdout, stderr = sem_run("teams:list")
-
-      msg = [
-        "ID                                    NAME                     PERMISSION  MEMBERS",
-        "3bc7ed43-ac8a-487e-b488-c38bc757a034  renderedtext/developers  write       72 members",
-        "fe3624cf-0cea-4d87-9dde-cb9ddacfefc0  tb-render/developers     admin       3 members"
-      ]
-
-      expect(stdout.strip).to eq(msg.join("\n"))
-      expect(stderr).to eq("")
+        expect(stdout).to eq(msg.join("\n"))
+        expect(stderr).to eq("")
+      end
     end
   end
 
@@ -185,28 +208,51 @@ describe Sem::CLI::Teams do
 
   describe Sem::CLI::Teams::Members do
     describe "#list" do
-      let(:user_0) { { :id => "ijovan" } }
-      let(:user_1) { { :id => "shiroyasha" } }
+      context "when the team has several members" do
+        let(:user_0) { { :id => "ijovan" } }
+        let(:user_1) { { :id => "shiroyasha" } }
 
-      before { allow(Sem::API::Users).to receive(:list_for_team).and_return([user_0, user_1]) }
+        before { allow(Sem::API::Users).to receive(:list_for_team).and_return([user_0, user_1]) }
 
-      it "calls the users API" do
-        expect(Sem::API::Users).to receive(:list_for_team).with("renderedtext", "cli")
+        it "calls the users API" do
+          expect(Sem::API::Users).to receive(:list_for_team).with("renderedtext", "cli")
 
-        sem_run("teams:members:list renderedtext/cli")
+          sem_run("teams:members:list renderedtext/cli")
+        end
+
+        it "lists team members" do
+          stdout, stderr = sem_run("teams:members:list renderedtext/cli")
+
+          msg = [
+            "NAME",
+            "ijovan",
+            "shiroyasha"
+          ]
+
+          expect(stderr).to eq("")
+          expect(stdout.strip).to eq(msg.join("\n"))
+        end
       end
 
-      it "lists team members" do
-        stdout, stderr = sem_run("teams:members:list renderedtext/cli")
+      context "when the team has no members" do
+        before { allow(Sem::API::Users).to receive(:list_for_team).and_return([]) }
 
-        msg = [
-          "NAME",
-          "ijovan",
-          "shiroyasha"
-        ]
+        it "offers help adding your first member" do
+          stdout, stderr = sem_run("teams:members:list renderedtext/devs")
 
-        expect(stderr).to eq("")
-        expect(stdout.strip).to eq(msg.join("\n"))
+          msg = [
+            "You don't have any members in the team.",
+            "",
+            "Add your first member:",
+            "",
+            "  sem teams:members:add renderedtext/devs USERNAME",
+            "",
+            ""
+          ]
+
+          expect(stderr).to eq("")
+          expect(stdout).to eq(msg.join("\n"))
+        end
       end
     end
 

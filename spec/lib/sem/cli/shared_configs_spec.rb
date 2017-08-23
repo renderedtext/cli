@@ -14,34 +14,57 @@ describe Sem::CLI::SharedConfigs do
   end
 
   describe "#list" do
-    let(:another_shared_config) do
-      {
-        :id => "37d8fdc0-4a96-4535-a4bc-601d1c7c7058",
-        :name => "renderedtext/rubygems",
-        :config_files => 1,
-        :env_vars => 0
-      }
+    context "when the user has multiple shared configs" do
+      let(:another_shared_config) do
+        {
+          :id => "37d8fdc0-4a96-4535-a4bc-601d1c7c7058",
+          :name => "renderedtext/rubygems",
+          :config_files => 1,
+          :env_vars => 0
+        }
+      end
+
+      before { allow(Sem::API::SharedConfigs).to receive(:list).and_return([shared_config, another_shared_config]) }
+
+      it "calls the API" do
+        expect(Sem::API::SharedConfigs).to receive(:list)
+
+        sem_run("shared-configs:list")
+      end
+
+      it "lists shared configurations" do
+        stdout, stderr = sem_run("shared-configs:list")
+
+        msg = [
+          "ID                                    NAME                     CONFIG FILES  ENV VARS",
+          "3bc7ed43-ac8a-487e-b488-c38bc757a034  renderedtext/aws-tokens             3         1",
+          "37d8fdc0-4a96-4535-a4bc-601d1c7c7058  renderedtext/rubygems               1         0"
+        ]
+
+        expect(stdout.strip).to eq(msg.join("\n"))
+        expect(stderr).to eq("")
+      end
     end
 
-    before { allow(Sem::API::SharedConfigs).to receive(:list).and_return([shared_config, another_shared_config]) }
+    context "when the user has no shared configs" do
+      before { allow(Sem::API::SharedConfigs).to receive(:list).and_return([]) }
 
-    it "calls the API" do
-      expect(Sem::API::SharedConfigs).to receive(:list)
+      it "offers to create your first shared config" do
+        stdout, stderr = sem_run("shared-configs:list")
 
-      sem_run("shared-configs:list")
-    end
+        msg = [
+          "You don't have any shared configurations on Semaphore.",
+          "",
+          "Create your first shared configuration:",
+          "",
+          "  sem shared-config:create ORG_NAME/SHARED_CONFIG",
+          "",
+          ""
+        ]
 
-    it "lists shared configurations" do
-      stdout, stderr = sem_run("shared-configs:list")
-
-      msg = [
-        "ID                                    NAME                     CONFIG FILES  ENV VARS",
-        "3bc7ed43-ac8a-487e-b488-c38bc757a034  renderedtext/aws-tokens             3         1",
-        "37d8fdc0-4a96-4535-a4bc-601d1c7c7058  renderedtext/rubygems               1         0"
-      ]
-
-      expect(stdout.strip).to eq(msg.join("\n"))
-      expect(stderr).to eq("")
+        expect(stdout).to eq(msg.join("\n"))
+        expect(stderr).to eq("")
+      end
     end
   end
 

@@ -14,25 +14,50 @@ describe Sem::CLI::Projects do
   describe "#list" do
     let(:another_project) { { :id => "fe3624cf-0cea-4d87-9dde-cb9ddacfefc0", :name => "api", :org => "tb-render" } }
 
-    before { allow(Sem::API::Projects).to receive(:list).and_return([project, another_project]) }
+    context "you have at least one project on semaphore" do
+      before do
+        allow(Sem::API::Projects).to receive(:list).and_return([project, another_project])
+      end
 
-    it "calls the API" do
-      expect(Sem::API::Projects).to receive(:list)
+      it "calls the API" do
+        expect(Sem::API::Projects).to receive(:list)
 
-      sem_run("projects:list")
+        sem_run("projects:list")
+      end
+
+      it "lists projects" do
+        stdout, stderr = sem_run("projects:list")
+
+        msg = [
+          "ID                                    NAME",
+          "3bc7ed43-ac8a-487e-b488-c38bc757a034  renderedtext/cli",
+          "fe3624cf-0cea-4d87-9dde-cb9ddacfefc0  tb-render/api"
+        ]
+
+        expect(stdout.strip).to eq(msg.join("\n"))
+        expect(stderr).to eq("")
+      end
     end
 
-    it "lists projects" do
-      stdout, stderr = sem_run("projects:list")
+    context "no projects on semaphore" do
+      before do
+        allow(Sem::API::Projects).to receive(:list).and_return([])
+      end
 
-      msg = [
-        "ID                                    NAME",
-        "3bc7ed43-ac8a-487e-b488-c38bc757a034  renderedtext/cli",
-        "fe3624cf-0cea-4d87-9dde-cb9ddacfefc0  tb-render/api"
-      ]
+      it "offers you to set up a project on sempaphore" do
+        stdout, stderr = sem_run("projects:list")
 
-      expect(stdout.strip).to eq(msg.join("\n"))
-      expect(stderr).to eq("")
+        msg = [
+          "You don't have any project configured on Semaphore.",
+          "",
+          "Add your first project: https://semaphoreci.com/new",
+          "",
+          ""
+        ]
+
+        expect(stdout).to eq(msg.join("\n"))
+        expect(stderr).to eq("")
+      end
     end
   end
 

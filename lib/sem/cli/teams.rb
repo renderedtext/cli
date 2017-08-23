@@ -70,7 +70,7 @@ class Sem::CLI::Teams < Dracula
 
       members = Sem::API::Users.list_for_team(org_name, team_name)
 
-      Sem::Views::Users.list(members)
+      Sem::Views::Teams.list_members(team, members)
     end
 
     desc "add", "add a user to the team"

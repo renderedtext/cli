@@ -1,6 +1,15 @@
 class Sem::Views::Projects < Sem::Views::Base
   class << self
     def list(projects)
+      if projects.empty?
+        puts "You don't have any project configured on Semaphore."
+        puts ""
+        puts "Add your first project: https://semaphoreci.com/new"
+        puts ""
+
+        return
+      end
+
       header = ["ID", "NAME"]
 
       body = projects.map do |project|
