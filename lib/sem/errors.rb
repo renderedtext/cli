@@ -3,6 +3,8 @@ module Sem::Errors
 
   InvalidSRN = Class.new(StandardError)
 
+  InvalidParameter = Class.new(StandardError)
+
   module Resource
     Base = Class.new(StandardError)
 
