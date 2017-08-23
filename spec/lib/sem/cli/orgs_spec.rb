@@ -12,32 +12,55 @@ describe Sem::CLI::Orgs do
   end
 
   describe "#list" do
-    let(:another_org) do
-      {
-        :id => "fe3624cf-0cea-4d87-9dde-cb9ddacfefc0",
-        :username => "tb-render"
-      }
+    context "when the user belongs to at least one organization" do
+      let(:another_org) do
+        {
+          :id => "fe3624cf-0cea-4d87-9dde-cb9ddacfefc0",
+          :username => "tb-render"
+        }
+      end
+
+      before { allow(Sem::API::Orgs).to receive(:list).and_return([org, another_org]) }
+
+      it "calls the API" do
+        expect(Sem::API::Orgs).to receive(:list)
+
+        sem_run("orgs:list")
+      end
+
+      it "lists organizations" do
+        stdout, stderr = sem_run("orgs:list")
+
+        msg = [
+          "ID                                    NAME",
+          "3bc7ed43-ac8a-487e-b488-c38bc757a034  renderedtext",
+          "fe3624cf-0cea-4d87-9dde-cb9ddacfefc0  tb-render"
+        ]
+
+        expect(stdout.strip).to eq(msg.join("\n"))
+        expect(stderr).to eq("")
+      end
     end
 
-    before { allow(Sem::API::Orgs).to receive(:list).and_return([org, another_org]) }
+    context "when the user belongs to no organization" do
+      before do
+        allow(Sem::API::Orgs).to receive(:list).and_return([])
+      end
 
-    it "calls the API" do
-      expect(Sem::API::Orgs).to receive(:list)
+      it "offers the user to create hos first organization" do
+        stdout, stderr = sem_run("orgs:list")
 
-      sem_run("orgs:list")
-    end
+        msg = [
+          "You don't belong to any organization.",
+          "",
+          "Create your first organization: https://semaphoreci.com/organizations/new.",
+          "",
+          ""
+        ]
 
-    it "lists organizations" do
-      stdout, stderr = sem_run("orgs:list")
-
-      msg = [
-        "ID                                    NAME",
-        "3bc7ed43-ac8a-487e-b488-c38bc757a034  renderedtext",
-        "fe3624cf-0cea-4d87-9dde-cb9ddacfefc0  tb-render"
-      ]
-
-      expect(stdout.strip).to eq(msg.join("\n"))
-      expect(stderr).to eq("")
+        expect(stdout).to eq(msg.join("\n"))
+        expect(stderr).to eq("")
+      end
     end
   end
 
