@@ -12,7 +12,8 @@ describe Sem::SRN do
 
     context "format is invalid" do
       it "raises an exception" do
-        expected_message = "Invalid format for org: \"\".\nRequired format is: \"org\"."
+        expected_message = "Invalid formatting for ORG parameter: \"\".\n" \
+          "Required format is: \"org_name\"."
 
         expect { described_class.parse_org(nil) }.to raise_exception(Sem::Errors::InvalidSRN, expected_message)
       end
@@ -30,7 +31,8 @@ describe Sem::SRN do
 
     context "format is invalid" do
       it "raises an exception" do
-        expected_message = "Invalid format for team: \"team\".\nRequired format is: \"org/team\"."
+        expected_message = "Invalid formatting for TEAM parameter: \"team\".\n" \
+          "Required format is: \"org_name/team_name\"."
 
         expect { described_class.parse_team("team") }.to raise_exception(Sem::Errors::InvalidSRN, expected_message)
       end
@@ -48,7 +50,8 @@ describe Sem::SRN do
 
     context "format is invalid" do
       it "raises an exception" do
-        expected_message = "Invalid format for project: \"project\".\nRequired format is: \"org/project\"."
+        expected_message = "Invalid formatting for PROJECT parameter: \"project\".\n" \
+          "Required format is: \"org_name/project_name\"."
 
         expect { described_class.parse_project("project") }.to raise_exception(Sem::Errors::InvalidSRN,
                                                                                expected_message)
@@ -67,8 +70,8 @@ describe Sem::SRN do
 
     context "format is invalid" do
       it "raises an exception" do
-        expected_message = "Invalid format for shared_config: \"shared_config\".\n" \
-          "Required format is: \"org/shared_config\"."
+        expected_message = "Invalid formatting for SHARED_CONFIG parameter: \"shared_config\".\n" \
+          "Required format is: \"org_name/shared_config_name\"."
 
         expect { described_class.parse_shared_config("shared_config") }.to raise_exception(Sem::Errors::InvalidSRN,
                                                                                            expected_message)
@@ -87,8 +90,8 @@ describe Sem::SRN do
 
     context "format is invalid" do
       it "raises an exception" do
-        expected_message = "Invalid format for user: \"\".\n" \
-          "Required format is: \"user\"."
+        expected_message = "Invalid formatting for USER parameter: \"\".\n" \
+          "Required format is: \"user_name\"."
 
         expect { described_class.parse_user(nil) }.to raise_exception(Sem::Errors::InvalidSRN,
                                                                       expected_message)
