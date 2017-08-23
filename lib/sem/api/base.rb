@@ -10,8 +10,16 @@ module Sem
           )
         end
 
+        def raise_not_created(resource, path)
+          raise Sem::Errors::Resource::NotCreated, "#{resource} #{path.join("/")} not created."
+        end
+
         def raise_not_found(resource, path)
           raise Sem::Errors::Resource::NotFound, "#{resource} #{path.join("/")} not found."
+        end
+
+        def raise_not_updated(resource, path)
+          raise Sem::Errors::Resource::NotUpdated, "#{resource} #{path.join("/")} not updated."
         end
       end
     end

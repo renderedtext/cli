@@ -99,7 +99,7 @@ describe Sem::API::SharedConfigs do
   end
 
   describe ".create" do
-    let(:args) { { :id => 0 } }
+    let(:args) { { "name" => instance_name } }
 
     before { allow(class_api).to receive(:create_for_org).and_return(instance) }
 
@@ -120,6 +120,17 @@ describe Sem::API::SharedConfigs do
 
       expect(return_value).to eql(instance_hash)
     end
+
+    context "resource creation failed" do
+      before { allow(class_api).to receive(:create_for_org).and_return(nil) }
+
+      it "raises an exception" do
+        expected_message = "Shared Configuration #{org_name}/#{instance_name} not created."
+
+        expect { described_class.create(org_name, args) }.to raise_exception(Sem::Errors::Resource::NotCreated,
+                                                                             expected_message)
+      end
+    end
   end
 
   describe ".update" do
@@ -127,7 +138,7 @@ describe Sem::API::SharedConfigs do
 
     before do
       allow(described_class).to receive(:info).and_return(instance_hash)
-      allow(class_api).to receive(:update)
+      allow(class_api).to receive(:update).and_return(instance)
     end
 
     it "calls info on the described class" do
@@ -146,6 +157,19 @@ describe Sem::API::SharedConfigs do
       return_value = described_class.update(org_name, instance_name, args)
 
       expect(return_value).to eql(instance_hash)
+    end
+
+    context "resource update failed" do
+      before { allow(class_api).to receive(:update).and_return(nil) }
+
+      it "raises an exception" do
+        expected_message = "Shared Configuration #{org_name}/#{instance_name} not updated."
+
+        expect { described_class.update(org_name, instance_name, args) }.to raise_exception(
+          Sem::Errors::Resource::NotUpdated,
+          expected_message
+        )
+      end
     end
   end
 

@@ -96,7 +96,7 @@ describe Sem::API::Teams do
   end
 
   describe ".create" do
-    let(:args) { { :name => instance_name } }
+    let(:args) { { "name" => instance_name } }
 
     before { allow(class_api).to receive(:create_for_org).and_return(instance) }
 
@@ -116,6 +116,17 @@ describe Sem::API::Teams do
       return_value = described_class.create(org_name, args)
 
       expect(return_value).to eql(instance_hash)
+    end
+
+    context "resource creation failed" do
+      before { allow(class_api).to receive(:create_for_org).and_return(nil) }
+
+      it "raises an exception" do
+        expected_message = "Team #{org_name}/#{instance_name} not created."
+
+        expect { described_class.create(org_name, args) }.to raise_exception(Sem::Errors::Resource::NotCreated,
+                                                                             expected_message)
+      end
     end
   end
 
@@ -143,6 +154,19 @@ describe Sem::API::Teams do
       return_value = described_class.update(org_name, instance_name, args)
 
       expect(return_value).to eql(instance_hash)
+    end
+
+    context "resource update failed" do
+      before { allow(class_api).to receive(:update).and_return(nil) }
+
+      it "raises an exception" do
+        expected_message = "Team #{org_name}/#{instance_name} not updated."
+
+        expect { described_class.update(org_name, instance_name, args) }.to raise_exception(
+          Sem::Errors::Resource::NotUpdated,
+          expected_message
+        )
+      end
     end
   end
 

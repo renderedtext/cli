@@ -21,6 +21,8 @@ module Sem
         def create(org_name, args)
           team = api.create_for_org(org_name, args)
 
+          raise_not_created("Team", [org_name, args["name"]]) if team.nil?
+
           to_hash(team, org_name)
         end
 
@@ -30,6 +32,8 @@ module Sem
           raise_not_found("Team", [org_name, team_name]) if team.nil?
 
           team = api.update(team[:id], args)
+
+          raise_not_updated("Team", [org_name, team_name]) if team.nil?
 
           to_hash(team, org_name)
         end

@@ -4,7 +4,11 @@ module Sem::Errors
   InvalidSRN = Class.new(StandardError)
 
   module Resource
-    NotFound = Class.new(StandardError)
+    Base = Class.new(StandardError)
+
+    NotFound = Class.new(Base)
+    NotCreated = Class.new(Base)
+    NotUpdated = Class.new(Base)
   end
 
   module Auth
