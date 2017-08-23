@@ -8,8 +8,8 @@ class Sem::CLI::SharedConfigs < Dracula
   end
 
   desc "info", "show information about a shared configuration"
-  def info(srn)
-    org_name, shared_config_name = Sem::SRN.parse_shared_config(srn)
+  def info(semaphore_resource_name)
+    org_name, shared_config_name = Sem::SRN.parse_shared_config(semaphore_resource_name)
 
     shared_config = Sem::API::SharedConfigs.info(org_name, shared_config_name).to_h
 
@@ -17,8 +17,8 @@ class Sem::CLI::SharedConfigs < Dracula
   end
 
   desc "create", "create a new shared configuration"
-  def create(srn)
-    org_name, shared_config_name = Sem::SRN.parse_shared_config(srn)
+  def create(semaphore_resource_name)
+    org_name, shared_config_name = Sem::SRN.parse_shared_config(semaphore_resource_name)
 
     shared_config = Sem::API::SharedConfigs.create(org_name, :name => shared_config_name)
 
@@ -26,9 +26,9 @@ class Sem::CLI::SharedConfigs < Dracula
   end
 
   desc "rename", "rename a shared configuration"
-  def rename(old_srn, new_srn)
-    org_name, old_name = Sem::SRN.parse_shared_config(old_srn)
-    _, new_name = Sem::SRN.parse_shared_config(new_srn)
+  def rename(old_semaphore_resource_name, new_semaphore_resource_name)
+    org_name, old_name = Sem::SRN.parse_shared_config(old_semaphore_resource_name)
+    _, new_name = Sem::SRN.parse_shared_config(new_semaphore_resource_name)
 
     shared_config = Sem::API::SharedConfigs.update(org_name, old_name, :name => new_name)
 
@@ -36,8 +36,8 @@ class Sem::CLI::SharedConfigs < Dracula
   end
 
   desc "delete", "removes a shared configuration from your organization"
-  def delete(srn)
-    org_name, shared_config_name = Sem::SRN.parse_shared_config(srn)
+  def delete(semaphore_resource_name)
+    org_name, shared_config_name = Sem::SRN.parse_shared_config(semaphore_resource_name)
 
     Sem::API::SharedConfigs.delete(org_name, shared_config_name)
 
@@ -46,8 +46,8 @@ class Sem::CLI::SharedConfigs < Dracula
 
   class Files < Dracula
     desc "list", "list files in the shared configuration"
-    def list(shared_config_srn)
-      org_name, shared_config_name = Sem::SRN.parse_shared_config(shared_config_srn)
+    def list(semaphore_resource_name)
+      org_name, shared_config_name = Sem::SRN.parse_shared_config(semaphore_resource_name)
 
       files = Sem::API::SharedConfigs.list_files(org_name, shared_config_name)
 
@@ -56,8 +56,8 @@ class Sem::CLI::SharedConfigs < Dracula
 
     desc "add", "add a file to the shared configuration"
     option :file, :aliases => "f", :desc => "File to upload", :required => true
-    def add(shared_config_srn, file_name)
-      org_name, shared_config_name = Sem::SRN.parse_shared_config(shared_config_srn)
+    def add(shared_config_semaphore_resource_name, file_name)
+      org_name, shared_config_name = Sem::SRN.parse_shared_config(shared_config_semaphore_resource_name)
 
       content = File.read(options[:file])
 
@@ -67,8 +67,8 @@ class Sem::CLI::SharedConfigs < Dracula
     end
 
     desc "remove", "remove a file from the shared configuration"
-    def remove(shared_config_srn, file_name)
-      org_name, shared_config_name = Sem::SRN.parse_shared_config(shared_config_srn)
+    def remove(shared_config_semaphore_resource_name, file_name)
+      org_name, shared_config_name = Sem::SRN.parse_shared_config(shared_config_semaphore_resource_name)
 
       Sem::API::Files.remove_from_shared_config(org_name, shared_config_name, file_name)
 
@@ -78,8 +78,8 @@ class Sem::CLI::SharedConfigs < Dracula
 
   class EnvVars < Dracula
     desc "list", "list environment variables in the shared configuration"
-    def list(shared_config_srn)
-      org_name, shared_config_name = Sem::SRN.parse_shared_config(shared_config_srn)
+    def list(semaphore_resource_name)
+      org_name, shared_config_name = Sem::SRN.parse_shared_config(semaphore_resource_name)
 
       env_vars = Sem::API::SharedConfigs.list_env_vars(org_name, shared_config_name)
 
@@ -89,8 +89,8 @@ class Sem::CLI::SharedConfigs < Dracula
     desc "add", "add an environment variable to the shared configuration"
     option :name, :aliases => "-n", :desc => "Name of the variable", :required => true
     option :content, :aliases => "-c", :desc => "Content of the variable", :required => true
-    def add(shared_config_srn)
-      org_name, shared_config_name = Sem::SRN.parse_shared_config(shared_config_srn)
+    def add(shared_config_semaphore_resource_name)
+      org_name, shared_config_name = Sem::SRN.parse_shared_config(shared_config_semaphore_resource_name)
 
       Sem::API::EnvVars.add_to_shared_config(org_name,
                                              shared_config_name,
@@ -101,8 +101,8 @@ class Sem::CLI::SharedConfigs < Dracula
     end
 
     desc "remove", "remove an environment variable from the shared configuration"
-    def remove(shared_config_srn, env_var_name)
-      org_name, shared_config_name = Sem::SRN.parse_shared_config(shared_config_srn)
+    def remove(shared_config_semaphore_resource_name, env_var_name)
+      org_name, shared_config_name = Sem::SRN.parse_shared_config(shared_config_semaphore_resource_name)
 
       Sem::API::EnvVars.remove_from_shared_config(org_name, shared_config_name, env_var_name)
 

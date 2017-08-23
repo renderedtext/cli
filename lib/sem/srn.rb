@@ -18,6 +18,10 @@ class Sem::SRN
       parse_srn(semaphore_resource_name, "org/shared_config")
     end
 
+    def parse_user(semaphore_resource_name)
+      parse_srn(semaphore_resource_name, "user")
+    end
+
     private
 
     def parse_srn(semaphore_resource_name, format)

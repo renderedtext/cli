@@ -8,8 +8,8 @@ class Sem::CLI::Teams < Dracula
   end
 
   desc "info", "show information about a team"
-  def info(srn)
-    org_name, team_name = Sem::SRN.parse_team(srn)
+  def info(semaphore_resource_name)
+    org_name, team_name = Sem::SRN.parse_team(semaphore_resource_name)
 
     team = Sem::API::Teams.info(org_name, team_name).to_h
 
@@ -20,8 +20,8 @@ class Sem::CLI::Teams < Dracula
   option :permission, :default => "read",
                       :aliases => "-p",
                       :desc => "Permission level of the team in the organization"
-  def create(srn)
-    org_name, team_name = Sem::SRN.parse_team(srn)
+  def create(semaphore_resource_name)
+    org_name, team_name = Sem::SRN.parse_team(semaphore_resource_name)
 
     team = Sem::API::Teams.create(org_name,
                                   :name => team_name,
@@ -31,9 +31,9 @@ class Sem::CLI::Teams < Dracula
   end
 
   desc "rename", "change the name of the team"
-  def rename(old_srn, new_srn)
-    org_name, old_name = Sem::SRN.parse_team(old_srn)
-    _, new_name = Sem::SRN.parse_team(new_srn)
+  def rename(old_semaphore_resource_name, new_semaphore_resource_name)
+    org_name, old_name = Sem::SRN.parse_team(old_semaphore_resource_name)
+    _, new_name = Sem::SRN.parse_team(new_semaphore_resource_name)
 
     team = Sem::API::Teams.update(org_name, old_name, :name => new_name)
 
@@ -41,8 +41,8 @@ class Sem::CLI::Teams < Dracula
   end
 
   desc "set-permission", "set the permission level of the team"
-  def set_permission(srn, permission)
-    org_name, team_name = Sem::SRN.parse_team(srn)
+  def set_permission(semaphore_resource_name, permission)
+    org_name, team_name = Sem::SRN.parse_team(semaphore_resource_name)
 
     team = Sem::API::Teams.update(org_name, team_name, :permission => permission)
 
@@ -50,8 +50,8 @@ class Sem::CLI::Teams < Dracula
   end
 
   desc "delete", "removes a team from your organization"
-  def delete(srn)
-    org_name, team_name = Sem::SRN.parse_team(srn)
+  def delete(semaphore_resource_name)
+    org_name, team_name = Sem::SRN.parse_team(semaphore_resource_name)
 
     Sem::API::Teams.delete(org_name, team_name)
 
@@ -60,8 +60,8 @@ class Sem::CLI::Teams < Dracula
 
   class Members < Dracula
     desc "list", "lists members of the team"
-    def list(team_srn)
-      org_name, team_name = Sem::SRN.parse_team(team_srn)
+    def list(semaphore_resource_name)
+      org_name, team_name = Sem::SRN.parse_team(semaphore_resource_name)
 
       members = Sem::API::Users.list_for_team(org_name, team_name)
 
@@ -69,28 +69,30 @@ class Sem::CLI::Teams < Dracula
     end
 
     desc "add", "add a user to the team"
-    def add(team_srn, user_srn)
-      org_name, team_name = Sem::SRN.parse_team(team_srn)
+    def add(team_semaphore_resource_name, user_semaphore_resource_name)
+      org_name, team_name = Sem::SRN.parse_team(team_semaphore_resource_name)
+      user_name = Sem::SRN.parse_user(user_semaphore_resource_name).first
 
-      Sem::API::Users.add_to_team(org_name, team_name, user_srn)
+      Sem::API::Users.add_to_team(org_name, team_name, user_name)
 
-      puts "User #{user_srn} added to the team."
+      puts "User #{user_name} added to the team."
     end
 
     desc "remove", "removes a user from the team"
-    def remove(team_srn, user_srn)
-      org_name, team_name = Sem::SRN.parse_team(team_srn)
+    def remove(team_semaphore_resource_name, user_semaphore_resource_name)
+      org_name, team_name = Sem::SRN.parse_team(team_semaphore_resource_name)
+      user_name = Sem::SRN.parse_user(user_semaphore_resource_name).first
 
-      Sem::API::Users.remove_from_team(org_name, team_name, user_srn)
+      Sem::API::Users.remove_from_team(org_name, team_name, user_name)
 
-      puts "User #{user_srn} removed from the team."
+      puts "User #{user_name} removed from the team."
     end
   end
 
   class Projects < Dracula
     desc "list", "lists projects in a team"
-    def list(team_srn)
-      org_name, team_name = Sem::SRN.parse_team(team_srn)
+    def list(semaphore_resource_name)
+      org_name, team_name = Sem::SRN.parse_team(semaphore_resource_name)
 
       projects = Sem::API::Projects.list_for_team(org_name, team_name)
 
@@ -98,9 +100,9 @@ class Sem::CLI::Teams < Dracula
     end
 
     desc "add", "add a project to a team"
-    def add(team_srn, project_srn)
-      org_name, team_name = Sem::SRN.parse_team(team_srn)
-      _, project_name = Sem::SRN.parse_project(project_srn)
+    def add(team_semaphore_resource_name, project_semaphore_resource_name)
+      org_name, team_name = Sem::SRN.parse_team(team_semaphore_resource_name)
+      _, project_name = Sem::SRN.parse_project(project_semaphore_resource_name)
 
       Sem::API::Projects.add_to_team(org_name, team_name, project_name)
 
@@ -108,9 +110,9 @@ class Sem::CLI::Teams < Dracula
     end
 
     desc "remove", "removes a project from the team"
-    def remove(team_srn, project_srn)
-      org_name, team_name = Sem::SRN.parse_team(team_srn)
-      _, project_name = Sem::SRN.parse_project(project_srn)
+    def remove(team_semaphore_resource_name, project_semaphore_resource_name)
+      org_name, team_name = Sem::SRN.parse_team(team_semaphore_resource_name)
+      _, project_name = Sem::SRN.parse_project(project_semaphore_resource_name)
 
       Sem::API::Projects.remove_from_team(org_name, team_name, project_name)
 
@@ -120,8 +122,8 @@ class Sem::CLI::Teams < Dracula
 
   class SharedConfigs < Dracula
     desc "list", "list shared configurations in a team"
-    def list(team_srn)
-      org_name, team_name = team_srn.split("/")
+    def list(semaphore_resource_name)
+      org_name, team_name = Sem::SRN.parse_team(semaphore_resource_name)
 
       configs = Sem::API::SharedConfigs.list_for_team(org_name, team_name)
 
@@ -129,9 +131,9 @@ class Sem::CLI::Teams < Dracula
     end
 
     desc "add", "add a shared configuration to a team"
-    def add(team_srn, shared_config_srn)
-      org_name, team_name = team_srn.split("/")
-      _, shared_config_name = shared_config_srn.split("/")
+    def add(team_semaphore_resource_name, shared_config_semaphore_resource_name)
+      org_name, team_name = Sem::SRN.parse_team(team_semaphore_resource_name)
+      _, shared_config_name = Sem::SRN.parse_shared_config(shared_config_semaphore_resource_name)
 
       Sem::API::SharedConfigs.add_to_team(org_name, team_name, shared_config_name)
 
@@ -139,9 +141,9 @@ class Sem::CLI::Teams < Dracula
     end
 
     desc "remove", "removes a project from the team"
-    def remove(team_srn, shared_config_srn)
-      org_name, team_name = team_srn.split("/")
-      _, shared_config_name = shared_config_srn.split("/")
+    def remove(team_semaphore_resource_name, shared_config_semaphore_resource_name)
+      org_name, team_name = Sem::SRN.parse_team(team_semaphore_resource_name)
+      _, shared_config_name = Sem::SRN.parse_shared_config(shared_config_semaphore_resource_name)
 
       Sem::API::SharedConfigs.remove_from_team(org_name, team_name, shared_config_name)
 
