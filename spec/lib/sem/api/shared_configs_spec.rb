@@ -16,6 +16,7 @@ describe Sem::API::SharedConfigs do
     {
       :id => instance_id,
       :name => instance_name,
+      :org => org_name,
       :config_files => 1,
       :env_vars => 2,
       :created_at => 123,
@@ -109,7 +110,7 @@ describe Sem::API::SharedConfigs do
     end
 
     it "converts the instance to instance hash" do
-      expect(described_class).to receive(:to_hash).with(instance)
+      expect(described_class).to receive(:to_hash).with(instance, org_name)
 
       described_class.create(org_name, args)
     end
@@ -227,7 +228,7 @@ describe Sem::API::SharedConfigs do
     end
 
     it "returns the hash" do
-      return_value = described_class.to_hash(instance)
+      return_value = described_class.to_hash(instance, org_name)
 
       expect(return_value).to eql(instance_hash)
     end

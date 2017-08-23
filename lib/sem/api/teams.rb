@@ -21,7 +21,7 @@ module Sem
         def create(org_name, args)
           team = api.create_for_org(org_name, args)
 
-          to_hash(team)
+          to_hash(team, org_name)
         end
 
         def update(org_name, team_name, args)
@@ -31,7 +31,7 @@ module Sem
 
           team = api.update(team[:id], args)
 
-          to_hash(team)
+          to_hash(team, org_name)
         end
 
         def delete(org_name, team_name)
@@ -46,10 +46,11 @@ module Sem
           client.teams
         end
 
-        def to_hash(team)
+        def to_hash(team, org)
           {
             :id => team.id,
             :name => team.name,
+            :org => org,
             :permission => team.permission,
             :members => client.users.list_for_team(team.id).to_a.size.to_s,
             :created_at => team.created_at,

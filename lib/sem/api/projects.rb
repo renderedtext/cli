@@ -23,10 +23,11 @@ module Sem
           client.projects
         end
 
-        def to_hash(project)
+        def to_hash(project, org)
           {
             :id => project.id,
             :name => project.name,
+            :org => org,
             :created_at => project.created_at,
             :updated_at => project.updated_at
           }

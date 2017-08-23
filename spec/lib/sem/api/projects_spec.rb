@@ -16,6 +16,7 @@ describe Sem::API::Projects do
     {
       :id => instance_id,
       :name => instance_name,
+      :org => org_name,
       :created_at => 123,
       :updated_at => 456
     }
@@ -107,7 +108,7 @@ describe Sem::API::Projects do
     before { allow(described_class).to receive(:to_hash).and_call_original }
 
     it "returns the hash" do
-      return_value = described_class.to_hash(instance)
+      return_value = described_class.to_hash(instance, org_name)
 
       expect(return_value).to eql(instance_hash)
     end

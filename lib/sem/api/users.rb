@@ -25,7 +25,7 @@ module Sem
           client.users
         end
 
-        def to_hash(user)
+        def to_hash(user, _ = nil)
           { :id => user.username }
         end
       end

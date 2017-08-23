@@ -19,7 +19,7 @@ shared_examples "associated_with_org" do
     end
 
     it "converts the instances to instance hashes" do
-      expect(described_class).to receive(:to_hash).with(instance)
+      expect(described_class).to receive(:to_hash).with(instance, org_name)
 
       described_class.list_for_org(org_name)
     end
@@ -27,7 +27,7 @@ shared_examples "associated_with_org" do
     it "returns the instance hashes" do
       return_value = described_class.list_for_org(org_name)
 
-      expect(return_value).to eql([instance_hash.merge(:org => org_name)])
+      expect(return_value).to eql([instance_hash])
     end
   end
 end
