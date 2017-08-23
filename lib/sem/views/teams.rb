@@ -1,6 +1,17 @@
 class Sem::Views::Teams < Sem::Views::Base
   class << self
     def list(teams)
+      if teams.empty?
+        puts "You don't have any teams on Semaphore."
+        puts ""
+        puts "Create your first team:"
+        puts ""
+        puts "  sem teams:create ORG_NAME/TEAM"
+        puts ""
+
+        return
+      end
+
       header = ["ID", "NAME", "PERMISSION", "MEMBERS"]
 
       body = teams.map do |team|
