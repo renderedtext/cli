@@ -62,12 +62,18 @@ module Sem
         end
 
         def to_hash(shared_config, org)
+          network_actions = [:config_files_count, :env_vars_count]
+
+          config_files, env_vars = network_actions.pmap do |action|
+            send(action, shared_config.id)
+          end
+
           {
             :id => shared_config.id,
             :name => shared_config.name,
             :org => org,
-            :config_files => config_files_count(shared_config.id),
-            :env_vars => env_vars_count(shared_config.id),
+            :config_files => config_files,
+            :env_vars => env_vars,
             :created_at => shared_config.created_at,
             :updated_at => shared_config.updated_at
           }
