@@ -8,10 +8,10 @@ module Sem
         loop do
           pages = range_map(index, pages_per_call, &block)
 
-          break instances if pages.flatten.compact.empty?
-
-          instances.push(pages)
+          instances += pages.select { |page| !(page.nil? || page.empty?) }
           index += pages_per_call
+
+          break instances if pages.any? { |page| page.nil? || page.empty? }
         end
       end
 

@@ -2,7 +2,7 @@ require "spec_helper"
 
 describe Sem::Pagination do
   describe ".pages" do
-    let(:hash) { { "1" => 1 } }
+    let(:hash) { { "1" => [1] } }
 
     it "stops after it reaches an empty page" do
       expect(hash).to receive(:[]).with("1").and_call_original
@@ -18,7 +18,7 @@ describe Sem::Pagination do
         hash[index.to_s]
       end
 
-      expect(return_value).to eql([[1, nil]])
+      expect(return_value).to eql([[1]])
     end
   end
 end
