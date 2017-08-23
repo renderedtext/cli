@@ -208,28 +208,51 @@ describe Sem::CLI::Teams do
 
   describe Sem::CLI::Teams::Members do
     describe "#list" do
-      let(:user_0) { { :id => "ijovan" } }
-      let(:user_1) { { :id => "shiroyasha" } }
+      context "when the team has several members" do
+        let(:user_0) { { :id => "ijovan" } }
+        let(:user_1) { { :id => "shiroyasha" } }
 
-      before { allow(Sem::API::Users).to receive(:list_for_team).and_return([user_0, user_1]) }
+        before { allow(Sem::API::Users).to receive(:list_for_team).and_return([user_0, user_1]) }
 
-      it "calls the users API" do
-        expect(Sem::API::Users).to receive(:list_for_team).with("renderedtext", "cli")
+        it "calls the users API" do
+          expect(Sem::API::Users).to receive(:list_for_team).with("renderedtext", "cli")
 
-        sem_run("teams:members:list renderedtext/cli")
+          sem_run("teams:members:list renderedtext/cli")
+        end
+
+        it "lists team members" do
+          stdout, stderr = sem_run("teams:members:list renderedtext/cli")
+
+          msg = [
+            "NAME",
+            "ijovan",
+            "shiroyasha"
+          ]
+
+          expect(stderr).to eq("")
+          expect(stdout.strip).to eq(msg.join("\n"))
+        end
       end
 
-      it "lists team members" do
-        stdout, stderr = sem_run("teams:members:list renderedtext/cli")
+      context "when the team has no members" do
+        before { allow(Sem::API::Users).to receive(:list_for_team).and_return([]) }
 
-        msg = [
-          "NAME",
-          "ijovan",
-          "shiroyasha"
-        ]
+        it "offers help adding your first member" do
+          stdout, stderr = sem_run("teams:members:list renderedtext/devs")
 
-        expect(stderr).to eq("")
-        expect(stdout.strip).to eq(msg.join("\n"))
+          msg = [
+            "You don't have any members in the team.",
+            "",
+            "Add your first member:",
+            "",
+            "  sem teams:members:add renderedtext/devs USERNAME",
+            "",
+            ""
+          ]
+
+          expect(stderr).to eq("")
+          expect(stdout).to eq(msg.join("\n"))
+        end
       end
     end
 

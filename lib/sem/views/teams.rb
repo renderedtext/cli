@@ -32,6 +32,27 @@ class Sem::Views::Teams < Sem::Views::Base
       ]
     end
 
+    def list_members(team, members)
+      if members.empty?
+        puts "You don't have any members in the team."
+        puts ""
+        puts "Add your first member:"
+        puts ""
+        puts "  sem teams:members:add #{team} USERNAME"
+        puts ""
+
+        return
+      end
+
+      header = ["NAME"]
+
+      body = members.map do |user|
+        [user[:id]]
+      end
+
+      print_table [header, *body]
+    end
+
     private
 
     def name(team)
