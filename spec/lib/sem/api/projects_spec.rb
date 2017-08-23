@@ -67,13 +67,10 @@ describe Sem::API::Projects do
   end
 
   describe ".info" do
-    let(:instance_hash_0) { { :name => instance_name } }
-    let(:instance_hash_1) { { :name => "project_1" } }
+    before { allow(class_api).to receive(:list_for_org).and_return([instance_hash]) }
 
-    before { allow(described_class).to receive(:list_for_org).and_return([instance_hash_0, instance_hash_1]) }
-
-    it "calls list_for_org on the described class" do
-      expect(described_class).to receive(:list_for_org).with(org_name, :name => instance_name)
+    it "calls list_for_org on the class api" do
+      expect(class_api).to receive(:list_for_org).with(org_name, :name => instance_name)
 
       described_class.info(org_name, instance_name)
     end
@@ -81,11 +78,11 @@ describe Sem::API::Projects do
     it "returns the selected instance" do
       return_value = described_class.info(org_name, instance_name)
 
-      expect(return_value).to eql(instance_hash_0)
+      expect(return_value).to eql(instance_hash)
     end
 
     context "resource not found" do
-      before { allow(described_class).to receive(:list_for_org).and_return([]) }
+      before { allow(class_api).to receive(:list_for_org).and_return([]) }
 
       it "raises an exception" do
         expected_message = "Project #{org_name}/#{instance_name} not found."
