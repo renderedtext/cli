@@ -136,6 +136,14 @@ describe Sem::CLI::Projects do
         sem_run("projects:shared-configs:add rt/prj1 rt/aws-tokens")
       end
 
+      context "org names are not matching" do
+        it "raises an exception" do
+          expect { sem_run("projects:shared-configs:add rt/prj1 org/aws-tokens") }.to raise_exception(
+            Sem::Errors::OrgNamesNotMatching
+          )
+        end
+      end
+
       it "add a project to the team" do
         stdout, stderr = sem_run("projects:shared-configs:add rt/prj1 rt/aws-tokens")
 
@@ -151,6 +159,14 @@ describe Sem::CLI::Projects do
         expect(Sem::API::SharedConfigs).to receive(:remove_from_project).with("rt", "prj1", "tokens")
 
         sem_run("projects:shared-configs:remove rt/prj1 rt/tokens")
+      end
+
+      context "org names are not matching" do
+        it "raises an exception" do
+          expect { sem_run("projects:shared-configs:remove rt/prj1 org/tokens") }.to raise_exception(
+            Sem::Errors::OrgNamesNotMatching
+          )
+        end
       end
 
       it "removes a project from the team" do

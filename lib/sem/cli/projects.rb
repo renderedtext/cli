@@ -28,22 +28,26 @@ class Sem::CLI::Projects < Dracula
 
     desc "add", "attach a shared configuration to a project"
     def add(project, shared_config)
-      org_name, project_name = Sem::SRN.parse_project(project)
-      _, shared_config_name = Sem::SRN.parse_shared_config(shared_config)
+      project_org_name, project_name = Sem::SRN.parse_project(project)
+      shared_config_org_name, shared_config_name = Sem::SRN.parse_shared_config(shared_config)
 
-      Sem::API::SharedConfigs.add_to_project(org_name, project_name, shared_config_name)
+      raise Sem::Errors::OrgNamesNotMatching unless project_org_name == shared_config_org_name
 
-      puts "Shared Configuration #{org_name}/#{shared_config_name} added to the project."
+      Sem::API::SharedConfigs.add_to_project(project_org_name, project_name, shared_config_name)
+
+      puts "Shared Configuration #{project_org_name}/#{shared_config_name} added to the project."
     end
 
     desc "remove", "removes a shared configuration from the project"
     def remove(project, shared_config)
-      org_name, project_name = Sem::SRN.parse_project(project)
-      _, shared_config_name = Sem::SRN.parse_shared_config(shared_config)
+      project_org_name, project_name = Sem::SRN.parse_project(project)
+      shared_config_org_name, shared_config_name = Sem::SRN.parse_shared_config(shared_config)
 
-      Sem::API::SharedConfigs.remove_from_project(org_name, project_name, shared_config_name)
+      raise Sem::Errors::OrgNamesNotMatching unless project_org_name == shared_config_org_name
 
-      puts "Shared Configuration #{org_name}/#{shared_config_name} removed from the project."
+      Sem::API::SharedConfigs.remove_from_project(project_org_name, project_name, shared_config_name)
+
+      puts "Shared Configuration #{project_org_name}/#{shared_config_name} removed from the project."
     end
   end
 
