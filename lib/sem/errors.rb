@@ -4,13 +4,29 @@ module Sem::Errors
   InvalidSRN = Class.new(StandardError)
   OrgNamesNotMatching = Class.new(StandardError)
 
-  module Resource
-    Base = Class.new(StandardError)
+  class ResourceException < Base
+    def initialize(resource, path)
+      @resource = resource
+      @path = path
+    end
+  end
 
-    NotFound = Class.new(Base)
-    NotCreated = Class.new(Base)
-    NotUpdated = Class.new(Base)
-    NotDeleted = Class.new(Base)
+  class ResourceNotFound < ResourceException
+    def message
+      "[ERROR] #{@resource} lookup failed\n\n#{@resource} #{@path.join("/")} not found."
+    end
+  end
+
+  class ResourceNotCreated < ResourceException
+    def message
+      "[ERROR] #{@resource} creation failed\n\n#{@resource} #{@path.join("/")} not created."
+    end
+  end
+
+  class ResourceNotUpdated < ResourceException
+    def message
+      "[ERROR] #{@resource} update failed\n\n#{@resource} #{@path.join("/")} not updated."
+    end
   end
 
   module Auth

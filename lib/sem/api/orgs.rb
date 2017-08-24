@@ -11,7 +11,7 @@ module Sem
         def info(name)
           org = api.get(name)
 
-          raise_not_found("Organization", [name]) if org.nil?
+          raise Sem::Errors::ResourceNotFound.new("Organization", [name]) if org.nil?
 
           to_hash(org)
         end

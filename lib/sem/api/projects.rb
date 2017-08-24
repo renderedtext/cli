@@ -14,7 +14,7 @@ module Sem
         def info(org_name, project_name)
           project = api.list_for_org(org_name, :name => project_name).first
 
-          raise_not_found("Project", [org_name, project_name]) if project.nil?
+          raise Sem::Errors::ResourceNotFound.new("Project", [org_name, project_name]) if project.nil?
 
           to_hash(project, org_name)
         end

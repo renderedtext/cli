@@ -89,7 +89,7 @@ describe Sem::API::Teams do
       it "raises an exception" do
         expected_message = "[ERROR] Team lookup failed\n\nTeam #{org_name}/#{instance_name} not found."
 
-        expect { described_class.info(org_name, instance_name) }.to raise_exception(Sem::Errors::Resource::NotFound,
+        expect { described_class.info(org_name, instance_name) }.to raise_exception(Sem::Errors::ResourceNotFound,
                                                                                     expected_message)
       end
     end
@@ -124,7 +124,7 @@ describe Sem::API::Teams do
       it "raises an exception" do
         expected_message = "[ERROR] Team creation failed\n\nTeam #{org_name}/#{instance_name} not created."
 
-        expect { described_class.create(org_name, args) }.to raise_exception(Sem::Errors::Resource::NotCreated,
+        expect { described_class.create(org_name, args) }.to raise_exception(Sem::Errors::ResourceNotCreated,
                                                                              expected_message)
       end
     end
@@ -163,7 +163,7 @@ describe Sem::API::Teams do
         expected_message = "[ERROR] Team update failed\n\nTeam #{org_name}/#{instance_name} not updated."
 
         expect { described_class.update(org_name, instance_name, args) }.to raise_exception(
-          Sem::Errors::Resource::NotUpdated,
+          Sem::Errors::ResourceNotUpdated,
           expected_message
         )
       end

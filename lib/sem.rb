@@ -33,7 +33,7 @@ module Sem
       Sem::CLI.start(args)
 
       0
-    rescue Sem::Errors::Resource::Base => e
+    rescue Sem::Errors::ResourceException => e
       puts e.message
 
       1

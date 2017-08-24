@@ -87,7 +87,7 @@ describe Sem::API::Projects do
       it "raises an exception" do
         expected_message = "[ERROR] Project lookup failed\n\nProject #{org_name}/#{instance_name} not found."
 
-        expect { described_class.info(org_name, instance_name) }.to raise_exception(Sem::Errors::Resource::NotFound,
+        expect { described_class.info(org_name, instance_name) }.to raise_exception(Sem::Errors::ResourceNotFound,
                                                                                     expected_message)
       end
     end

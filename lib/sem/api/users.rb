@@ -22,7 +22,7 @@ module Sem
 
           selected_user = users.find { |user| user[:id] == user_name }
 
-          raise_not_found("User", [user_name]) if selected_user.nil?
+          raise Sem::Errors::ResourceNotFound.new("User", [user_name]) if selected_user.nil?
 
           selected_user
         end

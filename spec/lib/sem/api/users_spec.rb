@@ -91,7 +91,7 @@ describe Sem::API::Users do
       it "raises an exception" do
         expected_message = "[ERROR] User lookup failed\n\nUser #{instance_name} not found."
 
-        expect { described_class.info(instance_name) }.to raise_exception(Sem::Errors::Resource::NotFound,
+        expect { described_class.info(instance_name) }.to raise_exception(Sem::Errors::ResourceNotFound,
                                                                           expected_message)
       end
     end
