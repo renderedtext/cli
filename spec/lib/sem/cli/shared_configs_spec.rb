@@ -131,9 +131,10 @@ describe Sem::CLI::SharedConfigs do
 
     context "org names are not matching" do
       it "raises an exception" do
-        expect { sem_run("shared-configs:rename renderedtext/tokens org/aws-tokens") }.to raise_exception(
-          Sem::Errors::OrgNamesNotMatching
-        )
+        stdout, stderr = sem_run("shared-configs:rename renderedtext/tokens org/aws-tokens")
+
+        expect(stderr.strip).to eq(Sem::Views::Teams.org_names_not_matching)
+        expect(stdout.strip).to eq("")
       end
     end
 
