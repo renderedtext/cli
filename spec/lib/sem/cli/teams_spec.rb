@@ -130,6 +130,14 @@ describe Sem::CLI::Teams do
       sem_run("teams:rename renderedtext/admins renderedtext/developers")
     end
 
+    context "org names are not matching" do
+      it "raises an exception" do
+        expect { sem_run("teams:rename renderedtext/admins org/developers") }.to raise_exception(
+          Sem::Errors::OrgNamesNotMatching
+        )
+      end
+    end
+
     it "changes the team name" do
       stdout, stderr = sem_run("teams:rename renderedtext/developers renderedtext/admins")
 
@@ -327,6 +335,14 @@ describe Sem::CLI::Teams do
         sem_run("teams:projects:add renderedtext/developers renderedtext/cli")
       end
 
+      context "org names are not matching" do
+        it "raises an exception" do
+          expect { sem_run("teams:projects:add renderedtext/developers org/cli") }.to raise_exception(
+            Sem::Errors::OrgNamesNotMatching
+          )
+        end
+      end
+
       it "add a project to the team" do
         stdout, stderr = sem_run("teams:projects:add renderedtext/developers renderedtext/cli")
 
@@ -342,6 +358,14 @@ describe Sem::CLI::Teams do
         expect(Sem::API::Projects).to receive(:remove_from_team).with("renderedtext", "developers", "api")
 
         sem_run("teams:projects:remove renderedtext/developers renderedtext/api")
+      end
+
+      context "org names are not matching" do
+        it "raises an exception" do
+          expect { sem_run("teams:projects:remove renderedtext/developers org/api") }.to raise_exception(
+            Sem::Errors::OrgNamesNotMatching
+          )
+        end
       end
 
       it "removes a project from the team" do
@@ -404,6 +428,14 @@ describe Sem::CLI::Teams do
         sem_run("teams:shared-configs:add rt/developers rt/aws-tokens")
       end
 
+      context "org names are not matching" do
+        it "raises an exception" do
+          expect { sem_run("teams:shared-configs:add rt/developers org/aws-tokens") }.to raise_exception(
+            Sem::Errors::OrgNamesNotMatching
+          )
+        end
+      end
+
       it "add a project to the team" do
         stdout, stderr = sem_run("teams:shared-configs:add renderedtext/developers renderedtext/aws-tokens")
 
@@ -419,6 +451,14 @@ describe Sem::CLI::Teams do
         expect(Sem::API::SharedConfigs).to receive(:remove_from_team).with("rt", "developers", "tokens")
 
         sem_run("teams:shared-configs:remove rt/developers rt/tokens")
+      end
+
+      context "org names are not matching" do
+        it "raises an exception" do
+          expect { sem_run("teams:shared-configs:remove rt/developers org/tokens") }.to raise_exception(
+            Sem::Errors::OrgNamesNotMatching
+          )
+        end
       end
 
       it "removes a project from the team" do
