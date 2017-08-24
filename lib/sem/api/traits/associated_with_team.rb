@@ -7,7 +7,7 @@ module Sem
 
           instances = api.list_for_team(team[:id]).to_a
 
-          instances.map { |instance| to_hash(instance) }
+          instances.map { |instance| to_hash(instance, org_name) }
         end
 
         def add_to_team(org_name, team_name, instance_name)

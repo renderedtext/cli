@@ -35,7 +35,7 @@ shared_examples "associated_with_team" do
     end
 
     it "converts the instances to instance hashes" do
-      expect(described_class).to receive(:to_hash).with(instance)
+      expect(described_class).to receive(:to_hash).with(instance, org_name)
 
       described_class.list_for_team(org_name, team_name)
     end
