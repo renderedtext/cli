@@ -179,7 +179,7 @@ describe Sem::API::SharedConfigs do
   describe ".delete" do
     before do
       allow(described_class).to receive(:info).and_return(instance_hash)
-      allow(class_api).to receive(:delete)
+      allow(class_api).to receive(:delete!)
     end
 
     it "calls info on the described class" do
@@ -189,9 +189,20 @@ describe Sem::API::SharedConfigs do
     end
 
     it "calls delete on the class_api" do
-      expect(class_api).to receive(:delete).with(instance_id)
+      expect(class_api).to receive(:delete!).with(instance_id)
 
       described_class.delete(org_name, instance_name)
+    end
+
+    context "deletion failed" do
+      before { allow(class_api).to receive(:delete!).and_raise(SemaphoreClient::Exceptions::RequestFailed) }
+
+      it "raises an exception" do
+        expect { described_class.delete(org_name, instance_name) }.to raise_exception(
+          Sem::Errors::Resource::NotDeleted,
+          "Shared Configuration org/config not deleted."
+        )
+      end
     end
   end
 
