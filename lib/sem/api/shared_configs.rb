@@ -3,6 +3,7 @@ module Sem
     class SharedConfigs < Base
       extend Traits::AssociatedWithTeam
       extend Traits::AssociatedWithOrg
+      extend Traits::AssociatedWithProject
 
       class << self
         def list

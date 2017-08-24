@@ -153,7 +153,7 @@ class Sem::CLI::Teams < Dracula
       puts "Shared Configuration #{team_org_name}/#{shared_config_name} added to the team."
     end
 
-    desc "remove", "removes a project from the team"
+    desc "remove", "removes a shared Configuration from the team"
     def remove(team, shared_config)
       team_org_name, team_name = Sem::SRN.parse_team(team)
       shared_config_org_name, shared_config_name = Sem::SRN.parse_shared_config(shared_config)

@@ -2,6 +2,7 @@ require "spec_helper"
 
 require_relative "traits/shared_examples_for_associated_with_org"
 require_relative "traits/shared_examples_for_associated_with_team"
+require_relative "traits/shared_examples_for_associated_with_project"
 
 describe Sem::API::SharedConfigs do
   let(:class_api) { instance_double(SemaphoreClient::Api::SharedConfig) }
@@ -9,6 +10,7 @@ describe Sem::API::SharedConfigs do
 
   let(:org_name) { "org" }
   let(:team_name) { "team" }
+  let(:project_name) { "project-ultra-plus" }
 
   let(:instance_id) { 0 }
   let(:instance_name) { "config" }
@@ -39,6 +41,7 @@ describe Sem::API::SharedConfigs do
 
   it_behaves_like "associated_with_org"
   it_behaves_like "associated_with_team"
+  it_behaves_like "associated_with_project"
 
   describe ".list" do
     let(:org_username) { "org" }
