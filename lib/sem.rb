@@ -34,7 +34,7 @@ module Sem
 
       0
     rescue Sem::Errors::Resource::Base => e
-      on_resource_exception(e)
+      puts e.message
 
       1
     rescue Sem::Errors::OrgNamesNotMatching
@@ -60,25 +60,6 @@ module Sem
     end
 
     private
-
-    def on_resource_exception(exception)
-      puts resource_exception_title(exception)
-      puts ""
-      puts exception.message
-    end
-
-    def resource_exception_title(exception)
-      case exception.class
-      when Sem::Errors::Resource::NotFound
-        "[ERROR] Resource lookup failed"
-      when Sem::Errors::Resource::NotCreated
-        "[ERROR] Resource creation failed"
-      when Sem::Errors::Resource::NotUpdated
-        "[ERROR] Resource update failed"
-      else
-        "[ERROR] Resource operation failed"
-      end
-    end
 
     def on_org_names_not_matching
       puts "[ERROR] Organization names not matching."

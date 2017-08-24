@@ -85,7 +85,7 @@ describe Sem::API::Projects do
       before { allow(class_api).to receive(:list_for_org).and_return([]) }
 
       it "raises an exception" do
-        expected_message = "Project #{org_name}/#{instance_name} not found."
+        expected_message = "[ERROR] Project lookup failed\n\nProject #{org_name}/#{instance_name} not found."
 
         expect { described_class.info(org_name, instance_name) }.to raise_exception(Sem::Errors::Resource::NotFound,
                                                                                     expected_message)

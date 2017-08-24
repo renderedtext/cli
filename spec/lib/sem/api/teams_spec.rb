@@ -87,7 +87,7 @@ describe Sem::API::Teams do
       before { allow(described_class).to receive(:list_for_org).and_return([]) }
 
       it "raises an exception" do
-        expected_message = "Team #{org_name}/#{instance_name} not found."
+        expected_message = "[ERROR] Team lookup failed\n\nTeam #{org_name}/#{instance_name} not found."
 
         expect { described_class.info(org_name, instance_name) }.to raise_exception(Sem::Errors::Resource::NotFound,
                                                                                     expected_message)
@@ -122,7 +122,7 @@ describe Sem::API::Teams do
       before { allow(class_api).to receive(:create_for_org).and_return(nil) }
 
       it "raises an exception" do
-        expected_message = "Team #{org_name}/#{instance_name} not created."
+        expected_message = "[ERROR] Team creation failed\n\nTeam #{org_name}/#{instance_name} not created."
 
         expect { described_class.create(org_name, args) }.to raise_exception(Sem::Errors::Resource::NotCreated,
                                                                              expected_message)
@@ -160,7 +160,7 @@ describe Sem::API::Teams do
       before { allow(class_api).to receive(:update).and_return(nil) }
 
       it "raises an exception" do
-        expected_message = "Team #{org_name}/#{instance_name} not updated."
+        expected_message = "[ERROR] Team update failed\n\nTeam #{org_name}/#{instance_name} not updated."
 
         expect { described_class.update(org_name, instance_name, args) }.to raise_exception(
           Sem::Errors::Resource::NotUpdated,
