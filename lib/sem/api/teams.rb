@@ -29,8 +29,6 @@ module Sem
         def update(org_name, team_name, args)
           team = info(org_name, team_name)
 
-          raise_not_found("Team", [org_name, team_name]) if team.nil?
-
           team = api.update(team[:id], args)
 
           raise_not_updated("Team", [org_name, team_name]) if team.nil?
@@ -40,8 +38,6 @@ module Sem
 
         def delete(org_name, team_name)
           team = info(org_name, team_name)
-
-          raise_not_found("Team", [org_name, team_name]) if team.nil?
 
           api.delete(team[:id])
         end
