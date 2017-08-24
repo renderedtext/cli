@@ -37,7 +37,7 @@ describe Sem::API::UsersWithPermissions do
     let(:user_2) { instance_double(SemaphoreClient::Model::User, :username => "user_2") }
 
     let(:team_0) { instance_double(SemaphoreClient::Model::Team, :id => 0, :permission => "admin") }
-    let(:team_1) { instance_double(SemaphoreClient::Model::Team, :id => 1, :permission => "write") }
+    let(:team_1) { instance_double(SemaphoreClient::Model::Team, :id => 1, :permission => "edit") }
     let(:team_2) { instance_double(SemaphoreClient::Model::Team, :id => 2, :permission => "read") }
 
     before do
@@ -53,7 +53,7 @@ describe Sem::API::UsersWithPermissions do
 
       expect(return_value).to eql([
         { :id => "user_0", :permission => "admin" },
-        { :id => "user_1", :permission => "write" },
+        { :id => "user_1", :permission => "edit" },
         { :id => "user_2", :permission => "read" }
       ])
     end

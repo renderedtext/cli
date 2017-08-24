@@ -35,7 +35,7 @@ module Sem
         def list_owners(name)
           owners_team = list_teams(name).find { |team| team[:name] == "Owners" }
 
-          owners = client.users.list_for_team(owners_team[:id]).to_a
+          owners = client.users.list_for_team(Hash[owners_team.to_a][:id]).to_a
 
           owners.map { |owner| Sem::API::Users.to_hash(owner) }
         end
