@@ -39,7 +39,9 @@ module Sem
         def delete(org_name, team_name)
           team = info(org_name, team_name)
 
-          api.delete(team[:id])
+          api.delete!(team[:id])
+        rescue SemaphoreClient::Exceptions::RequestFailed
+          raise_not_deleted("Team", [org_name, team_name])
         end
 
         def api

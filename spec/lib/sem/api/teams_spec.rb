@@ -6,7 +6,7 @@ describe Sem::API::Teams do
   let(:class_api) { instance_double(SemaphoreClient::Api::Team) }
   let(:client) { instance_double(SemaphoreClient, :teams => class_api) }
 
-  let(:org_name) { "org_0" }
+  let(:org_name) { "org" }
   let(:instance_name) { "instance" }
 
   let(:instance_id) { 0 }
@@ -173,7 +173,7 @@ describe Sem::API::Teams do
   describe ".delete" do
     before do
       allow(described_class).to receive(:info).and_return(instance_hash)
-      allow(class_api).to receive(:delete)
+      allow(class_api).to receive(:delete!)
     end
 
     it "calls info on the described class" do
@@ -183,9 +183,20 @@ describe Sem::API::Teams do
     end
 
     it "calls delete on the class_api" do
-      expect(class_api).to receive(:delete).with(instance_id)
+      expect(class_api).to receive(:delete!).with(instance_id)
 
       described_class.delete(org_name, instance_name)
+    end
+
+    context "deletion failed" do
+      before { allow(class_api).to receive(:delete!).and_raise(SemaphoreClient::Exceptions::RequestFailed) }
+
+      it "raises an exception" do
+        expect { described_class.delete(org_name, instance_name) }.to raise_exception(
+          Sem::Errors::Resource::NotDeleted,
+          "Team org/instance not deleted."
+        )
+      end
     end
   end
 
