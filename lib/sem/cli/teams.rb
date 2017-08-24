@@ -32,10 +32,12 @@ class Sem::CLI::Teams < Dracula
 
   desc "rename", "change the name of the team"
   def rename(old_team, new_team)
-    org_name, old_name = Sem::SRN.parse_team(old_team)
-    _, new_name = Sem::SRN.parse_team(new_team)
+    old_org_name, old_name = Sem::SRN.parse_team(old_team)
+    new_org_name, new_name = Sem::SRN.parse_team(new_team)
 
-    team_instance = Sem::API::Teams.update(org_name, old_name, :name => new_name)
+    raise Sem::Errors::OrgNamesNotMatching unless old_org_name == new_org_name
+
+    team_instance = Sem::API::Teams.update(old_org_name, old_name, :name => new_name)
 
     Sem::Views::Teams.info(team_instance)
   end
@@ -106,22 +108,26 @@ class Sem::CLI::Teams < Dracula
 
     desc "add", "add a project to a team"
     def add(team, project)
-      org_name, team_name = Sem::SRN.parse_team(team)
-      _, project_name = Sem::SRN.parse_project(project)
+      team_org_name, team_name = Sem::SRN.parse_team(team)
+      project_org_name, project_name = Sem::SRN.parse_project(project)
 
-      Sem::API::Projects.add_to_team(org_name, team_name, project_name)
+      raise Sem::Errors::OrgNamesNotMatching unless team_org_name == project_org_name
 
-      puts "Project #{org_name}/#{project_name} added to the team."
+      Sem::API::Projects.add_to_team(team_org_name, team_name, project_name)
+
+      puts "Project #{team_org_name}/#{project_name} added to the team."
     end
 
     desc "remove", "removes a project from the team"
     def remove(team, project)
-      org_name, team_name = Sem::SRN.parse_team(team)
-      _, project_name = Sem::SRN.parse_project(project)
+      team_org_name, team_name = Sem::SRN.parse_team(team)
+      project_org_name, project_name = Sem::SRN.parse_project(project)
 
-      Sem::API::Projects.remove_from_team(org_name, team_name, project_name)
+      raise Sem::Errors::OrgNamesNotMatching unless team_org_name == project_org_name
 
-      puts "Project #{org_name}/#{project_name} removed from the team."
+      Sem::API::Projects.remove_from_team(team_org_name, team_name, project_name)
+
+      puts "Project #{team_org_name}/#{project_name} removed from the team."
     end
   end
 
@@ -137,22 +143,26 @@ class Sem::CLI::Teams < Dracula
 
     desc "add", "add a shared configuration to a team"
     def add(team, shared_config)
-      org_name, team_name = Sem::SRN.parse_team(team)
-      _, shared_config_name = Sem::SRN.parse_shared_config(shared_config)
+      team_org_name, team_name = Sem::SRN.parse_team(team)
+      shared_config_org_name, shared_config_name = Sem::SRN.parse_shared_config(shared_config)
 
-      Sem::API::SharedConfigs.add_to_team(org_name, team_name, shared_config_name)
+      raise Sem::Errors::OrgNamesNotMatching unless team_org_name == shared_config_org_name
 
-      puts "Shared Configuration #{org_name}/#{shared_config_name} added to the team."
+      Sem::API::SharedConfigs.add_to_team(team_org_name, team_name, shared_config_name)
+
+      puts "Shared Configuration #{team_org_name}/#{shared_config_name} added to the team."
     end
 
     desc "remove", "removes a shared Configuration from the team"
     def remove(team, shared_config)
-      org_name, team_name = Sem::SRN.parse_team(team)
-      _, shared_config_name = Sem::SRN.parse_shared_config(shared_config)
+      team_org_name, team_name = Sem::SRN.parse_team(team)
+      shared_config_org_name, shared_config_name = Sem::SRN.parse_shared_config(shared_config)
 
-      Sem::API::SharedConfigs.remove_from_team(org_name, team_name, shared_config_name)
+      raise Sem::Errors::OrgNamesNotMatching unless team_org_name == shared_config_org_name
 
-      puts "Shared Configuration #{org_name}/#{shared_config_name} removed from the team."
+      Sem::API::SharedConfigs.remove_from_team(team_org_name, team_name, shared_config_name)
+
+      puts "Shared Configuration #{team_org_name}/#{shared_config_name} removed from the team."
     end
   end
 

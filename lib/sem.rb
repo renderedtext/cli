@@ -37,6 +37,10 @@ module Sem
       on_resource_exception(e)
 
       1
+    rescue Sem::Errors::OrgNamesNotMatching
+      on_org_names_not_matching
+
+      1
     rescue Sem::Errors::InvalidParameter => e
       on_invalid_parameter(e)
 
@@ -65,6 +69,12 @@ module Sem
       puts "[ERROR] Resource operation failed."
       puts ""
       puts exception.message
+    end
+
+    def on_org_names_not_matching
+      puts "[ERROR] Organization names not matching."
+      puts ""
+      puts "Resource manipulation is only possible within the same organization."
     end
 
     def on_invalid_srn(exception)
