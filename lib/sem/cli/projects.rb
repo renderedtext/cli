@@ -31,8 +31,6 @@ class Sem::CLI::Projects < Dracula
       org_name, project_name = Sem::SRN.parse_project(project)
       _, shared_config_name = Sem::SRN.parse_shared_config(shared_config)
 
-      # TODO org_name must be the same cc @ijovan
-
       Sem::API::SharedConfigs.add_to_project(org_name, project_name, shared_config_name)
 
       puts "Shared Configuration #{org_name}/#{shared_config_name} added to the project."
@@ -42,8 +40,6 @@ class Sem::CLI::Projects < Dracula
     def remove(project, shared_config)
       org_name, project_name = Sem::SRN.parse_project(project)
       _, shared_config_name = Sem::SRN.parse_shared_config(shared_config)
-
-      # TODO org_name must be the same cc @ijovan
 
       Sem::API::SharedConfigs.remove_from_project(org_name, project_name, shared_config_name)
 
