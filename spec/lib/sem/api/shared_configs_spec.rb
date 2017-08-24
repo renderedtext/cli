@@ -201,10 +201,11 @@ describe Sem::API::SharedConfigs do
       before { allow(class_api).to receive(:delete!).and_raise(SemaphoreClient::Exceptions::RequestFailed) }
 
       it "raises an exception" do
-        expect { described_class.delete(org_name, instance_name) }.to raise_exception(
-          Sem::Errors::Resource::NotDeleted,
-          "Shared Configuration org/config not deleted."
-        )
+        expected_message = "[ERROR] Shared Configuration deletion failed\n\n" \
+          "Shared Configuration #{org_name}/#{instance_name} not deleted."
+
+        expect { described_class.delete(org_name, instance_name) }.to raise_exception(Sem::Errors::ResourceNotDeleted,
+                                                                                      expected_message)
       end
     end
   end

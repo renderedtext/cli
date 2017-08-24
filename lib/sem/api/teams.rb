@@ -41,7 +41,7 @@ module Sem
 
           api.delete!(team[:id])
         rescue SemaphoreClient::Exceptions::RequestFailed
-          raise_not_deleted("Team", [org_name, team_name])
+          raise Sem::Errors::ResourceNotDeleted.new("Team", [org_name, team_name])
         end
 
         def api

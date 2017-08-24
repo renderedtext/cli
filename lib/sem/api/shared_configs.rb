@@ -51,7 +51,7 @@ module Sem
 
           api.delete!(shared_config[:id])
         rescue SemaphoreClient::Exceptions::RequestFailed
-          raise_not_deleted("Shared Configuration", [org_name, shared_config_name])
+          raise Sem::Errors::ResourceNotDeleted.new("Shared Configuration", [org_name, shared_config_name])
         end
 
         def list_env_vars(org_name, shared_config_name)

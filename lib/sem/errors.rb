@@ -29,6 +29,12 @@ module Sem::Errors
     end
   end
 
+  class ResourceNotDeleted < ResourceException
+    def message
+      "[ERROR] #{@resource} deletion failed\n\n#{@resource} #{@path.join("/")} not deleted."
+    end
+  end
+
   module Auth
     NoCredentials = Class.new(Sem::Errors::Base)
     InvalidCredentials = Class.new(Sem::Errors::Base)
