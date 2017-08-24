@@ -11,6 +11,7 @@ module Sem::Errors
     NotFound = Class.new(Base)
     NotCreated = Class.new(Base)
     NotUpdated = Class.new(Base)
+    NotDeleted = Class.new(Base)
   end
 
   module Auth

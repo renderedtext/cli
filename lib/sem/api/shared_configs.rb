@@ -43,7 +43,9 @@ module Sem
         def delete(org_name, shared_config_name)
           shared_config = info(org_name, shared_config_name)
 
-          api.delete(shared_config[:id])
+          api.delete!(shared_config[:id])
+        rescue SemaphoreClient::Exceptions::RequestFailed
+          raise_not_deleted("Shared Configuration", [org_name, shared_config_name])
         end
 
         def list_env_vars(org_name, shared_config_name)

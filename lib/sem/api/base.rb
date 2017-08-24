@@ -21,6 +21,10 @@ module Sem
         def raise_not_updated(resource, path)
           raise Sem::Errors::Resource::NotUpdated, "#{resource} #{path.join("/")} not updated."
         end
+
+        def raise_not_deleted(resource, path)
+          raise Sem::Errors::Resource::NotDeleted, "#{resource} #{path.join("/")} not deleted."
+        end
       end
     end
   end
