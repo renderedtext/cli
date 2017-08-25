@@ -134,7 +134,13 @@ describe Sem::CLI::Teams do
       it "raises an exception" do
         stdout, stderr = sem_run("teams:rename renderedtext/admins org/developers")
 
-        expect(stderr.strip).to eq(Sem::Views::Teams.org_names_not_matching)
+        msg = [
+          "[ERROR] Organization names not matching.",
+          "",
+          "Old team name \"renderedtext/admins\" and new team name \"org/developers\" are not in the same organization."
+        ]
+
+        expect(stderr.strip).to eq(msg.join("\n"))
         expect(stdout.strip).to eq("")
       end
     end
@@ -340,7 +346,13 @@ describe Sem::CLI::Teams do
         it "raises an exception" do
           stdout, stderr = sem_run("teams:projects:add renderedtext/developers org/cli")
 
-          expect(stderr.strip).to eq(Sem::Views::Teams.org_names_not_matching)
+          msg = [
+            "[ERROR] Organization names not matching.",
+            "",
+            "Team \"renderedtext/developers\" and project \"org/cli\" are not in the same organization."
+          ]
+
+          expect(stderr.strip).to eq(msg.join("\n"))
           expect(stdout.strip).to eq("")
         end
       end
@@ -366,7 +378,13 @@ describe Sem::CLI::Teams do
         it "raises an exception" do
           stdout, stderr = sem_run("teams:projects:remove renderedtext/developers org/api")
 
-          expect(stderr.strip).to eq(Sem::Views::Teams.org_names_not_matching)
+          msg = [
+            "[ERROR] Organization names not matching.",
+            "",
+            "Team \"renderedtext/developers\" and project \"org/api\" are not in the same organization."
+          ]
+
+          expect(stderr.strip).to eq(msg.join("\n"))
           expect(stdout.strip).to eq("")
         end
       end
@@ -435,7 +453,13 @@ describe Sem::CLI::Teams do
         it "raises an exception" do
           stdout, stderr = sem_run("teams:shared-configs:add rt/developers org/aws-tokens")
 
-          expect(stderr.strip).to eq(Sem::Views::Teams.org_names_not_matching)
+          msg = [
+            "[ERROR] Organization names not matching.",
+            "",
+            "Team \"rt/developers\" and shared configuration \"org/aws-tokens\" are not in the same organization."
+          ]
+
+          expect(stderr.strip).to eq(msg.join("\n"))
           expect(stdout.strip).to eq("")
         end
       end
@@ -461,7 +485,13 @@ describe Sem::CLI::Teams do
         it "raises an exception" do
           stdout, stderr = sem_run("teams:shared-configs:remove rt/developers org/tokens")
 
-          expect(stderr.strip).to eq(Sem::Views::Teams.org_names_not_matching)
+          msg = [
+            "[ERROR] Organization names not matching.",
+            "",
+            "Team \"rt/developers\" and shared configuration \"org/tokens\" are not in the same organization."
+          ]
+
+          expect(stderr.strip).to eq(msg.join("\n"))
           expect(stdout.strip).to eq("")
         end
       end

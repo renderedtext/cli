@@ -140,7 +140,13 @@ describe Sem::CLI::Projects do
         it "raises an exception" do
           stdout, stderr = sem_run("projects:shared-configs:add rt/prj1 org/aws-tokens")
 
-          expect(stderr.strip).to eq(Sem::Views::Teams.org_names_not_matching)
+          msg = [
+            "[ERROR] Organization names not matching.",
+            "",
+            "Project \"rt/prj1\" and shared configuration \"org/aws-tokens\" are not in the same organization."
+          ]
+
+          expect(stderr.strip).to eq(msg.join("\n"))
           expect(stdout.strip).to eq("")
         end
       end
@@ -166,7 +172,13 @@ describe Sem::CLI::Projects do
         it "raises an exception" do
           stdout, stderr = sem_run("projects:shared-configs:remove rt/prj1 org/tokens")
 
-          expect(stderr.strip).to eq(Sem::Views::Teams.org_names_not_matching)
+          msg = [
+            "[ERROR] Organization names not matching.",
+            "",
+            "Project \"rt/prj1\" and shared configuration \"org/tokens\" are not in the same organization."
+          ]
+
+          expect(stderr.strip).to eq(msg.join("\n"))
           expect(stdout.strip).to eq("")
         end
       end

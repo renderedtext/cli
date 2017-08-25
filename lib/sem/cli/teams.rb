@@ -32,12 +32,14 @@ class Sem::CLI::Teams < Dracula
 
   desc "rename", "change the name of the team"
   def rename(old_team, new_team)
-    old_org_name, old_name = Sem::SRN.parse_team(old_team)
-    new_org_name, new_name = Sem::SRN.parse_team(new_team)
+    old_org_name, old_team_name = Sem::SRN.parse_team(old_team)
+    new_org_name, new_team_name = Sem::SRN.parse_team(new_team)
 
-    abort Sem::Views::Teams.org_names_not_matching unless old_org_name == new_org_name
+    if old_org_name != new_org_name
+      abort Sem::Views::Teams.org_names_not_matching("old team name", "new team name", old_team, new_team)
+    end
 
-    team_instance = Sem::API::Teams.update(old_org_name, old_name, :name => new_name)
+    team_instance = Sem::API::Teams.update(old_org_name, old_team_name, :name => new_team_name)
 
     Sem::Views::Teams.info(team_instance)
   end
@@ -111,7 +113,9 @@ class Sem::CLI::Teams < Dracula
       team_org_name, team_name = Sem::SRN.parse_team(team)
       project_org_name, project_name = Sem::SRN.parse_project(project)
 
-      abort Sem::Views::Teams.org_names_not_matching unless team_org_name == project_org_name
+      if team_org_name != project_org_name
+        abort Sem::Views::Teams.org_names_not_matching("team", "project", team, project)
+      end
 
       Sem::API::Projects.add_to_team(team_org_name, team_name, project_name)
 
@@ -123,7 +127,9 @@ class Sem::CLI::Teams < Dracula
       team_org_name, team_name = Sem::SRN.parse_team(team)
       project_org_name, project_name = Sem::SRN.parse_project(project)
 
-      abort Sem::Views::Teams.org_names_not_matching unless team_org_name == project_org_name
+      if team_org_name != project_org_name
+        abort Sem::Views::Teams.org_names_not_matching("team", "project", team, project)
+      end
 
       Sem::API::Projects.remove_from_team(team_org_name, team_name, project_name)
 
@@ -146,7 +152,9 @@ class Sem::CLI::Teams < Dracula
       team_org_name, team_name = Sem::SRN.parse_team(team)
       shared_config_org_name, shared_config_name = Sem::SRN.parse_shared_config(shared_config)
 
-      abort Sem::Views::Teams.org_names_not_matching unless team_org_name == shared_config_org_name
+      if team_org_name != shared_config_org_name
+        abort Sem::Views::Teams.org_names_not_matching("team", "shared configuration", team, shared_config)
+      end
 
       Sem::API::SharedConfigs.add_to_team(team_org_name, team_name, shared_config_name)
 
@@ -158,7 +166,9 @@ class Sem::CLI::Teams < Dracula
       team_org_name, team_name = Sem::SRN.parse_team(team)
       shared_config_org_name, shared_config_name = Sem::SRN.parse_shared_config(shared_config)
 
-      abort Sem::Views::Teams.org_names_not_matching unless team_org_name == shared_config_org_name
+      if team_org_name != shared_config_org_name
+        abort Sem::Views::Teams.org_names_not_matching("team", "shared configuration", team, shared_config)
+      end
 
       Sem::API::SharedConfigs.remove_from_team(team_org_name, team_name, shared_config_name)
 
