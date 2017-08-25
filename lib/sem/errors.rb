@@ -2,7 +2,6 @@ module Sem::Errors
   Base = Class.new(StandardError)
 
   InvalidSRN = Class.new(StandardError)
-  OrgNamesNotMatching = Class.new(StandardError)
 
   class ResourceException < Base
     def initialize(resource, path)

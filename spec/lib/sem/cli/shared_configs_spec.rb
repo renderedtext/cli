@@ -33,7 +33,7 @@ describe Sem::CLI::SharedConfigs do
       end
 
       it "lists shared configurations" do
-        stdout, stderr = sem_run("shared-configs:list")
+        stdout, stderr, status = sem_run("shared-configs:list")
 
         msg = [
           "ID                                    NAME                     CONFIG FILES  ENV VARS",
@@ -43,6 +43,7 @@ describe Sem::CLI::SharedConfigs do
 
         expect(stdout.strip).to eq(msg.join("\n"))
         expect(stderr).to eq("")
+        expect(status).to eq(:ok)
       end
     end
 
@@ -50,7 +51,7 @@ describe Sem::CLI::SharedConfigs do
       before { allow(Sem::API::SharedConfigs).to receive(:list).and_return([]) }
 
       it "offers to create your first shared config" do
-        stdout, stderr = sem_run("shared-configs:list")
+        stdout, stderr, status = sem_run("shared-configs:list")
 
         msg = [
           "You don't have any shared configurations on Semaphore.",
@@ -64,6 +65,7 @@ describe Sem::CLI::SharedConfigs do
 
         expect(stdout).to eq(msg.join("\n"))
         expect(stderr).to eq("")
+        expect(status).to eq(:ok)
       end
     end
   end
@@ -78,7 +80,7 @@ describe Sem::CLI::SharedConfigs do
     end
 
     it "shows information about a shared configuration" do
-      stdout, stderr = sem_run("shared-configs:info renderedtext/aws-tokens")
+      stdout, stderr, status = sem_run("shared-configs:info renderedtext/aws-tokens")
 
       msg = [
         "ID                     3bc7ed43-ac8a-487e-b488-c38bc757a034",
@@ -91,6 +93,7 @@ describe Sem::CLI::SharedConfigs do
 
       expect(stdout.strip).to eq(msg.join("\n"))
       expect(stderr).to eq("")
+      expect(status).to eq(:ok)
     end
   end
 
@@ -104,7 +107,7 @@ describe Sem::CLI::SharedConfigs do
     end
 
     it "create a new shared configuration" do
-      stdout, stderr = sem_run("shared-configs:create renderedtext/aws-tokens")
+      stdout, stderr, status = sem_run("shared-configs:create renderedtext/aws-tokens")
 
       msg = [
         "ID                     3bc7ed43-ac8a-487e-b488-c38bc757a034",
@@ -117,6 +120,7 @@ describe Sem::CLI::SharedConfigs do
 
       expect(stdout.strip).to eq(msg.join("\n"))
       expect(stderr).to eq("")
+      expect(status).to eq(:ok)
     end
   end
 
@@ -131,14 +135,23 @@ describe Sem::CLI::SharedConfigs do
 
     context "org names are not matching" do
       it "raises an exception" do
-        expect { sem_run("shared-configs:rename renderedtext/tokens org/aws-tokens") }.to raise_exception(
-          Sem::Errors::OrgNamesNotMatching
-        )
+        stdout, stderr, status = sem_run("shared-configs:rename renderedtext/tokens org/aws-tokens")
+
+        msg = [
+          "[ERROR] Organization names not matching.",
+          "",
+          "Old shared configuration name \"renderedtext/tokens\" and new shared configuration name \"org/aws-tokens\"" \
+          " are not in the same organization."
+        ]
+
+        expect(stderr.strip).to eq(msg.join("\n"))
+        expect(stdout.strip).to eq("")
+        expect(status).to eq(:system_error)
       end
     end
 
     it "renames a shared configuration" do
-      stdout, stderr = sem_run("shared-configs:rename renderedtext/tokens renderedtext/aws-tokens")
+      stdout, stderr, status = sem_run("shared-configs:rename renderedtext/tokens renderedtext/aws-tokens")
 
       msg = [
         "ID                     3bc7ed43-ac8a-487e-b488-c38bc757a034",
@@ -151,6 +164,7 @@ describe Sem::CLI::SharedConfigs do
 
       expect(stdout.strip).to eq(msg.join("\n"))
       expect(stderr).to eq("")
+      expect(status).to eq(:ok)
     end
   end
 
@@ -164,10 +178,11 @@ describe Sem::CLI::SharedConfigs do
     end
 
     it "deletes the shared configuration" do
-      stdout, stderr = sem_run("shared-configs:delete renderedtext/tokens")
+      stdout, stderr, status = sem_run("shared-configs:delete renderedtext/tokens")
 
       expect(stdout.strip).to eq("Deleted shared configuration renderedtext/tokens")
       expect(stderr).to eq("")
+      expect(status).to eq(:ok)
     end
   end
 
@@ -199,7 +214,7 @@ describe Sem::CLI::SharedConfigs do
       end
 
       it "lists files in a shared_configuration" do
-        stdout, stderr = sem_run("shared-configs:files:list renderedtext/tokens")
+        stdout, stderr, status = sem_run("shared-configs:files:list renderedtext/tokens")
 
         msg = [
           "ID                                    NAME         ENCRYPTED?",
@@ -209,6 +224,7 @@ describe Sem::CLI::SharedConfigs do
 
         expect(stdout.strip).to eq(msg.join("\n"))
         expect(stderr).to eq("")
+        expect(status).to eq(:ok)
       end
     end
 
@@ -236,10 +252,11 @@ describe Sem::CLI::SharedConfigs do
       end
 
       it "adds a file to the shared configuration" do
-        stdout, stderr = sem_run("shared-configs:files:add renderedtext/tokens secrets.yml -f secrets.yml")
+        stdout, stderr, status = sem_run("shared-configs:files:add renderedtext/tokens secrets.yml -f secrets.yml")
 
         expect(stdout.strip).to eq("Added secrets.yml to renderedtext/tokens")
         expect(stderr).to eq("")
+        expect(status).to eq(:ok)
       end
     end
 
@@ -253,10 +270,11 @@ describe Sem::CLI::SharedConfigs do
       end
 
       it "deletes a file from the shared configuration" do
-        stdout, stderr = sem_run("shared-configs:files:remove renderedtext/tokens secrets.yml")
+        stdout, stderr, status = sem_run("shared-configs:files:remove renderedtext/tokens secrets.yml")
 
         expect(stdout.strip).to eq("Removed secrets.yml from renderedtext/tokens")
         expect(stderr).to eq("")
+        expect(status).to eq(:ok)
       end
     end
 
@@ -292,7 +310,7 @@ describe Sem::CLI::SharedConfigs do
       end
 
       it "lists env vars in a shared_configuration" do
-        stdout, stderr = sem_run("shared-configs:env-vars:list renderedtext/tokens")
+        stdout, stderr, status = sem_run("shared-configs:env-vars:list renderedtext/tokens")
 
         msg = [
           "ID                                    NAME           ENCRYPTED?  CONTENT",
@@ -302,6 +320,7 @@ describe Sem::CLI::SharedConfigs do
 
         expect(stdout.strip).to eq(msg.join("\n"))
         expect(stderr).to eq("")
+        expect(status).to eq(:ok)
       end
     end
 
@@ -318,10 +337,12 @@ describe Sem::CLI::SharedConfigs do
       end
 
       it "adds an env var to the shared configuration" do
-        stdout, stderr = sem_run("shared-configs:env-vars:add rt/tokens --name AWS_CLIENT_ID --content 3412341234123")
+        stdout, stderr, status =
+          sem_run("shared-configs:env-vars:add rt/tokens --name AWS_CLIENT_ID --content 3412341234123")
 
         expect(stderr).to eq("")
         expect(stdout.strip).to eq("Added AWS_CLIENT_ID to rt/tokens")
+        expect(status).to eq(:ok)
       end
     end
 
@@ -335,10 +356,11 @@ describe Sem::CLI::SharedConfigs do
       end
 
       it "deletes an env var from the shared configuration" do
-        stdout, stderr = sem_run("shared-configs:env-vars:remove renderedtext/tokens AWS_CLIENT_ID")
+        stdout, stderr, status = sem_run("shared-configs:env-vars:remove renderedtext/tokens AWS_CLIENT_ID")
 
         expect(stdout.strip).to eq("Removed AWS_CLIENT_ID from renderedtext/tokens")
         expect(stderr).to eq("")
+        expect(status).to eq(:ok)
       end
     end
 

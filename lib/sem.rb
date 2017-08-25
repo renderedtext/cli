@@ -37,10 +37,6 @@ module Sem
       puts e.message
 
       1
-    rescue Sem::Errors::OrgNamesNotMatching
-      on_org_names_not_matching
-
-      1
     rescue Sem::Errors::InvalidSRN => e
       on_invalid_srn(e)
 
@@ -60,12 +56,6 @@ module Sem
     end
 
     private
-
-    def on_org_names_not_matching
-      puts "[ERROR] Organization names not matching."
-      puts ""
-      puts "Resource manipulation is only possible within the same organization."
-    end
 
     def on_invalid_srn(exception)
       puts "[ERROR] Invalid parameter formatting."

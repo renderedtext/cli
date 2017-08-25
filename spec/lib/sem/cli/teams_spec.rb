@@ -34,7 +34,7 @@ describe Sem::CLI::Teams do
       end
 
       it "lists the teams" do
-        stdout, stderr = sem_run("teams:list")
+        stdout, stderr, status = sem_run("teams:list")
 
         msg = [
           "ID                                    NAME                     PERMISSION  MEMBERS",
@@ -44,6 +44,7 @@ describe Sem::CLI::Teams do
 
         expect(stdout.strip).to eq(msg.join("\n"))
         expect(stderr).to eq("")
+        expect(status).to eq(:ok)
       end
     end
 
@@ -51,7 +52,7 @@ describe Sem::CLI::Teams do
       before { allow(Sem::API::Teams).to receive(:list).and_return([]) }
 
       it "offers you to set up a team on sempaphore" do
-        stdout, stderr = sem_run("teams:list")
+        stdout, stderr, status = sem_run("teams:list")
 
         msg = [
           "You don't have any teams on Semaphore.",
@@ -65,6 +66,7 @@ describe Sem::CLI::Teams do
 
         expect(stdout).to eq(msg.join("\n"))
         expect(stderr).to eq("")
+        expect(status).to eq(:ok)
       end
     end
   end
@@ -79,7 +81,7 @@ describe Sem::CLI::Teams do
     end
 
     it "shows information about a team" do
-      stdout, stderr = sem_run("teams:info renderedtext/developers")
+      stdout, stderr, status = sem_run("teams:info renderedtext/developers")
 
       msg = [
         "ID          3bc7ed43-ac8a-487e-b488-c38bc757a034",
@@ -92,6 +94,7 @@ describe Sem::CLI::Teams do
 
       expect(stderr).to eq("")
       expect(stdout.strip).to eq(msg.join("\n"))
+      expect(status).to eq(:ok)
     end
   end
 
@@ -105,7 +108,7 @@ describe Sem::CLI::Teams do
     end
 
     it "creates a team and displays it" do
-      stdout, stderr = sem_run("teams:create renderedtext/developers --permission write")
+      stdout, stderr, status = sem_run("teams:create renderedtext/developers --permission write")
 
       msg = [
         "ID          3bc7ed43-ac8a-487e-b488-c38bc757a034",
@@ -118,6 +121,7 @@ describe Sem::CLI::Teams do
 
       expect(stderr).to eq("")
       expect(stdout.strip).to eq(msg.join("\n"))
+      expect(status).to eq(:ok)
     end
   end
 
@@ -132,14 +136,22 @@ describe Sem::CLI::Teams do
 
     context "org names are not matching" do
       it "raises an exception" do
-        expect { sem_run("teams:rename renderedtext/admins org/developers") }.to raise_exception(
-          Sem::Errors::OrgNamesNotMatching
-        )
+        stdout, stderr, status = sem_run("teams:rename renderedtext/admins org/developers")
+
+        msg = [
+          "[ERROR] Organization names not matching.",
+          "",
+          "Old team name \"renderedtext/admins\" and new team name \"org/developers\" are not in the same organization."
+        ]
+
+        expect(stderr.strip).to eq(msg.join("\n"))
+        expect(stdout.strip).to eq("")
+        expect(status).to eq(:system_error)
       end
     end
 
     it "changes the team name" do
-      stdout, stderr = sem_run("teams:rename renderedtext/developers renderedtext/admins")
+      stdout, stderr, status = sem_run("teams:rename renderedtext/developers renderedtext/admins")
 
       msg = [
         "ID          3bc7ed43-ac8a-487e-b488-c38bc757a034",
@@ -152,6 +164,7 @@ describe Sem::CLI::Teams do
 
       expect(stderr).to eq("")
       expect(stdout.strip).to eq(msg.join("\n"))
+      expect(status).to eq(:ok)
     end
   end
 
@@ -166,18 +179,19 @@ describe Sem::CLI::Teams do
 
     context "setting an invalid permission" do
       it "raises an exception" do
-        stdout, stderr = sem_run("teams:set-permission renderedtext/developers something")
+        stdout, stderr, status = sem_run("teams:set-permission renderedtext/developers something")
 
         expected_message = "Permission \"something\" doesn't exist.\n" \
           "Choose one of the following: read, write, admin."
 
         expect(stderr.strip).to eql(expected_message)
         expect(stdout.strip).to eql("")
+        expect(status).to eq(:system_error)
       end
     end
 
     it "sets the permisssion level of the team" do
-      stdout, stderr = sem_run("teams:set-permission renderedtext/developers write")
+      stdout, stderr, status = sem_run("teams:set-permission renderedtext/developers write")
 
       msg = [
         "ID          3bc7ed43-ac8a-487e-b488-c38bc757a034",
@@ -190,6 +204,7 @@ describe Sem::CLI::Teams do
 
       expect(stderr).to eq("")
       expect(stdout.strip).to eq(msg.join("\n"))
+      expect(status).to eq(:ok)
     end
   end
 
@@ -203,7 +218,7 @@ describe Sem::CLI::Teams do
     end
 
     it "deletes the team" do
-      stdout, stderr = sem_run("teams:delete renderedtext/old-developers")
+      stdout, stderr, status = sem_run("teams:delete renderedtext/old-developers")
 
       msg = [
         "Deleted team renderedtext/old-developers"
@@ -211,6 +226,7 @@ describe Sem::CLI::Teams do
 
       expect(stderr).to eq("")
       expect(stdout.strip).to eq(msg.join("\n"))
+      expect(status).to eq(:ok)
     end
   end
 
@@ -229,7 +245,7 @@ describe Sem::CLI::Teams do
         end
 
         it "lists team members" do
-          stdout, stderr = sem_run("teams:members:list renderedtext/cli")
+          stdout, stderr, status = sem_run("teams:members:list renderedtext/cli")
 
           msg = [
             "NAME",
@@ -239,6 +255,7 @@ describe Sem::CLI::Teams do
 
           expect(stderr).to eq("")
           expect(stdout.strip).to eq(msg.join("\n"))
+          expect(status).to eq(:ok)
         end
       end
 
@@ -246,7 +263,7 @@ describe Sem::CLI::Teams do
         before { allow(Sem::API::Users).to receive(:list_for_team).and_return([]) }
 
         it "offers help adding your first member" do
-          stdout, stderr = sem_run("teams:members:list renderedtext/devs")
+          stdout, stderr, status = sem_run("teams:members:list renderedtext/devs")
 
           msg = [
             "You don't have any members in the team.",
@@ -260,6 +277,7 @@ describe Sem::CLI::Teams do
 
           expect(stderr).to eq("")
           expect(stdout).to eq(msg.join("\n"))
+          expect(status).to eq(:ok)
         end
       end
     end
@@ -274,10 +292,11 @@ describe Sem::CLI::Teams do
       end
 
       it "add a user to the team" do
-        stdout, stderr = sem_run("teams:members:add renderedtext/developers ijovan")
+        stdout, stderr, status = sem_run("teams:members:add renderedtext/developers ijovan")
 
         expect(stderr).to eq("")
         expect(stdout.strip).to eq("User ijovan added to the team.")
+        expect(status).to eq(:ok)
       end
     end
 
@@ -291,10 +310,11 @@ describe Sem::CLI::Teams do
       end
 
       it "removes a user from the team" do
-        stdout, stderr = sem_run("teams:members:remove renderedtext/developers ijovan")
+        stdout, stderr, status = sem_run("teams:members:remove renderedtext/developers ijovan")
 
         expect(stderr).to eq("")
         expect(stdout.strip).to eq("User ijovan removed from the team.")
+        expect(status).to eq(:ok)
       end
     end
   end
@@ -313,7 +333,7 @@ describe Sem::CLI::Teams do
       end
 
       it "lists projects in the team" do
-        stdout, stderr = sem_run("teams:projects:list renderedtext/cli")
+        stdout, stderr, status = sem_run("teams:projects:list renderedtext/cli")
 
         msg = [
           "ID                                    NAME",
@@ -323,6 +343,7 @@ describe Sem::CLI::Teams do
 
         expect(stderr).to eq("")
         expect(stdout.strip).to eq(msg.join("\n"))
+        expect(status).to eq(:ok)
       end
     end
 
@@ -337,17 +358,26 @@ describe Sem::CLI::Teams do
 
       context "org names are not matching" do
         it "raises an exception" do
-          expect { sem_run("teams:projects:add renderedtext/developers org/cli") }.to raise_exception(
-            Sem::Errors::OrgNamesNotMatching
-          )
+          stdout, stderr, status = sem_run("teams:projects:add renderedtext/developers org/cli")
+
+          msg = [
+            "[ERROR] Organization names not matching.",
+            "",
+            "Team \"renderedtext/developers\" and project \"org/cli\" are not in the same organization."
+          ]
+
+          expect(stderr.strip).to eq(msg.join("\n"))
+          expect(stdout.strip).to eq("")
+          expect(status).to eq(:system_error)
         end
       end
 
       it "add a project to the team" do
-        stdout, stderr = sem_run("teams:projects:add renderedtext/developers renderedtext/cli")
+        stdout, stderr, status = sem_run("teams:projects:add renderedtext/developers renderedtext/cli")
 
         expect(stderr).to eq("")
         expect(stdout.strip).to eq("Project renderedtext/cli added to the team.")
+        expect(status).to eq(:ok)
       end
     end
 
@@ -362,17 +392,26 @@ describe Sem::CLI::Teams do
 
       context "org names are not matching" do
         it "raises an exception" do
-          expect { sem_run("teams:projects:remove renderedtext/developers org/api") }.to raise_exception(
-            Sem::Errors::OrgNamesNotMatching
-          )
+          stdout, stderr, status = sem_run("teams:projects:remove renderedtext/developers org/api")
+
+          msg = [
+            "[ERROR] Organization names not matching.",
+            "",
+            "Team \"renderedtext/developers\" and project \"org/api\" are not in the same organization."
+          ]
+
+          expect(stderr.strip).to eq(msg.join("\n"))
+          expect(stdout.strip).to eq("")
+          expect(status).to eq(:system_error)
         end
       end
 
       it "removes a project from the team" do
-        stdout, stderr = sem_run("teams:projects:remove renderedtext/developers renderedtext/api")
+        stdout, stderr, status = sem_run("teams:projects:remove renderedtext/developers renderedtext/api")
 
         expect(stderr).to eq("")
         expect(stdout.strip).to eq("Project renderedtext/api removed from the team.")
+        expect(status).to eq(:ok)
       end
     end
   end
@@ -406,7 +445,7 @@ describe Sem::CLI::Teams do
       end
 
       it "lists shared configurations in the team" do
-        stdout, stderr = sem_run("teams:shared-configs:list renderedtext/aws-tokens")
+        stdout, stderr, status = sem_run("teams:shared-configs:list renderedtext/aws-tokens")
 
         msg = [
           "ID                                    NAME                     CONFIG FILES  ENV VARS",
@@ -416,6 +455,7 @@ describe Sem::CLI::Teams do
 
         expect(stderr).to eq("")
         expect(stdout.strip).to eq(msg.join("\n"))
+        expect(status).to eq(:ok)
       end
     end
 
@@ -430,17 +470,26 @@ describe Sem::CLI::Teams do
 
       context "org names are not matching" do
         it "raises an exception" do
-          expect { sem_run("teams:shared-configs:add rt/developers org/aws-tokens") }.to raise_exception(
-            Sem::Errors::OrgNamesNotMatching
-          )
+          stdout, stderr, status = sem_run("teams:shared-configs:add rt/developers org/aws-tokens")
+
+          msg = [
+            "[ERROR] Organization names not matching.",
+            "",
+            "Team \"rt/developers\" and shared configuration \"org/aws-tokens\" are not in the same organization."
+          ]
+
+          expect(stderr.strip).to eq(msg.join("\n"))
+          expect(stdout.strip).to eq("")
+          expect(status).to eq(:system_error)
         end
       end
 
       it "add a project to the team" do
-        stdout, stderr = sem_run("teams:shared-configs:add renderedtext/developers renderedtext/aws-tokens")
+        stdout, stderr, status = sem_run("teams:shared-configs:add renderedtext/developers renderedtext/aws-tokens")
 
         expect(stderr).to eq("")
         expect(stdout.strip).to eq("Shared Configuration renderedtext/aws-tokens added to the team.")
+        expect(status).to eq(:ok)
       end
     end
 
@@ -455,17 +504,26 @@ describe Sem::CLI::Teams do
 
       context "org names are not matching" do
         it "raises an exception" do
-          expect { sem_run("teams:shared-configs:remove rt/developers org/tokens") }.to raise_exception(
-            Sem::Errors::OrgNamesNotMatching
-          )
+          stdout, stderr, status = sem_run("teams:shared-configs:remove rt/developers org/tokens")
+
+          msg = [
+            "[ERROR] Organization names not matching.",
+            "",
+            "Team \"rt/developers\" and shared configuration \"org/tokens\" are not in the same organization."
+          ]
+
+          expect(stderr.strip).to eq(msg.join("\n"))
+          expect(stdout.strip).to eq("")
+          expect(status).to eq(:system_error)
         end
       end
 
       it "removes a project from the team" do
-        stdout, stderr = sem_run("teams:shared-configs:remove renderedtext/developers renderedtext/aws-tokens")
+        stdout, stderr, status = sem_run("teams:shared-configs:remove renderedtext/developers renderedtext/aws-tokens")
 
         expect(stderr).to eq("")
         expect(stdout.strip).to eq("Shared Configuration renderedtext/aws-tokens removed from the team.")
+        expect(status).to eq(:ok)
       end
     end
   end

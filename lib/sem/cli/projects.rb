@@ -31,7 +31,9 @@ class Sem::CLI::Projects < Dracula
       project_org_name, project_name = Sem::SRN.parse_project(project)
       shared_config_org_name, shared_config_name = Sem::SRN.parse_shared_config(shared_config)
 
-      raise Sem::Errors::OrgNamesNotMatching unless project_org_name == shared_config_org_name
+      if project_org_name != shared_config_org_name
+        abort Sem::Views::Projects.org_names_not_matching("project", "shared configuration", project, shared_config)
+      end
 
       Sem::API::SharedConfigs.add_to_project(project_org_name, project_name, shared_config_name)
 
@@ -43,7 +45,9 @@ class Sem::CLI::Projects < Dracula
       project_org_name, project_name = Sem::SRN.parse_project(project)
       shared_config_org_name, shared_config_name = Sem::SRN.parse_shared_config(shared_config)
 
-      raise Sem::Errors::OrgNamesNotMatching unless project_org_name == shared_config_org_name
+      if project_org_name != shared_config_org_name
+        abort Sem::Views::Projects.org_names_not_matching("project", "shared configuration", project, shared_config)
+      end
 
       Sem::API::SharedConfigs.remove_from_project(project_org_name, project_name, shared_config_name)
 

@@ -18,20 +18,20 @@ def collect_output
 
   result = yield
 
-  [fake_stdout.string.to_s, fake_stderr.string.to_s, result]
+  [fake_stdout.string.to_s, fake_stderr.string.to_s, result, :ok]
 rescue SystemExit
-  [fake_stdout.string.to_s, fake_stderr.string.to_s, result]
+  [fake_stdout.string.to_s, fake_stderr.string.to_s, result, :system_error]
 ensure
   $stdout = original_stdout
   $stderr = original_stderr
 end
 
 def sem_run(args)
-  stdout, stderr, = collect_output do
+  stdout, stderr, _, status = collect_output do
     Sem::CLI.start(args.split(" "))
   end
 
-  [stdout, stderr]
+  [stdout, stderr, status]
 end
 
 RSpec.configure do |config|

@@ -26,7 +26,7 @@ describe Sem::CLI::Projects do
       end
 
       it "lists projects" do
-        stdout, stderr = sem_run("projects:list")
+        stdout, stderr, status = sem_run("projects:list")
 
         msg = [
           "ID                                    NAME",
@@ -36,6 +36,7 @@ describe Sem::CLI::Projects do
 
         expect(stdout.strip).to eq(msg.join("\n"))
         expect(stderr).to eq("")
+        expect(status).to eq(:ok)
       end
     end
 
@@ -45,7 +46,7 @@ describe Sem::CLI::Projects do
       end
 
       it "offers you to set up a project on sempaphore" do
-        stdout, stderr = sem_run("projects:list")
+        stdout, stderr, status = sem_run("projects:list")
 
         msg = [
           "You don't have any project configured on Semaphore.",
@@ -57,6 +58,7 @@ describe Sem::CLI::Projects do
 
         expect(stdout).to eq(msg.join("\n"))
         expect(stderr).to eq("")
+        expect(status).to eq(:ok)
       end
     end
   end
@@ -71,7 +73,7 @@ describe Sem::CLI::Projects do
     end
 
     it "shows detailed information about an organization" do
-      stdout, stderr = sem_run("projects:info renderedtext/cli")
+      stdout, stderr, status = sem_run("projects:info renderedtext/cli")
 
       msg = [
         "ID       3bc7ed43-ac8a-487e-b488-c38bc757a034",
@@ -82,6 +84,7 @@ describe Sem::CLI::Projects do
 
       expect(stdout.strip).to eq(msg.join("\n"))
       expect(stderr).to eq("")
+      expect(status).to eq(:ok)
     end
   end
 
@@ -114,7 +117,7 @@ describe Sem::CLI::Projects do
       end
 
       it "lists shared configurations on a project" do
-        stdout, stderr = sem_run("projects:shared-configs:list renderedtext/prj1")
+        stdout, stderr, status = sem_run("projects:shared-configs:list renderedtext/prj1")
 
         msg = [
           "ID                                    NAME                     CONFIG FILES  ENV VARS",
@@ -124,6 +127,7 @@ describe Sem::CLI::Projects do
 
         expect(stderr).to eq("")
         expect(stdout.strip).to eq(msg.join("\n"))
+        expect(status).to eq(:ok)
       end
     end
 
@@ -138,17 +142,26 @@ describe Sem::CLI::Projects do
 
       context "org names are not matching" do
         it "raises an exception" do
-          expect { sem_run("projects:shared-configs:add rt/prj1 org/aws-tokens") }.to raise_exception(
-            Sem::Errors::OrgNamesNotMatching
-          )
+          stdout, stderr, status = sem_run("projects:shared-configs:add rt/prj1 org/aws-tokens")
+
+          msg = [
+            "[ERROR] Organization names not matching.",
+            "",
+            "Project \"rt/prj1\" and shared configuration \"org/aws-tokens\" are not in the same organization."
+          ]
+
+          expect(stderr.strip).to eq(msg.join("\n"))
+          expect(stdout.strip).to eq("")
+          expect(status).to eq(:system_error)
         end
       end
 
       it "add a project to the team" do
-        stdout, stderr = sem_run("projects:shared-configs:add rt/prj1 rt/aws-tokens")
+        stdout, stderr, status = sem_run("projects:shared-configs:add rt/prj1 rt/aws-tokens")
 
         expect(stderr).to eq("")
         expect(stdout.strip).to eq("Shared Configuration rt/aws-tokens added to the project.")
+        expect(status).to eq(:ok)
       end
     end
 
@@ -163,17 +176,26 @@ describe Sem::CLI::Projects do
 
       context "org names are not matching" do
         it "raises an exception" do
-          expect { sem_run("projects:shared-configs:remove rt/prj1 org/tokens") }.to raise_exception(
-            Sem::Errors::OrgNamesNotMatching
-          )
+          stdout, stderr, status = sem_run("projects:shared-configs:remove rt/prj1 org/tokens")
+
+          msg = [
+            "[ERROR] Organization names not matching.",
+            "",
+            "Project \"rt/prj1\" and shared configuration \"org/tokens\" are not in the same organization."
+          ]
+
+          expect(stderr.strip).to eq(msg.join("\n"))
+          expect(stdout.strip).to eq("")
+          expect(status).to eq(:system_error)
         end
       end
 
       it "removes a project from the team" do
-        stdout, stderr = sem_run("projects:shared-configs:remove rt/prj1 rt/aws-tokens")
+        stdout, stderr, status = sem_run("projects:shared-configs:remove rt/prj1 rt/aws-tokens")
 
         expect(stderr).to eq("")
         expect(stdout.strip).to eq("Shared Configuration rt/aws-tokens removed from the project.")
+        expect(status).to eq(:ok)
       end
     end
   end
