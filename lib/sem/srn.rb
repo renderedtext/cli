@@ -28,11 +28,10 @@ class Sem::SRN
       srn_tokens    = semaphore_resource_name.to_s.split("/")
       format_tokens = format.split("/")
 
-      resource = format_tokens.last.split("_").tap(&:pop).join("_")
-
       if srn_tokens.count != format_tokens.count
-        message = "Invalid formatting for #{resource.upcase} parameter: \"#{semaphore_resource_name}\".\n" \
-          "Required format is: \"#{format}\"."
+        resource = format_tokens.last.split("_").tap(&:pop).join(" ").capitalize
+
+        message = "#{resource} \"#{semaphore_resource_name}\" not found."
 
         raise Sem::Errors::InvalidSRN, message
       end
