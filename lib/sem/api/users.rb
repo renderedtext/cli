@@ -16,7 +16,7 @@ module Sem
             org_name, user_name = args
             users = list_for_org(org_name)
           else
-            user_name  = args.first
+            user_name = args.first
             users = list
           end
 
