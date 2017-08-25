@@ -166,13 +166,13 @@ describe Sem::CLI::Teams do
 
     context "setting an invalid permission" do
       it "raises an exception" do
+        stdout, stderr = sem_run("teams:set-permission renderedtext/developers something")
+
         expected_message = "Permission \"something\" doesn't exist.\n" \
           "Choose one of the following: read, write, admin."
 
-        expect { sem_run("teams:set-permission renderedtext/developers something") }.to raise_exception(
-          Sem::Errors::InvalidParameter,
-          expected_message
-        )
+        expect(stderr.strip).to eql(expected_message)
+        expect(stdout.strip).to eql("")
       end
     end
 

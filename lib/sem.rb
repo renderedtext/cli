@@ -41,10 +41,6 @@ module Sem
       on_org_names_not_matching
 
       1
-    rescue Sem::Errors::InvalidParameter => e
-      on_invalid_parameter(e)
-
-      1
     rescue Sem::Errors::InvalidSRN => e
       on_invalid_srn(e)
 
@@ -79,12 +75,6 @@ module Sem
 
     def on_invalid_srn(exception)
       puts "[ERROR] Invalid parameter formatting."
-      puts ""
-      puts exception.message
-    end
-
-    def on_invalid_parameter(exception)
-      puts "[ERROR] Invalid parameter."
       puts ""
       puts exception.message
     end

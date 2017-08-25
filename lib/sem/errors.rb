@@ -2,7 +2,6 @@ module Sem::Errors
   Base = Class.new(StandardError)
 
   InvalidSRN = Class.new(StandardError)
-  InvalidParameter = Class.new(StandardError)
   OrgNamesNotMatching = Class.new(StandardError)
 
   module Resource

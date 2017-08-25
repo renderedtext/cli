@@ -45,7 +45,7 @@ class Sem::CLI::Teams < Dracula
   desc "set-permission", "set the permission level of the team"
   def set_permission(team, permission)
     unless ["read", "write", "admin"].include?(permission)
-      raise Sem::Errors::InvalidParameter, "Permission \"#{permission}\" doesn't exist.\n" \
+      abort "Permission \"#{permission}\" doesn't exist.\n" \
         "Choose one of the following: read, write, admin."
     end
 
