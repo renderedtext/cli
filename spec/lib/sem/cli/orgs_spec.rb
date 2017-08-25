@@ -93,40 +93,22 @@ describe Sem::CLI::Orgs do
     let(:user_2) { { :id => "shiroyasha", :permission => "admin" } }
 
     before do
-      allow(Sem::API::UsersWithPermissions).to receive(:list_for_org).and_return([user_1, user_2])
-      allow(Sem::API::UsersWithPermissions).to receive(:list_admins_for_org).and_return([user_2])
-      allow(Sem::API::UsersWithPermissions).to receive(:list_owners_for_org).and_return([user_2])
+      allow(Sem::API::Users).to receive(:list_for_org).and_return([user_1, user_2])
     end
 
     it "calls the API" do
-      expect(Sem::API::UsersWithPermissions).to receive(:list_for_org).with("renderedtext")
+      expect(Sem::API::Users).to receive(:list_for_org).with("renderedtext")
 
       sem_run("orgs:members renderedtext")
-    end
-
-    context "admins option is true" do
-      it "calls the API" do
-        expect(Sem::API::UsersWithPermissions).to receive(:list_admins_for_org).with("renderedtext")
-
-        sem_run("orgs:members renderedtext --admins")
-      end
-    end
-
-    context "owners option is true" do
-      it "calls the API" do
-        expect(Sem::API::UsersWithPermissions).to receive(:list_owners_for_org).with("renderedtext")
-
-        sem_run("orgs:members renderedtext --owners true")
-      end
     end
 
     it "list members in an organization" do
       stdout, stderr = sem_run("orgs:members renderedtext")
 
       msg = [
-        "NAME        PERMISSION",
-        "ijovan      write",
-        "shiroyasha  admin"
+        "NAME",
+        "ijovan",
+        "shiroyasha"
       ]
 
       expect(stdout.strip).to eq(msg.join("\n"))
