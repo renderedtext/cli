@@ -43,6 +43,16 @@ describe Sem::API::SharedConfigs do
   it_behaves_like "associated_with_team"
   it_behaves_like "associated_with_project"
 
+  describe ".name_to_id" do
+    before { allow(described_class).to receive(:info).with(org_name, instance_name).and_return(instance_hash) }
+
+    it "returns the id" do
+      return_value = described_class.name_to_id(org_name, instance_name)
+
+      expect(return_value).to eql(instance_id)
+    end
+  end
+
   describe ".list" do
     let(:org_username) { "org" }
     let(:org) { { :username => org_username } }
