@@ -70,6 +70,14 @@ describe Sem::API::Users do
     end
 
     context "org_name included in the call" do
+      before { allow(described_class).to receive(:list_for_org).and_return([instance_hash_0, instance_hash_1]) }
+
+      it "calls list_for_org on the described class" do
+        expect(described_class).to receive(:list_for_org).with(org_name)
+
+        described_class.info(org_name, instance_name)
+      end
+
       it "returns the selected instance" do
         return_value = described_class.info(org_name, instance_name)
 

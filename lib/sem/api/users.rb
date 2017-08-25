@@ -12,11 +12,17 @@ module Sem
         end
 
         def info(*args)
-          name = args.count == 2 ? args[1] : args[0]
+          if args.count == 2
+            org_name, user_name = args
+            users = list_for_org(org_name)
+          else
+            user_name  = args.first
+            users = list
+          end
 
-          selected_user = list.find { |user| user[:id] == name }
+          selected_user = users.find { |user| user[:id] == user_name }
 
-          raise_not_found("User", [name]) if selected_user.nil?
+          raise_not_found("User", [user_name]) if selected_user.nil?
 
           selected_user
         end
