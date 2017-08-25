@@ -87,16 +87,16 @@ describe Sem::API::Teams do
       before { allow(described_class).to receive(:list_for_org).and_return([]) }
 
       it "raises an exception" do
-        expected_message = "Team #{org_name}/#{instance_name} not found."
+        expected_message = "[ERROR] Team lookup failed\n\nTeam #{org_name}/#{instance_name} not found."
 
-        expect { described_class.info(org_name, instance_name) }.to raise_exception(Sem::Errors::Resource::NotFound,
+        expect { described_class.info(org_name, instance_name) }.to raise_exception(Sem::Errors::ResourceNotFound,
                                                                                     expected_message)
       end
     end
   end
 
   describe ".create" do
-    let(:args) { { "name" => instance_name } }
+    let(:args) { { :name => instance_name } }
 
     before { allow(class_api).to receive(:create_for_org).and_return(instance) }
 
@@ -122,16 +122,16 @@ describe Sem::API::Teams do
       before { allow(class_api).to receive(:create_for_org).and_return(nil) }
 
       it "raises an exception" do
-        expected_message = "Team #{org_name}/#{instance_name} not created."
+        expected_message = "[ERROR] Team creation failed\n\nTeam #{org_name}/#{instance_name} not created."
 
-        expect { described_class.create(org_name, args) }.to raise_exception(Sem::Errors::Resource::NotCreated,
+        expect { described_class.create(org_name, args) }.to raise_exception(Sem::Errors::ResourceNotCreated,
                                                                              expected_message)
       end
     end
   end
 
   describe ".update" do
-    let(:args) { { "name" => instance_name } }
+    let(:args) { { :name => instance_name } }
 
     before do
       allow(described_class).to receive(:info).and_return(instance_hash)
@@ -160,10 +160,10 @@ describe Sem::API::Teams do
       before { allow(class_api).to receive(:update).and_return(nil) }
 
       it "raises an exception" do
-        expected_message = "Team #{org_name}/#{instance_name} not updated."
+        expected_message = "[ERROR] Team update failed\n\nTeam #{org_name}/#{instance_name} not updated."
 
         expect { described_class.update(org_name, instance_name, args) }.to raise_exception(
-          Sem::Errors::Resource::NotUpdated,
+          Sem::Errors::ResourceNotUpdated,
           expected_message
         )
       end
@@ -192,10 +192,10 @@ describe Sem::API::Teams do
       before { allow(class_api).to receive(:delete!).and_raise(SemaphoreClient::Exceptions::RequestFailed) }
 
       it "raises an exception" do
-        expect { described_class.delete(org_name, instance_name) }.to raise_exception(
-          Sem::Errors::Resource::NotDeleted,
-          "Team org/instance not deleted."
-        )
+        expected_message = "[ERROR] Team deletion failed\n\nTeam #{org_name}/#{instance_name} not deleted."
+
+        expect { described_class.delete(org_name, instance_name) }.to raise_exception(Sem::Errors::ResourceNotDeleted,
+                                                                                      expected_message)
       end
     end
   end

@@ -75,9 +75,9 @@ describe Sem::API::Orgs do
       before { allow(class_api).to receive(:get).and_return(nil) }
 
       it "raises an exception" do
-        expected_message = "Organization #{instance_name} not found."
+        expected_message = "[ERROR] Organization lookup failed\n\nOrganization #{instance_name} not found."
 
-        expect { described_class.info(instance_name) }.to raise_exception(Sem::Errors::Resource::NotFound,
+        expect { described_class.info(instance_name) }.to raise_exception(Sem::Errors::ResourceNotFound,
                                                                           expected_message)
       end
     end

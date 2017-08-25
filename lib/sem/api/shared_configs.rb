@@ -17,7 +17,9 @@ module Sem
             shared_config[:name] == shared_config_name
           end
 
-          raise_not_found("Shared Configuration", [org_name, shared_config_name]) if selected_shared_config.nil?
+          if selected_shared_config.nil?
+            raise Sem::Errors::ResourceNotFound.new("Shared Configuration", [org_name, shared_config_name])
+          end
 
           selected_shared_config
         end
@@ -25,7 +27,9 @@ module Sem
         def create(org_name, args)
           shared_config = api.create_for_org(org_name, args)
 
-          raise_not_created("Shared Configuration", [org_name, args["name"]]) if shared_config.nil?
+          if shared_config.nil?
+            raise Sem::Errors::ResourceNotCreated.new("Shared Configuration", [org_name, args[:name]])
+          end
 
           to_hash(shared_config, org_name)
         end
@@ -35,7 +39,9 @@ module Sem
 
           shared_config = api.update(shared_config[:id], args)
 
-          raise_not_updated("Shared Configuration", [org_name, shared_config_name]) if shared_config.nil?
+          if shared_config.nil?
+            raise Sem::Errors::ResourceNotUpdated.new("Shared Configuration", [org_name, shared_config_name])
+          end
 
           to_hash(shared_config, org_name)
         end
@@ -45,7 +51,7 @@ module Sem
 
           api.delete!(shared_config[:id])
         rescue SemaphoreClient::Exceptions::RequestFailed
-          raise_not_deleted("Shared Configuration", [org_name, shared_config_name])
+          raise Sem::Errors::ResourceNotDeleted.new("Shared Configuration", [org_name, shared_config_name])
         end
 
         def list_env_vars(org_name, shared_config_name)

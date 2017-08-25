@@ -89,9 +89,9 @@ describe Sem::API::Users do
       before { allow(described_class).to receive(:list).and_return([]) }
 
       it "raises an exception" do
-        expected_message = "User #{instance_name} not found."
+        expected_message = "[ERROR] User lookup failed\n\nUser #{instance_name} not found."
 
-        expect { described_class.info(instance_name) }.to raise_exception(Sem::Errors::Resource::NotFound,
+        expect { described_class.info(instance_name) }.to raise_exception(Sem::Errors::ResourceNotFound,
                                                                           expected_message)
       end
     end

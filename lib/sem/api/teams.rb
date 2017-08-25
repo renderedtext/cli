@@ -13,7 +13,7 @@ module Sem
         def info(org_name, team_name)
           selected_team = list_for_org(org_name).find { |team| team[:name] == team_name }
 
-          raise_not_found("Team", [org_name, team_name]) if selected_team.nil?
+          raise Sem::Errors::ResourceNotFound.new("Team", [org_name, team_name]) if selected_team.nil?
 
           selected_team
         end
@@ -21,7 +21,7 @@ module Sem
         def create(org_name, args)
           team = api.create_for_org(org_name, args)
 
-          raise_not_created("Team", [org_name, args["name"]]) if team.nil?
+          raise Sem::Errors::ResourceNotCreated.new("Team", [org_name, args[:name]]) if team.nil?
 
           to_hash(team, org_name)
         end
@@ -31,7 +31,7 @@ module Sem
 
           team = api.update(team[:id], args)
 
-          raise_not_updated("Team", [org_name, team_name]) if team.nil?
+          raise Sem::Errors::ResourceNotUpdated.new("Team", [org_name, team_name]) if team.nil?
 
           to_hash(team, org_name)
         end
@@ -41,7 +41,7 @@ module Sem
 
           api.delete!(team[:id])
         rescue SemaphoreClient::Exceptions::RequestFailed
-          raise_not_deleted("Team", [org_name, team_name])
+          raise Sem::Errors::ResourceNotDeleted.new("Team", [org_name, team_name])
         end
 
         def api

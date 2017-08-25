@@ -24,13 +24,4 @@ describe Sem::API::Base do
 
     after { described_class.instance_variable_set(:@client, nil) }
   end
-
-  describe ".raise_not_found" do
-    it "raises the exception with the resource path" do
-      expect { described_class.raise_not_found("Resource", ["org", "team"]) }.to raise_exception(
-        Sem::Errors::Resource::NotFound,
-        "Resource org/team not found."
-      )
-    end
-  end
 end

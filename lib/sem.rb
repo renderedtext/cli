@@ -33,8 +33,8 @@ module Sem
       Sem::CLI.start(args)
 
       0
-    rescue Sem::Errors::Resource::Base => e
-      on_resource_exception(e)
+    rescue Sem::Errors::ResourceException => e
+      puts e.message
 
       1
     rescue Sem::Errors::OrgNamesNotMatching
@@ -60,12 +60,6 @@ module Sem
     end
 
     private
-
-    def on_resource_exception(exception)
-      puts "[ERROR] Resource operation failed."
-      puts ""
-      puts exception.message
-    end
 
     def on_org_names_not_matching
       puts "[ERROR] Organization names not matching."
