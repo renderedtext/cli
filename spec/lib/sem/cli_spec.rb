@@ -15,7 +15,7 @@ describe Sem::CLI do
       end
 
       it "displays a success message" do
-        stdout, stderr = sem_run("login --auth_token 123456")
+        stdout, stderr, status = sem_run("login --auth_token 123456")
 
         msg = [
           "Your credentials have been saved to #{Sem::Configuration::CREDENTIALS_PATH}."
@@ -23,6 +23,7 @@ describe Sem::CLI do
 
         expect(stdout.strip).to eq(msg.join("\n"))
         expect(stderr).to eq("")
+        expect(status).to eq(:ok)
       end
     end
 
@@ -30,13 +31,14 @@ describe Sem::CLI do
       before { allow(Sem::Configuration).to receive(:valid_auth_token?).and_return(false) }
 
       it "writes an error to the output" do
-        _stdout, stderr = sem_run("login --auth_token 123456")
+        _stdout, stderr, status = sem_run("login --auth_token 123456")
 
         msg = [
           "[ERROR] Token is invalid!"
         ]
 
         expect(stderr.strip).to eq(msg.join("\n"))
+        expect(status).to eq(:system_error)
       end
 
       it "does not set the auth token" do
@@ -53,7 +55,7 @@ describe Sem::CLI do
     end
 
     it "displays a log out message" do
-      stdout, stderr = sem_run("logout")
+      stdout, stderr, status = sem_run("logout")
 
       msg = [
         "Loged out."
@@ -61,6 +63,7 @@ describe Sem::CLI do
 
       expect(stdout.strip).to eq(msg.join("\n"))
       expect(stderr.strip).to eq("")
+      expect(status).to eq(:ok)
     end
 
     it "deletes the auth token from the system" do

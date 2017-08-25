@@ -29,7 +29,7 @@ describe Sem::CLI::Orgs do
       end
 
       it "lists organizations" do
-        stdout, stderr = sem_run("orgs:list")
+        stdout, stderr, status = sem_run("orgs:list")
 
         msg = [
           "ID                                    NAME",
@@ -39,6 +39,7 @@ describe Sem::CLI::Orgs do
 
         expect(stdout.strip).to eq(msg.join("\n"))
         expect(stderr).to eq("")
+        expect(status).to eq(:ok)
       end
     end
 
@@ -48,7 +49,7 @@ describe Sem::CLI::Orgs do
       end
 
       it "offers the user to create hos first organization" do
-        stdout, stderr = sem_run("orgs:list")
+        stdout, stderr, status = sem_run("orgs:list")
 
         msg = [
           "You don't belong to any organization.",
@@ -60,6 +61,7 @@ describe Sem::CLI::Orgs do
 
         expect(stdout).to eq(msg.join("\n"))
         expect(stderr).to eq("")
+        expect(status).to eq(:ok)
       end
     end
   end
@@ -74,7 +76,7 @@ describe Sem::CLI::Orgs do
     end
 
     it "shows detailed information about an organization" do
-      stdout, stderr = sem_run("orgs:info renderedtext")
+      stdout, stderr, status = sem_run("orgs:info renderedtext")
 
       msg = [
         "ID       3bc7ed43-ac8a-487e-b488-c38bc757a034",
@@ -85,6 +87,7 @@ describe Sem::CLI::Orgs do
 
       expect(stdout.strip).to eq(msg.join("\n"))
       expect(stderr).to eq("")
+      expect(status).to eq(:ok)
     end
   end
 
@@ -103,7 +106,7 @@ describe Sem::CLI::Orgs do
     end
 
     it "list members in an organization" do
-      stdout, stderr = sem_run("orgs:members renderedtext")
+      stdout, stderr, status = sem_run("orgs:members renderedtext")
 
       msg = [
         "NAME",
@@ -113,6 +116,7 @@ describe Sem::CLI::Orgs do
 
       expect(stdout.strip).to eq(msg.join("\n"))
       expect(stderr).to eq("")
+      expect(status).to eq(:ok)
     end
   end
 
