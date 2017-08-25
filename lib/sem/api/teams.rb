@@ -21,7 +21,7 @@ module Sem
         def create(org_name, args)
           team = api.create_for_org(org_name, args)
 
-          raise Sem::Errors::ResourceNotCreated.new("Team", [org_name, args["name"]]) if team.nil?
+          raise Sem::Errors::ResourceNotCreated.new("Team", [org_name, args[:name]]) if team.nil?
 
           to_hash(team, org_name)
         end

@@ -103,7 +103,7 @@ describe Sem::API::SharedConfigs do
   end
 
   describe ".create" do
-    let(:args) { { "name" => instance_name } }
+    let(:args) { { :name => instance_name } }
 
     before { allow(class_api).to receive(:create_for_org).and_return(instance) }
 
@@ -139,7 +139,7 @@ describe Sem::API::SharedConfigs do
   end
 
   describe ".update" do
-    let(:args) { { "name" => instance_name } }
+    let(:args) { { :name => instance_name } }
 
     before do
       allow(described_class).to receive(:info).and_return(instance_hash)

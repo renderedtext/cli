@@ -28,7 +28,7 @@ module Sem
           shared_config = api.create_for_org(org_name, args)
 
           if shared_config.nil?
-            raise Sem::Errors::ResourceNotCreated.new("Shared Configuration", [org_name, args["name"]])
+            raise Sem::Errors::ResourceNotCreated.new("Shared Configuration", [org_name, args[:name]])
           end
 
           to_hash(shared_config, org_name)
