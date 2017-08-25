@@ -4,6 +4,10 @@ module Sem
       extend Traits::AssociatedWithOrg
 
       class << self
+        def name_to_id(org_name, team_name)
+          info(org_name, team_name)[:id]
+        end
+
         def list
           org_names = Sem::API::Orgs.list.map { |org| org[:username] }
 

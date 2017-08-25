@@ -5,6 +5,10 @@ module Sem
       extend Traits::AssociatedWithTeam
 
       class << self
+        def name_to_id(_, name)
+          name
+        end
+
         def list
           org_names = Orgs.list.map { |org| org[:username] }
 

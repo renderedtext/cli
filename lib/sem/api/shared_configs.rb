@@ -6,6 +6,10 @@ module Sem
       extend Traits::AssociatedWithProject
 
       class << self
+        def name_to_id(org_name, shared_config_name)
+          info(org_name, shared_config_name)[:id]
+        end
+
         def list
           org_names = Orgs.list.map { |org| org[:username] }
 
