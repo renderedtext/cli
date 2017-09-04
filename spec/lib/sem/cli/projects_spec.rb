@@ -96,6 +96,20 @@ describe Sem::CLI::Projects do
 
       expect(stdout).to include(env_var[:id])
     end
+
+    context "invalid git url" do
+      it "prints error" do
+        stdout, stderr, status = sem_run("projects:create renderedtext/api-2 --url lol")
+
+        msg = [
+          "Git URL lol is invalid."
+        ]
+
+        expect(stderr.strip).to eq(msg.join("\n"))
+        expect(stdout).to eq("")
+        expect(status).to eq(:system_error)
+      end
+    end
   end
 
   describe Sem::CLI::Projects::SharedConfigs do
