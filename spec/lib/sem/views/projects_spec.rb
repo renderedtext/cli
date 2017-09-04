@@ -30,4 +30,19 @@ describe Sem::Views::Projects do
       expect { Sem::Views::Projects.info(project1) }.to output(msg.join("\n")).to_stdout
     end
   end
+
+  describe ".create" do
+    it "returns the project in table format" do
+      table = [
+        ["ID", "3bc7ed43-ac8a-487e-b488-c38bc757a034"],
+        ["Name", "renderedtext/cli"],
+        ["Created", "2017-08-01 13:14:40 +0200"],
+        ["Updated", "2017-08-02 13:14:40 +0200"]
+      ]
+
+      expect(Sem::Views::Projects).to receive(:print_table).with(table)
+
+      described_class.info(project)
+    end
+  end
 end

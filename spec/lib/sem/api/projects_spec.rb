@@ -104,7 +104,7 @@ describe Sem::API::Projects do
   end
 
   describe ".create" do
-    let(:args) { { :name => instance_name, :repo_provider => "github", :repo_owner => "renderedtext", :repo_name => "cli" } }
+    let(:args) { { :name => "cli", :repo_provider => "github", :repo_owner => "renderedtext", :repo_name => "cli" } }
 
     before { allow(class_api).to receive(:create_for_org).and_return(instance) }
 
@@ -130,10 +130,7 @@ describe Sem::API::Projects do
       before { allow(class_api).to receive(:create_for_org).and_return(nil) }
 
       it "raises an exception" do
-        expected_message = "[ERROR] Project creation failed\n\nProject #{org_name}/#{instance_name} not created."
-
-        expect { described_class.create(org_name, args) }.to raise_exception(Sem::Errors::ResourceNotCreated,
-                                                                             expected_message)
+        expect { described_class.create(org_name, args) }.to raise_exception(Sem::Errors::ResourceNotCreated)
       end
     end
   end

@@ -25,7 +25,7 @@ class Sem::CLI::Projects < Dracula
     repo_provider, repo_owner, repo_name = Sem::Helpers::Git.parse_url(options[:url])
 
     project = Sem::API::Projects.create(org_name,
-                                        :name => team_name,
+                                        :name => project_name,
                                         :repo_provider => repo_provider,
                                         :repo_owner => repo_owner,
                                         :repo_name => repo_name)
