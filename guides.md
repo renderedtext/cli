@@ -26,7 +26,7 @@ We want to support Ruby versions >= 2.0, and set up continuous integration for
 every significant Ruby version (2.0, 2.1., 2.2, 2.3, 2.4).
 
 The choice of the language dictates the preferable installation method of `gem
-install semaphore-cli`.
+install sem`.
 
 ## Simple setup
 
@@ -43,7 +43,7 @@ make the installation step simple and intuitive.
 
 Installation methods for SemaphoreCli:
 
-- `gem install semaphore-cli`
+- `gem install sem`
 - (optional) `wget -qO- https://cli.semaphoreci.com | sh`
 - (optional) `sudo apt-get install semaphore-cli`
 
