@@ -39,6 +39,6 @@ For other issues, [submit a support ticket](https://semaphoreci.com/support).
 
 Developing the CLI locally requires Ruby.
 
-While developing please follow the [CLI development guide](guide.md).
+While developing please follow the [CLI development guide](guides.md).
 
 To run the CLI locally, use the `bundle exec sem`.
