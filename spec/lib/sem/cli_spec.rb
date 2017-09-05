@@ -2,6 +2,16 @@ require "spec_helper"
 
 describe Sem::CLI do
 
+  describe "#version" do
+    it "check cli version" do
+      stdout, stderr, status = sem_run("version")
+
+      expect(stdout.strip).to eq(Sem::VERSION)
+      expect(stderr).to eq("")
+      expect(status).to eq(:ok)
+    end
+  end
+
   describe "#login" do
     before { allow(Sem::Configuration).to receive(:export_auth_token) }
 

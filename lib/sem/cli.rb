@@ -7,6 +7,11 @@ module Sem
     require_relative "cli/teams"
     require_relative "cli/shared_configs"
 
+    desc "version", "Check CLI version"
+    def version
+      puts Sem::VERSION
+    end
+
     desc "login", "Log in to semaphore from the command line"
     option :auth_token, :required => true
     long_desc <<-DESC
