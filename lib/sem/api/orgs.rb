@@ -5,7 +5,7 @@ module Sem
         def list
           orgs = api.list
 
-          orgs.map { |org| to_hash(org) }
+          orgs.to_a.map { |org| to_hash(org) }
         end
 
         def info(name)

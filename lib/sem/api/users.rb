@@ -12,7 +12,7 @@ module Sem
         def list
           org_names = Orgs.list.map { |org| org[:username] }
 
-          org_names.pmap { |name| list_for_org(name) }.flatten
+          org_names.to_a.pmap { |name| list_for_org(name) }.flatten
         end
 
         def info(*args)
