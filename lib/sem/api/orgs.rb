@@ -1,42 +1,28 @@
-module Sem
-  module API
-    class Orgs < Base
-      class << self
-        def list
-          orgs = api.list
+class Sem::API::Org < SimpleDelegator
+  extend Base
 
-          orgs.to_a.map { |org| to_hash(org) }
-        end
-
-        def info(name)
-          org = api.get(name)
-
-          raise Sem::Errors::ResourceNotFound.new("Organization", [name]) if org.nil?
-
-          to_hash(org)
-        end
-
-        def list_teams(name)
-          Sem::API::Teams.list_for_org(name)
-        end
-
-        def list_users(name)
-          Sem::API::Users.list_for_org(name)
-        end
-
-        def api
-          client.orgs
-        end
-
-        def to_hash(org)
-          {
-            :id => org.id,
-            :username => org.username,
-            :created_at => org.created_at,
-            :updated_at => org.updated_at
-          }
-        end
-      end
-    end
+  def self.all
+    client.orgs.list.map { |org| new(org) }
   end
+
+  def self.find(org_name)
+    org = client.orgs.get(org_name)
+
+    raise Sem::Errors::ResourceNotFound.new("Organization", [org_name]) if org.nil?
+
+    new(org)
+  end
+
+  def users
+    client.users.list_for_org(name).map { |user| Sem::API::User.new(user) }
+  end
+
+  def teams
+    client.teams.list_for_org(name).map { |team| Sem::API::Team.new(team) }
+  end
+
+  def projects
+    client.projects.list_for_org(name).map { |project| Sem::API::Project.new(project) }
+  end
+
 end

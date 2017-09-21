@@ -1,42 +1,42 @@
-module Sem
-  module API
-    class Projects < Base
-      extend Traits::AssociatedWithOrg
-      extend Traits::AssociatedWithTeam
+class Sem::API::Project < Sem::API::Base
+  extend Base
 
-      class << self
-        def name_to_id(org_name, project_name)
-          info(org_name, project_name)[:id]
-        end
-
-        def list
-          org_names = Orgs.list.map { |org| org[:username] }
-
-          org_names.to_a.pmap { |name| list_for_org(name) }.flatten
-        end
-
-        def info(org_name, project_name)
-          project = api.list_for_org(org_name, :name => project_name).first
-
-          raise Sem::Errors::ResourceNotFound.new("Project", [org_name, project_name]) if project.nil?
-
-          to_hash(project, org_name)
-        end
-
-        def api
-          client.projects
-        end
-
-        def to_hash(project, org)
-          {
-            :id => project.id,
-            :name => project.name,
-            :org => org,
-            :created_at => project.created_at,
-            :updated_at => project.updated_at
-          }
-        end
-      end
-    end
+  def self.all
+    Sema::API::Org.all.map do |org|
+      client.projects.list_for_org(org.name).map { |project| new(project) }
+    end.flatten
   end
+
+  def self.find(org_name, project_name)
+    project = client.projects.list_for_org(org_name, :name => project_name).first
+
+    raise Sem::Errors::ResourceNotFound.new("Project", [org_name, project_name]) if project.nil?
+
+    new(org_name, project)
+  end
+
+  attr_reader :org_name
+
+  def initialize(org_name, project)
+    @org_name = org_name
+
+    super(project)
+  end
+
+  def teams
+    client.teams.list_for_project(id).map { |team| Sem::API::Team.new(org_name, team) }
+  end
+
+  def users
+
+  end
+
+  def files
+
+  end
+
+  def env_vars
+
+  end
+
 end
