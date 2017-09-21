@@ -4,7 +4,7 @@ describe Sem::Views::EnvVars do
   let(:env_var) do
     {
       :id => "3bc7ed43-ac8a-487e-b488-c38bc757a034",
-      :name => "renderedtext/cli",
+      :name => "GEM_TOKEN",
       :encrypted? => true,
       :content => "content"
     }
