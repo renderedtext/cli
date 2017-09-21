@@ -3,6 +3,7 @@ require "spec_helper"
 describe Sem::Views::SharedConfigs do
   let(:shared_config) do
     {
+      :org => "rt",
       :id => "8026c34e-0fcb-45c1-acb0-2cec38cd0068",
       :name => "tokens",
       :config_files => 1,
@@ -16,7 +17,7 @@ describe Sem::Views::SharedConfigs do
     it "shows list of shared configs" do
       expected_value = [
         ["ID", "NAME", "CONFIG FILES", "ENV VARS"],
-        [shared_config[:id], shared_config[:name], shared_config[:config_files], shared_config[:env_vars]]
+        ["8026c34e-0fcb-45c1-acb0-2cec38cd0068", "rt/tokens", 1, 2]
       ]
 
       expect(Sem::Views::SharedConfigs).to receive(:print_table).with(expected_value)
@@ -29,7 +30,7 @@ describe Sem::Views::SharedConfigs do
     it "returns the config in table format" do
       table = [
         ["ID", "8026c34e-0fcb-45c1-acb0-2cec38cd0068"],
-        ["Name", "tokens"],
+        ["Name", "rt/tokens"],
         ["Config Files", "1"],
         ["Environment Variables", "2"],
         ["Created", "2017-08-01 13:14:40 +0200"],

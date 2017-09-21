@@ -421,7 +421,8 @@ describe Sem::CLI::Teams do
       let(:config_0) do
         {
           :id => "3bc7ed43-ac8a-487e-b488-c38bc757a034",
-          :name => "renderedtext/aws-tokens",
+          :org => "renderedtext",
+          :name => "aws-tokens",
           :config_files => 2,
           :env_vars => 1
         }
@@ -430,7 +431,8 @@ describe Sem::CLI::Teams do
       let(:config_1) do
         {
           :id => "fe3624cf-0cea-4d87-9dde-cb9ddacfefc0",
-          :name => "renderedtext/gemfury",
+          :org => "renderedtext",
+          :name => "gemfury",
           :config_files => 1,
           :env_vars => 2
         }
