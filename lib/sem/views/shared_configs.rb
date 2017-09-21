@@ -15,7 +15,7 @@ class Sem::Views::SharedConfigs < Sem::Views::Base
     header = ["ID", "NAME", "CONFIG FILES", "ENV VARS"]
 
     body = configs.map do |config|
-      [config[:id], config[:name], config[:config_files], config[:env_vars]]
+      [config[:id], srn_name(config), config[:config_files], config[:env_vars]]
     end
 
     print_table [header, *body]
@@ -24,12 +24,16 @@ class Sem::Views::SharedConfigs < Sem::Views::Base
   def self.info(config)
     print_table [
       ["ID", config[:id]],
-      ["Name", config[:name]],
+      ["Name", srn_name(config)],
       ["Config Files", config[:config_files].to_s],
       ["Environment Variables", config[:env_vars].to_s],
       ["Created", config[:created_at]],
       ["Updated", config[:updated_at]]
     ]
+  end
+
+  def self.srn_name(config)
+    "#{config[:org]}/#{config[:name]}"
   end
 
 end
