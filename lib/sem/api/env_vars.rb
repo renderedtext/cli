@@ -4,6 +4,7 @@ module Sem
       extend Traits::AssociatedWithSharedConfig
 
       class << self
+
         def api
           client.env_vars
         end
