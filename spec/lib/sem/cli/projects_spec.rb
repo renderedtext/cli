@@ -201,4 +201,93 @@ describe Sem::CLI::Projects do
       end
     end
   end
+
+  describe Sem::CLI::Projects::Files do
+
+    describe "#list" do
+      let(:file_0) do
+        {
+          :id => "3bc7ed43-ac8a-487e-b488-c38bc757a034",
+          :name => "secrets.txt",
+          :encrypted? => true
+        }
+      end
+
+      let(:file_1) do
+        {
+          :id => "37d8fdc0-4a96-4535-a4bc-601d1c7c7058",
+          :name => "config.yml",
+          :encrypted? => true
+        }
+      end
+
+      before { allow(Sem::API::Projects).to receive(:list_files).and_return([file_0, file_1]) }
+
+      it "calls the configs API" do
+        expect(Sem::API::Projects).to receive(:list_files).with("rt", "base-app")
+
+        sem_run("projects:files:list rt/base-app")
+      end
+
+      it "lists files in a shared_configuration" do
+        stdout, stderr, status = sem_run("projects:files:list rt/base-app")
+
+        msg = [
+          "ID                                    NAME         ENCRYPTED?",
+          "3bc7ed43-ac8a-487e-b488-c38bc757a034  secrets.txt  true",
+          "37d8fdc0-4a96-4535-a4bc-601d1c7c7058  config.yml   true"
+        ]
+
+        expect(stdout.strip).to eq(msg.join("\n"))
+        expect(stderr).to eq("")
+        expect(status).to eq(:ok)
+      end
+    end
+  end
+
+  describe Sem::CLI::Projects::EnvVars do
+
+    describe "#list" do
+      let(:env_var_0) do
+        {
+          :id => "3bc7ed43-ac8a-487e-b488-c38bc757a034",
+          :name => "AWS_CLIENT_ID",
+          :encrypted? => true,
+          :content => "-"
+        }
+      end
+
+      let(:env_var_1) do
+        {
+          :id => "37d8fdc0-4a96-4535-a4bc-601d1c7c7058",
+          :name => "EMAIL",
+          :encrypted? => false,
+          :content => "admin@semaphoreci.com"
+        }
+      end
+
+      before { allow(Sem::API::Projects).to receive(:list_env_vars).and_return([env_var_0, env_var_1]) }
+
+      it "calls the configs API" do
+        expect(Sem::API::Projects).to receive(:list_env_vars).with("rt", "base-app")
+
+        sem_run("projects:env-vars:list rt/base-app")
+      end
+
+      it "lists env vars on a project" do
+        stdout, stderr, status = sem_run("projects:env-vars:list rt/tokens")
+
+        msg = [
+          "ID                                    NAME           ENCRYPTED?  CONTENT",
+          "3bc7ed43-ac8a-487e-b488-c38bc757a034  AWS_CLIENT_ID  true        -",
+          "37d8fdc0-4a96-4535-a4bc-601d1c7c7058  EMAIL          false       admin@semaphoreci.com"
+        ]
+
+        expect(stdout.strip).to eq(msg.join("\n"))
+        expect(stderr).to eq("")
+        expect(status).to eq(:ok)
+      end
+    end
+  end
+
 end

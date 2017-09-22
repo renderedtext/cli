@@ -21,18 +21,18 @@ class Sem::CLI::Projects < Dracula
     def list(project)
       org_name, project_name = Sem::SRN.parse_project(project)
 
-      files = Sem::API::Project.list_files(org_name, project_name)
+      files = Sem::API::Projects.list_files(org_name, project_name)
 
       Sem::Views::Files.list(files)
     end
   end
 
   class EnvVars < Dracula
-    desc "list", "list environment variables in the shared configuration"
-    def list(shared_config)
+    desc "list", "list environment variables on a project"
+    def list(project)
       org_name, project_name = Sem::SRN.parse_project(project)
 
-      env_vars = Sem::API::Project.list_env_vars(org_name, project_name)
+      env_vars = Sem::API::Projects.list_env_vars(org_name, project_name)
 
       Sem::Views::EnvVars.list(env_vars)
     end

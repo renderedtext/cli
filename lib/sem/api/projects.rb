@@ -15,6 +15,14 @@ module Sem
           org_names.to_a.pmap { |name| list_for_org(name) }.flatten
         end
 
+        def list_env_vars(org_name, project_name)
+          Sem::API::EnvVars.list_for_project(org_name, project_name)
+        end
+
+        def list_files(org_name, project_name)
+          Sem::API::Files.list_for_project(org_name, project_name)
+        end
+
         def info(org_name, project_name)
           project = api.list_for_org(org_name, :name => project_name).first
 
