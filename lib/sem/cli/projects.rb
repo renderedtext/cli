@@ -2,28 +2,22 @@ class Sem::CLI::Projects < Dracula
 
   desc "list", "list projects"
   def list
-    projects = Sem::API::Projects.list
-
-    Sem::Views::Projects.list(projects)
+    Sem::Views::Projects.list(Sem::API::Project.all)
   end
 
   desc "info", "shows detailed information about a project"
   def info(project)
-    org_name, project_name = Sem::SRN.parse_project(project)
+    prj = Sem::API::Project.find_by_srn!(project)
 
-    project_instance = Sem::API::Projects.info(org_name, project_name).to_h
-
-    Sem::Views::Projects.info(project_instance)
+    Sem::Views::Projects.info(prj)
   end
 
   class SharedConfigs < Dracula
     desc "list", "list shared configurations on a project"
     def list(project)
-      org_name, project_name = Sem::SRN.parse_project(project)
+      shared_configs = Sem::API::Project.find_by_srn!(project).shared_configs
 
-      configs = Sem::API::SharedConfigs.list_for_project(org_name, project_name)
-
-      Sem::Views::SharedConfigs.list(configs)
+      Sem::Views::SharedConfigs.list(project_instance.shared_configs)
     end
 
     desc "add", "attach a shared configuration to a project"
