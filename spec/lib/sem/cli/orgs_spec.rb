@@ -6,13 +6,24 @@ describe Sem::CLI::Orgs do
   let(:user) { StubFactory.user }
 
   describe "#list" do
-    it "lists all organizations" do
-      orgs = [org]
+    context "you have one or more orgs" do
+      it "lists all organizations" do
+        orgs = [org]
 
-      expect(Sem::API::Org).to receive(:all).and_return(orgs)
-      expect(Sem::Views::Orgs).to receive(:list).with(orgs)
+        expect(Sem::API::Org).to receive(:all).and_return(orgs)
+        expect(Sem::Views::Orgs).to receive(:list).with(orgs)
 
-      sem_run("orgs:list")
+        sem_run("orgs:list")
+      end
+    end
+
+    context "you have no orgs" do
+      it "offers you to create your first org" do
+        expect(Sem::API::Org).to receive(:all).and_return([])
+        expect(Sem::Views::Orgs).to receive(:create_first_org)
+
+        sem_run("orgs:list")
+      end
     end
   end
 

@@ -63,7 +63,7 @@ class Sem::CLI::Teams < Dracula
       users = team.users
 
       if users.size > 0
-        Sem::Views::Teams.list_members(team, users)
+        Sem::Views::Users.list(users)
       else
         Sem::Views::Teams.add_first_team_member(team)
       end
@@ -93,7 +93,7 @@ class Sem::CLI::Teams < Dracula
       projects = team.projects
 
       if projects.size > 0
-        Sem::Views::Teams.list_projects(team, projects)
+        Sem::Views::Projects.list(projects)
       else
         Sem::Views::Teams.add_first_project(team)
       end
@@ -127,7 +127,7 @@ class Sem::CLI::Teams < Dracula
       configs = team.shared_configs
 
       if configs.size > 0
-        Sem::Views::Teams.list_shared_configs(team, configs)
+        Sem::Views::SharedConfigs.list(configs)
       else
         Sem::Views::Teams.add_first_shared_config(team)
       end

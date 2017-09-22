@@ -27,6 +27,10 @@ class Sem::API::Team < SimpleDelegator
     super(team)
   end
 
+  def full_name
+    "#{org_name}/#{name}"
+  end
+
   def update
     new(api.update!(team.id, args))
   end

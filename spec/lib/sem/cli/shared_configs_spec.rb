@@ -88,7 +88,7 @@ describe Sem::CLI::SharedConfigs do
         before { allow(shared_config).to receive(:files).and_return(files) }
 
         it "lists all shared configurations on the project" do
-          expect(Sem::Views::SharedConfigs).to receive(:file_list).with(shared_config, files)
+          expect(Sem::Views::Files).to receive(:list).with(files).and_call_original
 
           sem_run("shared-configs:files:list rt/tokens")
         end
@@ -98,7 +98,7 @@ describe Sem::CLI::SharedConfigs do
         before { allow(shared_config).to receive(:files).and_return([]) }
 
         it "offers you to create and attach a shared configuration" do
-          expect(Sem::Views::SharedConfigs).to receive(:add_first_file).with(shared_config)
+          expect(Sem::Views::SharedConfigs).to receive(:add_first_file).with(shared_config).and_call_original
 
           sem_run("shared-configs:files:list rt/tokens")
         end
@@ -157,7 +157,7 @@ describe Sem::CLI::SharedConfigs do
         before { allow(shared_config).to receive(:env_vars).and_return(env_vars) }
 
         it "lists all env vars in a shared_config" do
-          expect(Sem::Views::SharedConfigs).to receive(:env_vars_list).with(shared_config, env_vars)
+          expect(Sem::Views::EnvVars).to receive(:list).with(env_vars).and_call_original
 
           sem_run("shared-configs:env-vars:list rt/tokens")
         end

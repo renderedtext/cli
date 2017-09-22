@@ -2,7 +2,13 @@ class Sem::CLI::Orgs < Dracula
 
   desc "list", "list organizations"
   def list
-    Sem::Views::Orgs.list(Sem::API::Org.all)
+    orgs = Sem::API::Org.all
+
+    if orgs.size > 0
+      Sem::Views::Orgs.list(orgs)
+    else
+      Sem::Views::Orgs.create_first_org
+    end
   end
 
   desc "info", "shows detailed information about an organization"

@@ -3,6 +3,8 @@ require "byebug"
 require "sem"
 require "simplecov"
 
+ENV["__CLI_TEST"] = "true"
+
 require_relative "support/coverage"
 require_relative "support/factories"
 

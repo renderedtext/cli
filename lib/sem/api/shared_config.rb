@@ -11,7 +11,7 @@ class Sem::API::SharedConfig < SimpleDelegator
     configs = client.shared_configs.list_for_org(org_name)
     config = configs.find { |config| config[:name] == shared_config_name }
 
-    if selected_shared_config.nil?
+    if config.nil?
       raise Sem::Errors::ResourceNotFound.new("Shared Configuration", [org_name, shared_config_name])
     end
 
@@ -48,10 +48,14 @@ class Sem::API::SharedConfig < SimpleDelegator
 
   attr_reader :org_name
 
-  def new(org_name, shared_config)
+  def initialize(org_name, shared_config)
     @org_name = org_name
 
     super(shared_config)
+  end
+
+  def full_name
+    "#{org_name}/#{name}"
   end
 
   def teams

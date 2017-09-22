@@ -110,7 +110,7 @@ describe Sem::CLI::Teams do
         before { allow(team).to receive(:users).and_return([user]) }
 
         it "lists team members" do
-          expect(Sem::Views::Teams).to receive(:list_members).with(team, [user])
+          expect(Sem::Views::Users).to receive(:list).with([user]).and_call_original
 
           sem_run("teams:members:list rt/devs")
         end
@@ -158,7 +158,7 @@ describe Sem::CLI::Teams do
         before { allow(team).to receive(:projects).and_return([project]) }
 
         it "lists team members" do
-          expect(Sem::Views::Teams).to receive(:list_projects).with(team, [project])
+          expect(Sem::Views::Projects).to receive(:list).with([project]).and_call_original
 
           sem_run("teams:projects:list rt/devs")
         end
@@ -168,7 +168,7 @@ describe Sem::CLI::Teams do
         before { allow(team).to receive(:projects).and_return([]) }
 
         it "offers a way to add first project" do
-          expect(Sem::Views::Teams).to receive(:add_first_project).with(team)
+          expect(Sem::Views::Teams).to receive(:add_first_project).with(team).and_call_original
 
           sem_run("teams:projects:list rt/devs")
         end
@@ -206,7 +206,7 @@ describe Sem::CLI::Teams do
         before { allow(team).to receive(:shared_configs).and_return([shared_config]) }
 
         it "lists team's shared configs" do
-          expect(Sem::Views::Teams).to receive(:list_shared_configs).with(team, [shared_config])
+          expect(Sem::Views::SharedConfigs).to receive(:list).with([shared_config])
 
           sem_run("teams:shared-configs:list rt/devs")
         end
@@ -216,7 +216,7 @@ describe Sem::CLI::Teams do
         before { allow(team).to receive(:shared_configs).and_return([]) }
 
         it "offers a way to add first project" do
-          expect(Sem::Views::Teams).to receive(:add_first_shared_config).with(team)
+          expect(Sem::Views::Teams).to receive(:add_first_shared_config).with(team).and_call_original
 
           sem_run("teams:shared-configs:list rt/devs")
         end

@@ -52,7 +52,7 @@ describe Sem::CLI::Projects do
         before { allow(project).to receive(:shared_configs).and_return(shared_configs) }
 
         it "lists all shared configurations on the project" do
-          expect(Sem::Views::Projects).to receive(:shared_config_list).with(project, shared_configs)
+          expect(Sem::Views::SharedConfigs).to receive(:list).with(shared_configs)
 
           sem_run("projects:shared-configs:list rt/cli")
         end

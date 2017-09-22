@@ -49,7 +49,7 @@ class Sem::CLI::SharedConfigs < Dracula
       files = shared_config.files
 
       if files.size > 0
-        Sem::Views::SharedConfigs.file_list(shared_config, files)
+        Sem::Views::Files.list(files)
       else
         Sem::Views::SharedConfigs.add_first_file(shared_config)
       end
@@ -93,7 +93,7 @@ class Sem::CLI::SharedConfigs < Dracula
       env_vars = shared_config.env_vars
 
       if env_vars.size > 0
-        Sem::Views::SharedConfigs.env_vars_list(shared_config, env_vars)
+        Sem::Views::EnvVars.list(env_vars)
       else
         Sem::Views::SharedConfigs.add_first_env_var(shared_config)
       end

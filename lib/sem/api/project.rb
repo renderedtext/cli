@@ -23,6 +23,10 @@ class Sem::API::Project < SimpleDelegator
     super(project)
   end
 
+  def full_name
+    "#{@org_name}/#{name}"
+  end
+
   def teams
     client.teams.list_for_project(id).map { |team| Sem::API::Team.new(org_name, team) }
   end
