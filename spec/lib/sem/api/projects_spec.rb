@@ -76,6 +76,42 @@ describe Sem::API::Projects do
     end
   end
 
+  describe ".list_env_vars" do
+    let(:env_var_hash) { { :id => 0 } }
+
+    before { allow(Sem::API::EnvVars).to receive(:list_for_project).and_return([env_var_hash]) }
+
+    it "calls the env_vars api" do
+      expect(Sem::API::EnvVars).to receive(:list_for_project).with(org_name, instance_name)
+
+      described_class.list_env_vars(org_name, instance_name)
+    end
+
+    it "returns the env_vars" do
+      return_value = described_class.list_env_vars(org_name, instance_name)
+
+      expect(return_value).to eql([env_var_hash])
+    end
+  end
+
+  describe ".list_files" do
+    let(:file_hash) { { :id => 0 } }
+
+    before { allow(Sem::API::Files).to receive(:list_for_project).and_return([file_hash]) }
+
+    it "calls the files api" do
+      expect(Sem::API::Files).to receive(:list_for_project).with(org_name, instance_name)
+
+      described_class.list_files(org_name, instance_name)
+    end
+
+    it "returns the files" do
+      return_value = described_class.list_files(org_name, instance_name)
+
+      expect(return_value).to eql([file_hash])
+    end
+  end
+
   describe ".info" do
     before { allow(class_api).to receive(:list_for_org).and_return([instance_hash]) }
 
