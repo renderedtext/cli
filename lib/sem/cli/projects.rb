@@ -16,6 +16,28 @@ class Sem::CLI::Projects < Dracula
     Sem::Views::Projects.info(project_instance)
   end
 
+  class Files < Dracula
+    desc "list", "list files on a project"
+    def list(project)
+      org_name, project_name = Sem::SRN.parse_project(project)
+
+      files = Sem::API::Projects.list_files(org_name, project_name)
+
+      Sem::Views::Files.list(files)
+    end
+  end
+
+  class EnvVars < Dracula
+    desc "list", "list environment variables on a project"
+    def list(project)
+      org_name, project_name = Sem::SRN.parse_project(project)
+
+      env_vars = Sem::API::Projects.list_env_vars(org_name, project_name)
+
+      Sem::Views::EnvVars.list(env_vars)
+    end
+  end
+
   class SharedConfigs < Dracula
     desc "list", "list shared configurations on a project"
     def list(project)
@@ -55,6 +77,8 @@ class Sem::CLI::Projects < Dracula
     end
   end
 
+  register "files", "manage files", Files
+  register "env-vars", "manage environment variables", EnvVars
   register "shared-configs", "manage shared configurations", SharedConfigs
 
 end

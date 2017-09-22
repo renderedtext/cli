@@ -30,6 +30,8 @@ describe Sem::API::Projects do
                     :updated_at => 456)
   end
 
+  let(:project) { instance }
+
   before do
     allow(described_class).to receive(:client).and_return(client)
     allow(described_class).to receive(:to_hash).and_return(instance_hash)
@@ -76,8 +78,57 @@ describe Sem::API::Projects do
     end
   end
 
+  describe ".list_files" do
+    let(:env_var) do
+      instance_double(SemaphoreClient::Model::EnvVar,
+                      :id => "2121",
+                      :name => "/etc/init",
+                      :content => "aaa",
+                      :encrypted => true)
+    end
+
+    let(:env_vars_api) { instance_double(SemaphoreClient::Api::EnvVar) }
+
+    before do
+      allow(described_class).to receive(:info).and_return(instance_hash)
+      allow(described_class).to receive_message_chain(:client, :env_vars).and_return(env_vars_api)
+      allow(env_vars_api).to receive(:list_for_project).and_return([env_var])
+    end
+
+    it "returns the env_vars" do
+      return_value = described_class.list_env_vars(org_name, instance_name)
+
+      expect(return_value).to eql([{ :id => "2121", :name => "/etc/init", :encrypted? => true, :content => "aaa" }])
+    end
+  end
+
+  describe ".list_files" do
+    let(:file) do
+      instance_double(SemaphoreClient::Model::ConfigFile,
+                      :id => "2121",
+                      :path => "/etc/init",
+                      :encrypted => true)
+    end
+
+    let(:config_files_api) { instance_double(SemaphoreClient::Api::ConfigFile) }
+
+    before do
+      allow(described_class).to receive(:info).and_return(instance_hash)
+      allow(described_class).to receive_message_chain(:client, :config_files).and_return(config_files_api)
+      allow(config_files_api).to receive(:list_for_project).and_return([file])
+    end
+
+    it "returns the files" do
+      return_value = described_class.list_files(org_name, instance_name)
+
+      expect(return_value).to eql([{ :id => "2121", :name => "/etc/init", :encrypted? => true }])
+    end
+  end
+
   describe ".info" do
-    before { allow(class_api).to receive(:list_for_org).and_return([instance_hash]) }
+    before do
+      allow(class_api).to receive(:list_for_org).and_return([instance_hash])
+    end
 
     it "calls list_for_org on the class api" do
       expect(class_api).to receive(:list_for_org).with(org_name, :name => instance_name)

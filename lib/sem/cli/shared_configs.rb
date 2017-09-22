@@ -64,15 +64,22 @@ class Sem::CLI::SharedConfigs < Dracula
     end
 
     desc "add", "add a file to the shared configuration"
-    option :file, :aliases => "f", :desc => "File to upload", :required => true
-    def add(shared_config, file)
+    option "local-path", :aliases => "f", :desc => "File to upload", :required => true
+    option "path-on-semaphore", :aliases => "p", :desc => "Path of file in builds and deploys", :required => true
+    def add(shared_config)
       org_name, shared_config_name = Sem::SRN.parse_shared_config(shared_config)
 
-      content = File.read(options[:file])
+      local_path = options["local-path"]
+      path_on_semaphore = options["path-on-semaphore"]
 
-      Sem::API::Files.add_to_shared_config(org_name, shared_config_name, :path => file, :content => content)
+      abort "Local file #{local_path} does not exists." unless File.exist?(local_path)
 
-      puts "Added #{file} to #{org_name}/#{shared_config_name}"
+      Sem::API::Files.add_to_shared_config(org_name,
+                                           shared_config_name,
+                                           :path => path_on_semaphore,
+                                           :content => File.read(local_path))
+
+      puts "Added #{path_on_semaphore} to #{org_name}/#{shared_config_name}"
     end
 
     desc "remove", "remove a file from the shared configuration"

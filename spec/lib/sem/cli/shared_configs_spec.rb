@@ -231,34 +231,42 @@ describe Sem::CLI::SharedConfigs do
     end
 
     describe "#add" do
-      let(:content) { "content" }
 
-      before do
-        allow(File).to receive(:read).and_return(content)
-        allow(Sem::API::Files).to receive(:add_to_shared_config)
+      context "local file exists" do
+        before do
+          File.write("/tmp/secrets.yml", "santa-is-real")
+
+          allow(Sem::API::Files).to receive(:add_to_shared_config)
+        end
+
+        it "calls the projects API" do
+          expect(Sem::API::Files).to receive(:add_to_shared_config).with("rt",
+                                                                         "tokens",
+                                                                         :path => "/etc/secrets.yml",
+                                                                         :content => "santa-is-real")
+
+          sem_run("shared-configs:files:add rt/tokens --path-on-semaphore /etc/secrets.yml --local-path /tmp/secrets.yml") # rubocop:disable LineLength
+        end
+
+        it "adds a file to the shared configuration" do
+          stdout, stderr, status = sem_run("shared-configs:files:add rt/tokens --path-on-semaphore /etc/secrets.yml --local-path /tmp/secrets.yml") # rubocop:disable LineLength
+
+          expect(stdout.strip).to eq("Added /etc/secrets.yml to rt/tokens")
+          expect(stderr).to eq("")
+          expect(status).to eq(:ok)
+        end
       end
 
-      it "reads the file" do
-        expect(File).to receive(:read).with("secrets.yml")
+      context "local file does not exists" do
+        it "prints an error" do
+          FileUtils.rm_rf("/tmp/secrets.yml")
 
-        sem_run("shared-configs:files:add rt/tokens secrets.yml -f secrets.yml")
-      end
+          stdout, stderr, status = sem_run("shared-configs:files:add rt/tokens --path-on-semaphore /etc/secrets.yml --local-path /tmp/secrets.yml") # rubocop:disable LineLength
 
-      it "calls the projects API" do
-        expect(Sem::API::Files).to receive(:add_to_shared_config).with("rt",
-                                                                       "tokens",
-                                                                       :path => "secrets.yml",
-                                                                       :content => content)
-
-        sem_run("shared-configs:files:add rt/tokens secrets.yml -f secrets.yml")
-      end
-
-      it "adds a file to the shared configuration" do
-        stdout, stderr, status = sem_run("shared-configs:files:add rt/tokens secrets.yml -f secrets.yml")
-
-        expect(stdout.strip).to eq("Added secrets.yml to rt/tokens")
-        expect(stderr).to eq("")
-        expect(status).to eq(:ok)
+          expect(stdout.strip).to eq("")
+          expect(stderr.strip).to eq("Local file /tmp/secrets.yml does not exists.")
+          expect(status).to eq(:system_error)
+        end
       end
     end
 
