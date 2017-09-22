@@ -6,16 +6,14 @@ class Sem::CLI::Orgs < Dracula
   end
 
   desc "info", "shows detailed information about an organization"
-  def info(org)
-    org_name = Sem::SRN.parse_org(org).first
+  def info(org_name)
     org = Sem::API::Org.find(org_name)
 
     Sem::Views::Orgs.info(org)
   end
 
   desc "members", "list members of an organization"
-  def members(org)
-    org_name = Sem::SRN.parse_org(org).first
+  def members(org_name)
     org = Sem::API::Org.find(org_name)
 
     abort "Organization #{org_name} not found." unless org

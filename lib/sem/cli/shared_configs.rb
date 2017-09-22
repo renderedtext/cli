@@ -2,121 +2,99 @@ class Sem::CLI::SharedConfigs < Dracula
 
   desc "list", "list shared cofigurations"
   def list
-    shared_configs = Sem::API::SharedConfigs.list
+    shared_configs = Sem::API::SharedConfig.all
 
     Sem::Views::SharedConfigs.list(shared_configs)
   end
 
   desc "info", "show information about a shared configuration"
-  def info(shared_config)
-    org_name, shared_config_name = Sem::SRN.parse_shared_config(shared_config)
+  def info(shared_config_name)
+    shared_config = Sem::API::SharedConfig.find!(shared_config_name)
 
-    shared_config_instance = Sem::API::SharedConfigs.info(org_name, shared_config_name).to_h
-
-    Sem::Views::SharedConfigs.info(shared_config_instance)
+    Sem::Views::SharedConfigs.info(shared_config)
   end
 
   desc "create", "create a new shared configuration"
-  def create(shared_config)
-    org_name, shared_config_name = Sem::SRN.parse_shared_config(shared_config)
+  def create(shared_config_name)
+    shared_config = Sem::API::SharedConfig.create!(shared_config)
 
-    shared_config_instance = Sem::API::SharedConfigs.create(org_name, :name => shared_config_name)
-
-    Sem::Views::SharedConfigs.info(shared_config_instance)
+    Sem::Views::SharedConfigs.info(shared_config)
   end
 
   desc "rename", "rename a shared configuration"
   def rename(old_shared_config, new_shared_config)
-    old_org_name, old_shared_config_name = Sem::SRN.parse_shared_config(old_shared_config)
-    new_org_name, new_shared_config_name = Sem::SRN.parse_shared_config(new_shared_config)
+    shared_config = Sem::API::SharedConfig.find!(old_shared_config_name)
+    shared_config = shared_config.update!(:name => new_shared_config_name)
 
-    if old_org_name != new_org_name
-      abort Sem::Views::SharedConfigs.org_names_not_matching("old shared configuration name",
-                                                             "new shared configuration name",
-                                                             old_shared_config,
-                                                             new_shared_config)
-    end
-
-    shared_config_instance = Sem::API::SharedConfigs.update(old_org_name,
-                                                            old_shared_config_name,
-                                                            :name => new_shared_config_name)
-
-    Sem::Views::SharedConfigs.info(shared_config_instance)
+    Sem::Views::SharedConfigs.info(shared_config)
   end
 
   desc "delete", "removes a shared configuration from your organization"
-  def delete(shared_config)
-    org_name, shared_config_name = Sem::SRN.parse_shared_config(shared_config)
+  def delete(shared_config_name)
+    Sem::API::SharedConfig.delete!(shared_config_name)
 
-    Sem::API::SharedConfigs.delete(org_name, shared_config_name)
-
-    puts "Deleted shared configuration #{org_name}/#{shared_config_name}"
+    puts "Deleted shared configuration #{shared_config_name}"
   end
 
   class Files < Dracula
+
     desc "list", "list files in the shared configuration"
-    def list(shared_config)
-      org_name, shared_config_name = Sem::SRN.parse_shared_config(shared_config)
+    def list(shared_config_name)
+      shared_config = Sem::API::SharedConfig.find!(shared_config_name)
 
-      files = Sem::API::SharedConfigs.list_files(org_name, shared_config_name)
-
-      Sem::Views::Files.list(files)
+      Sem::Views::Files.list(shared_config.files)
     end
 
     desc "add", "add a file to the shared configuration"
     option :file, :aliases => "f", :desc => "File to upload", :required => true
-    def add(shared_config, file)
-      org_name, shared_config_name = Sem::SRN.parse_shared_config(shared_config)
+    def add(shared_config_name, file)
+      shared_config = Sem::API::SharedConfig.find!(shared_config_name)
 
-      content = File.read(options[:file])
+      shared_config.add_config_file(:path => file, :content => File.read(options[:file]))
 
-      Sem::API::Files.add_to_shared_config(org_name, shared_config_name, :path => file, :content => content)
-
-      puts "Added #{file} to #{org_name}/#{shared_config_name}"
+      puts "Added #{file} to #{shared_config_name)
     end
 
     desc "remove", "remove a file from the shared configuration"
-    def remove(shared_config, file)
-      org_name, shared_config_name = Sem::SRN.parse_shared_config(shared_config)
+    def remove(shared_config_name, file)
+      shared_config = Sem::API::SharedConfig.find!(shared_config_name)
 
-      Sem::API::Files.remove_from_shared_config(org_name, shared_config_name, file)
+      shared_config.remove_file(file)
 
-      puts "Removed #{file} from #{org_name}/#{shared_config_name}"
+      puts "Removed #{file} from #{shared_config_name}"
     end
+
   end
 
   class EnvVars < Dracula
+
     desc "list", "list environment variables in the shared configuration"
-    def list(shared_config)
-      org_name, shared_config_name = Sem::SRN.parse_shared_config(shared_config)
+    def list(shared_config_name)
+      shared_config = Sem::API::SharedConfig.find!(shared_config_name)
 
-      env_vars = Sem::API::SharedConfigs.list_env_vars(org_name, shared_config_name)
-
-      Sem::Views::EnvVars.list(env_vars)
+      Sem::Views::EnvVars.list(shared_config.env_vars)
     end
 
     desc "add", "add an environment variable to the shared configuration"
     option :name, :aliases => "-n", :desc => "Name of the variable", :required => true
     option :content, :aliases => "-c", :desc => "Content of the variable", :required => true
-    def add(shared_config)
-      org_name, shared_config_name = Sem::SRN.parse_shared_config(shared_config)
+    def add(shared_config_name)
+      shared_config = Sem::API::SharedConfig.find!(shared_config_name)
 
-      Sem::API::EnvVars.add_to_shared_config(org_name,
-                                             shared_config_name,
-                                             :name => options[:name],
-                                             :content => options[:content])
+      shared_config.add_env_var(:name => options[:name], :content => options[:content])
 
-      puts "Added #{options[:name]} to #{org_name}/#{shared_config_name}"
+      puts "Added #{options[:name]} to #{shared_config_name}"
     end
 
     desc "remove", "remove an environment variable from the shared configuration"
-    def remove(shared_config, env_var)
-      org_name, shared_config_name = Sem::SRN.parse_shared_config(shared_config)
+    def remove(shared_config_name, env_var)
+      shared_config = Sem::API::SharedConfig.find!(shared_config_name)
 
-      Sem::API::EnvVars.remove_from_shared_config(org_name, shared_config_name, env_var)
+      shared_config.remove_env_var(env_var)
 
-      puts "Removed #{env_var} from #{org_name}/#{shared_config_name}"
+      puts "Removed #{env_var} from #{shared_config_name}"
     end
+
   end
 
   register "files", "manage files", Files
