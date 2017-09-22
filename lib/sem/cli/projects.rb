@@ -4,12 +4,16 @@ class Sem::CLI::Projects < Dracula
   def list
     projects = Sem::API::Project.all
 
-    Sem::Views::Projects.list(projects)
+    if projects.size > 0
+      Sem::Views::Projects.list(projects)
+    else
+      Sem::Views::Projects.setup_first_project
+    end
   end
 
   desc "info", "shows detailed information about a project"
   def info(project_name)
-    project = Sem::API::Project.find(project_name)
+    project = Sem::API::Project.find!(project_name)
 
     Sem::Views::Projects.info(project)
   end
@@ -21,7 +25,11 @@ class Sem::CLI::Projects < Dracula
       project = Sem::API::Project.find!(project_name)
       shared_configs = project.shared_configs
 
-      Sem::Views::SharedConfigs.list(shared_configs)
+      if shared_configs.size > 0
+        Sem::Views::Projects.shared_config_list(project, shared_configs)
+      else
+        Sem::Views::Projects.attach_first_shared_configuration(project)
+      end
     end
 
     desc "add", "attach a shared configuration to a project"
@@ -35,7 +43,7 @@ class Sem::CLI::Projects < Dracula
     end
 
     desc "remove", "removes a shared configuration from the project"
-    def remove(project, shared_config)
+    def remove(project_name, shared_config_name)
       project = Sem::API::Project.find!(project_name)
       shared_config = Sem::API::SharedConfig.find!(shared_config_name)
 
@@ -47,5 +55,4 @@ class Sem::CLI::Projects < Dracula
   end
 
   register "shared-configs", "manage shared configurations", SharedConfigs
-
 end

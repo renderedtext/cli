@@ -1,5 +1,5 @@
 class Sem::API::Org < SimpleDelegator
-  extend Base
+  extend Sem::API::Base
 
   def self.all
     client.orgs.list.map { |org| new(org) }

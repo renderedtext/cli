@@ -1,3 +1,3 @@
-class Sem::API::Files < Sem::API::Base
-  extend Base
+class Sem::API::File < SimpleDelegator
+  extend Sem::API::Base
 end

@@ -1,5 +1,5 @@
 class Sem::API::SharedConfig < SimpleDelegator
-  extend Base
+  extend Sem::API::Base
 
   def self.all
     configs = Sem::API::Org.all.pmap { |org| client.shared_configs.list_for_org(org.username) }

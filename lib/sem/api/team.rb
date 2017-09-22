@@ -1,5 +1,5 @@
 class Sem::API::Team < SimpleDelegator
-  extend Base
+  extend Sem::API::Base
 
   def self.all
     projects = Sem::API::Org.all.pmap { |org| client.teams.list_for_org(org.username) }

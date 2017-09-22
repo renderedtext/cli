@@ -1,5 +1,5 @@
-class Sem::API::Project < Sem::API::Base
-  extend Base
+class Sem::API::Project < SimpleDelegator
+  extend Sem::API::Base
 
   def self.all
     Sema::API::Org.all.map do |org|
@@ -7,7 +7,7 @@ class Sem::API::Project < Sem::API::Base
     end.flatten
   end
 
-  def self.find(org_name, project_name)
+  def self.find(project_name)
     project = client.projects.list_for_org(org_name, :name => project_name).first
 
     raise Sem::Errors::ResourceNotFound.new("Project", [org_name, project_name]) if project.nil?
