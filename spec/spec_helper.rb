@@ -22,9 +22,18 @@ class IOStub
   end
 
   def write(data)
-    @original_io.write(data)
-
     @data += data
+    @original_io.write(data)
+  end
+
+  def print(data)
+    @data += data
+    @original_io.print(data)
+  end
+
+  def puts(data)
+    @data += data.to_s
+    @original_io.puts(data)
   end
 end
 

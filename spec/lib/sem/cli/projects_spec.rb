@@ -113,24 +113,30 @@ describe Sem::CLI::Projects do
       before do
         stub_api(:get, "/orgs/rt/projects/?name=cli").to_return(200, [project])
         stub_api(:get, "/orgs/rt/shared_configs").to_return(200, [shared_config])
+        stub_api(:post, "/projects/#{project[:id]}/shared_configs/#{shared_config[:id]}").to_return(204, "")
       end
 
       it "adds the shared configuration to the project" do
         stdout, stderr = sem_run!("projects:shared-configs:add rt/cli rt/tokens")
 
-        expect(stdout).to include("")
+        expect(stdout).to include("Shared Configuration rt/tokens added to the project.")
       end
     end
 
     describe "#remove" do
+      let(:shared_config) { StubFactory.shared_config(:name => "tokens") }
+
       before do
-        allow(Sem::API::SharedConfig).to receive(:find!).with("rt/tokens").and_return(shared_config)
+        stub_api(:get, "/orgs/rt/projects/?name=cli").to_return(200, [project])
+        stub_api(:get, "/orgs/rt/shared_configs").to_return(200, [shared_config])
+
+        stub_api(:delete, "/projects/#{project[:id]}/shared_configs/#{shared_config[:id]}").to_return(204, "")
       end
 
       it "adds the shared configuration to the project" do
-        expect(project).to receive(:remove_shared_config).with(shared_config)
+        stdout, stderr = sem_run!("projects:shared-configs:remove rt/cli rt/tokens")
 
-        sem_run("projects:shared-configs:remove rt/cli rt/tokens")
+        expect(stdout).to include("Shared Configuration rt/tokens removed from the project.")
       end
     end
 

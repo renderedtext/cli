@@ -39,6 +39,14 @@ class Sem::API::Project < SimpleDelegator
     Sem::API::Base.client.shared_configs.list_for_project(id).map { |project| Sem::API::SharedConfig.new(org_name, project) }
   end
 
+  def add_shared_config(shared_config)
+    Sem::API::Base.client.shared_configs.attach_to_project(id, shared_config.id)
+  end
+
+  def remove_shared_config(shared_config)
+    Sem::API::Base.client.shared_configs.detach_from_project(id, shared_config.id)
+  end
+
   def users
 
   end

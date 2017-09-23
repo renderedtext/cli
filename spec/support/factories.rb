@@ -45,7 +45,7 @@ module StubFactory
     Sem::API::Team.new(org_name, api_model)
   end
 
-  def project(org_name = "rt", params = {})
+  def project(params = {})
     params = {
       :id => "3bc7ed43-ac8a-487e-b488-c38bc757a034",
       :name => "cli",
@@ -60,7 +60,7 @@ module StubFactory
     params
   end
 
-  def shared_config(org_name = "rt", params = {})
+  def shared_config(params = {})
     params = {
       :id => "3bc7ed43-ac8a-487e-b488-c38bc757a034",
       :name => "cli",
