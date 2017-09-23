@@ -3,6 +3,7 @@ require "dracula"
 require "semaphore_client"
 require "fileutils"
 require "pmap"
+require "delegate"
 
 module Sem
   require "sem/errors"
