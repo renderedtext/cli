@@ -9,9 +9,11 @@ module StubFactory
       :updated_at => "2017-08-02 13:14:40 +0200"
     }.merge(params)
 
-    api_model = RSpec::Mocks::Double.new(SemaphoreClient::Model::Org, params)
+    # api_model = RSpec::Mocks::Double.new(SemaphoreClient::Model::Org, params)
 
-    Sem::API::Org.new(api_model)
+    # Sem::API::Org.new(api_model)
+
+    params
   end
 
   def user(params = {})
@@ -22,9 +24,11 @@ module StubFactory
       :updated_at => "2017-08-02 13:14:40 +0200"
     }.merge(params)
 
-    api_model = RSpec::Mocks::Double.new(SemaphoreClient::Model::User, params)
+    params
 
-    Sem::API::User.new(api_model)
+    # api_model = RSpec::Mocks::Double.new(SemaphoreClient::Model::User, params)
+
+    # Sem::API::User.new(api_model)
   end
 
   def team(org_name = "rt", params = {})

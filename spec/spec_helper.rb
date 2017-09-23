@@ -2,11 +2,11 @@ require "bundler/setup"
 require "byebug"
 require "sem"
 require "simplecov"
-
-ENV["__CLI_TEST"] = "true"
+require "webmock/rspec"
 
 require_relative "support/coverage"
 require_relative "support/factories"
+require_relative "support/web_stubs"
 
 SimpleCov.start do
   add_filter "/spec/"
@@ -32,7 +32,7 @@ end
 
 def sem_run(args)
   stdout, stderr, _, status = collect_output do
-    Sem::CLI.start(args.split(" "))
+    Sem.start(args.split(" "))
   end
 
   [stdout, stderr, status]
@@ -41,6 +41,8 @@ end
 RSpec.configure do |config|
   # Enable flags like --only-failures and --next-failure
   config.example_status_persistence_file_path = ".rspec_status"
+
+  config.include WebStubs
 
   config.mock_with :rspec do |mocks|
     mocks.verify_doubled_constant_names = true

@@ -3,23 +3,22 @@ require "spec_helper"
 describe Sem::CLI::Orgs do
 
   let(:org) { StubFactory.organization }
-  let(:user) { StubFactory.user }
 
   describe "#list" do
     context "you have one or more orgs" do
       it "lists all organizations" do
-        orgs = [org]
+        stub_api(:get, "/orgs").to_return(200, [org])
 
-        expect(Sem::API::Org).to receive(:all).and_return(orgs)
-        expect(Sem::Views::Orgs).to receive(:list).with(orgs)
+        stdout, stderr, status = sem_run("orgs:list")
 
-        sem_run("orgs:list")
+        expect(stdout).to include(org[:username])
       end
     end
 
     context "you have no orgs" do
       it "offers you to create your first org" do
-        expect(Sem::API::Org).to receive(:all).and_return([])
+        stub_api(:get, "/orgs").to_return(200, [])
+
         expect(Sem::Views::Orgs).to receive(:create_first_org)
 
         sem_run("orgs:list")
@@ -28,24 +27,37 @@ describe Sem::CLI::Orgs do
   end
 
   describe "#info" do
-    it "get info about an organization" do
-      expect(Sem::API::Org).to receive(:find!).with("rt").and_return(org)
-      expect(Sem::Views::Orgs).to receive(:info).with(org)
+    context "organization exists" do
+      it "get info about an organization" do
+        stub_api(:get, "/orgs/rt").to_return(200, org)
 
-      sem_run("orgs:info rt")
+        stdout, stderr, status = sem_run("orgs:info rt")
+
+        expect(stdout).to include(org[:username])
+      end
+    end
+
+    context "organization doesn't exists" do
+      it "get info about an organization" do
+        stub_api(:get, "/orgs/rt").to_return(404, org)
+
+        stdout, stderr, status = sem_run("orgs:info rt")
+
+        expect(stdout).to include("Organization rt not found.")
+      end
     end
   end
 
   describe "#members" do
-    before do
-      allow(org).to receive(:users).and_return([user])
-    end
+    let(:user) { StubFactory.user }
 
     it "list members of an organization" do
-      expect(Sem::API::Org).to receive(:find!).with("rt").and_return(org)
-      expect(Sem::Views::Users).to receive(:list).with([user])
+      stub_api(:get, "/orgs/rt").to_return(200, org)
+      stub_api(:get, "/orgs/users").to_return(200, [user])
 
-      sem_run("orgs:members rt")
+      stdout, stderr, status = sem_run("orgs:members rt")
+
+      expect(stdout).to include("john-snow")
     end
   end
 

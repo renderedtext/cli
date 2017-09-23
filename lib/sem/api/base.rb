@@ -1,8 +1,7 @@
 module Sem::API::Base
+  module_function
 
-  def self.client
-    return nil if ENV["__CLI_TEST"]
-
+  def client
     @client ||= SemaphoreClient.new(
       Sem::Configuration.auth_token,
       :api_url => Sem::Configuration.api_url,

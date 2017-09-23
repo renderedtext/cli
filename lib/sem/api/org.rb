@@ -14,15 +14,15 @@ class Sem::API::Org < SimpleDelegator
   end
 
   def users
-    client.users.list_for_org(name).map { |user| Sem::API::User.new(user) }
+    Sem::API::Base.client.users.list_for_org(name).map { |user| Sem::API::User.new(user) }
   end
 
   def teams
-    client.teams.list_for_org(name).map { |team| Sem::API::Team.new(team) }
+    Sem::API::Base.client.teams.list_for_org(name).map { |team| Sem::API::Team.new(team) }
   end
 
   def projects
-    client.projects.list_for_org(name).map { |project| Sem::API::Project.new(project) }
+    Sem::API::Base.client.projects.list_for_org(name).map { |project| Sem::API::Project.new(project) }
   end
 
 end
