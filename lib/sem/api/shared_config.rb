@@ -11,7 +11,7 @@ class Sem::API::SharedConfig < SimpleDelegator
     org_name, shared_config_name = Sem::SRN.parse_shared_config(shared_config_srn)
 
     configs = client.shared_configs.list_for_org(org_name)
-    config = configs.find { |config| config[:name] == shared_config_name }
+    config = configs.find { |config| config.name == shared_config_name }
 
     if config.nil?
       raise Sem::Errors::ResourceNotFound.new("Shared Configuration", [org_name, shared_config_name])
@@ -67,11 +67,11 @@ class Sem::API::SharedConfig < SimpleDelegator
   end
 
   def files
-    client.config_files.list_for_shared_config(id).map { |file| Sem::API::File.new(org_name, file) }
+    Sem::API::Base.client.config_files.list_for_shared_config(id).map { |file| Sem::API::File.new(org_name, file) }
   end
 
   def env_vars
-    client.env_vars.list_for_shared_config(id).map { |env_var| Sem::API::EnvVars.new(org_name, env_var) }
+    Sem::API::Base.client.env_vars.list_for_shared_config(id).map { |env_var| Sem::API::EnvVars.new(org_name, env_var) }
   end
 
 end

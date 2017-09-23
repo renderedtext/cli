@@ -35,6 +35,10 @@ class Sem::API::Project < SimpleDelegator
     client.teams.list_for_project(id).map { |team| Sem::API::Team.new(org_name, team) }
   end
 
+  def shared_configs
+    Sem::API::Base.client.shared_configs.list_for_project(id).map { |project| Sem::API::SharedConfig.new(org_name, project) }
+  end
+
   def users
 
   end

@@ -67,43 +67,58 @@ describe Sem::CLI::Projects do
   end
 
   describe Sem::CLI::Projects::SharedConfigs do
-    let(:shared_config) { StubFactory.shared_config }
-
-    before { allow(Sem::API::Project).to receive(:find!).with("rt/cli").and_return(project) }
+    let(:project) { StubFactory.project(:name => "cli") }
 
     describe "#list" do
       context "you have at least one shared_config attached to a project" do
-        let(:shared_configs) { [shared_config, StubFactory.shared_config] }
+        let(:shared_config1) { StubFactory.shared_config }
+        let(:shared_config2) { StubFactory.shared_config }
 
-        before { allow(project).to receive(:shared_configs).and_return(shared_configs) }
+        before do
+          stub_api(:get, "/orgs/rt/projects/?name=cli").to_return(200, [project])
+          stub_api(:get, "/projects/#{project[:id]}/shared_configs").to_return(200, [shared_config1, shared_config2])
+
+          stub_api(:get, "/shared_configs/#{shared_config1[:id]}/config_files").to_return(200, [])
+          stub_api(:get, "/shared_configs/#{shared_config2[:id]}/config_files").to_return(200, [])
+
+          stub_api(:get, "/shared_configs/#{shared_config1[:id]}/env_vars").to_return(200, [])
+          stub_api(:get, "/shared_configs/#{shared_config2[:id]}/env_vars").to_return(200, [])
+        end
 
         it "lists all shared configurations on the project" do
-          expect(Sem::Views::SharedConfigs).to receive(:list).with(shared_configs)
+          stdout, stderr = sem_run!("projects:shared-configs:list rt/cli")
 
-          sem_run("projects:shared-configs:list rt/cli")
+          expect(stdout).to include(shared_config1[:id])
+          expect(stdout).to include(shared_config2[:id])
         end
       end
 
       context "no shared_configuration attached to the project" do
-        before { allow(project).to receive(:shared_configs).and_return([]) }
+        before do
+          stub_api(:get, "/orgs/rt/projects/?name=cli").to_return(200, [project])
+          stub_api(:get, "/projects/#{project[:id]}/shared_configs").to_return(200, [])
+        end
 
         it "offers you to create and attach a shared configuration" do
-          expect(Sem::Views::Projects).to receive(:attach_first_shared_configuration).with(project)
+          stdout, stderr = sem_run!("projects:shared-configs:list rt/cli")
 
-          sem_run("projects:shared-configs:list rt/cli")
+          expect(stdout).to include("Add your first shared configuration")
         end
       end
     end
 
     describe "#add" do
+      let(:shared_config) { StubFactory.shared_config(:name => "tokens") }
+
       before do
-        allow(Sem::API::SharedConfig).to receive(:find!).with("rt/tokens").and_return(shared_config)
+        stub_api(:get, "/orgs/rt/projects/?name=cli").to_return(200, [project])
+        stub_api(:get, "/orgs/rt/shared_configs").to_return(200, [shared_config])
       end
 
       it "adds the shared configuration to the project" do
-        expect(project).to receive(:add_shared_config).with(shared_config)
+        stdout, stderr = sem_run!("projects:shared-configs:add rt/cli rt/tokens")
 
-        sem_run("projects:shared-configs:add rt/cli rt/tokens")
+        expect(stdout).to include("")
       end
     end
 

@@ -13,20 +13,35 @@ SimpleCov.start do
   add_filter "/.bundle/"
 end
 
+class IOStub
+  attr_reader :data
+
+  def initialize(original_io)
+    @original_io = original_io
+    @data = ""
+  end
+
+  def write(data)
+    @original_io.write(data)
+
+    @data += data
+  end
+end
+
 def collect_output
   original_stdout = $stdout
   original_stderr = $stderr
 
-  $stdout = fake_stdout = StringIO.new
-  $stderr = fake_stderr = StringIO.new
+  $stdout = fake_stdout = IOStub.new($stdout)
+  $stderr = fake_stderr = IOStub.new($stderr)
 
   result = yield
 
   status = result == 0 ? :ok : :fail
 
-  [fake_stdout.string.to_s, fake_stderr.string.to_s, result, status]
+  [fake_stdout.data.to_s, fake_stderr.data.to_s, result, status]
 rescue SystemExit
-  [fake_stdout.string.to_s, fake_stderr.string.to_s, result, :system_error]
+  [fake_stdout.data.to_s, fake_stderr.data.to_s, result, :system_error]
 ensure
   $stdout = original_stdout
   $stderr = original_stderr
@@ -44,9 +59,6 @@ def sem_run!(args)
   stdout, stderr, status = sem_run(args)
 
   if status != :ok
-    puts stdout
-    puts stderr
-
     raise "Non Zero Exit Status"
   end
 

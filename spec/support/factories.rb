@@ -68,9 +68,11 @@ module StubFactory
       :updated_at => "2017-08-02 13:14:40 +0200"
     }.merge(params)
 
-    api_model = RSpec::Mocks::Double.new(SemaphoreClient::Model::SharedConfig, params)
+    # api_model = RSpec::Mocks::Double.new(SemaphoreClient::Model::SharedConfig, params)
 
-    Sem::API::SharedConfig.new(org_name, api_model)
+    # Sem::API::SharedConfig.new(org_name, api_model)
+
+    params
   end
 
   def file(params = {})

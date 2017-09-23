@@ -28,7 +28,7 @@ class Sem::CLI::Projects < Dracula
       if shared_configs.size > 0
         Sem::Views::SharedConfigs.list(shared_configs)
       else
-        Sem::Views::Projects.attach_first_shared_configuration(project)
+        Sem::Views::Projects.attach_first_shared_config(project)
       end
     end
 
