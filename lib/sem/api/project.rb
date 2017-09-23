@@ -7,7 +7,9 @@ class Sem::API::Project < SimpleDelegator
     end.flatten
   end
 
-  def self.find(project_name)
+  def self.find!(project_srn)
+    org_name, project_name = Sem::SRN.parse_project(project_srn)    
+
     project = client.projects.list_for_org(org_name, :name => project_name).first
 
     raise Sem::Errors::ResourceNotFound.new("Project", [org_name, project_name]) if project.nil?

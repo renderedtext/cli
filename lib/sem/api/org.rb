@@ -5,7 +5,7 @@ class Sem::API::Org < SimpleDelegator
     client.orgs.list.map { |org| new(org) }
   end
 
-  def self.find(org_name)
+  def self.find!(org_name)
     org = client.orgs.get(org_name)
 
     raise Sem::Errors::ResourceNotFound.new("Organization", [org_name]) if org.nil?

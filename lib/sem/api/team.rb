@@ -7,14 +7,22 @@ class Sem::API::Team < SimpleDelegator
     projects.flatten.map { |project| new(project) }
   end
 
-  def self.find(org_name, team_name)
-    team = client.teams.list_for_org(org_name, :name => team_name).first
+  def self.find!(team_srn)
+    org_name, team_name = Sem::SRN.parse_team(team_srn)
 
-    new(org_name, team) if team
+    team = client.teams.list_for_org(org_name).find { |team| team[:name] == team_name }
+
+    raise Sem::Errors::ResourceNotFound.new("Team", [org_name, team_name]) if team.nil?
+
+    new(org_name, team) 
   end
 
-  def self.create(org_name, args)
+  def self.create!(org_name, args)
+    org_name, team_name = Sem::SRN.parse_team(team_srn)
+
     team = api.create_for_org!(org_name, args)
+
+    raise Sem::Errors::ResourceNotFound.new("Team", [org_name, team_name]) if team.nil?
 
     new(org_name, team)
   end
@@ -36,7 +44,7 @@ class Sem::API::Team < SimpleDelegator
   end
 
   def delete
-    client.projects.delete!(id)
+    client.teams.delete!(id)
   end
 
   def users

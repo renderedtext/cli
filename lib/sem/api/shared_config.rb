@@ -7,7 +7,9 @@ class Sem::API::SharedConfig < SimpleDelegator
     configs.flatten.map { |config| new(config) }
   end
 
-  def self.find(org_name, shared_config_name)
+  def self.find!(shared_config_srn)
+    org_name, shared_config_name = Sem::SRN.parse_shared_config(shared_config_srn)
+
     configs = client.shared_configs.list_for_org(org_name)
     config = configs.find { |config| config[:name] == shared_config_name }
 
@@ -18,32 +20,16 @@ class Sem::API::SharedConfig < SimpleDelegator
     new(selected_shared_config)
   end
 
-  def self.create(org_name, shared_config_name, args)
-    shared_config = api.create_for_org(org_name, args)
+  def self.create!(shared_config_srn, args)
+    org_name, shared_config_name = Sem::SRN.parse_shared_config(shared_config_srn)
+
+    shared_config = client.shared_configs.create_for_org(org_name, args)
 
     if shared_config.nil?
       raise Sem::Errors::ResourceNotCreated.new("Shared Configuration", [org_name, args[:name]])
     end
 
     new(shared_config)
-  end
-
-  def self.update(org_name, shared_config_name, args)
-    shared_config = info(org_name, shared_config_name)
-
-    shared_config = api.update(shared_config[:id], args)
-
-    if shared_config.nil?
-      raise Sem::Errors::ResourceNotUpdated.new("Shared Configuration", [org_name, shared_config_name])
-    end
-
-    new(shared_config)
-  end
-
-  def self.delete(org_name, shared_config_name)
-    shared_config = find(org_name, shared_config_name)
-
-    api.delete!(shared_config.id)
   end
 
   attr_reader :org_name
@@ -56,6 +42,20 @@ class Sem::API::SharedConfig < SimpleDelegator
 
   def full_name
     "#{org_name}/#{name}"
+  end
+
+  def update(args)
+    shared_config = api.update(id, args)
+
+    if shared_config.nil?
+      raise Sem::Errors::ResourceNotUpdated.new("Shared Configuration", [org_name, shared_config_name])
+    end
+
+    new(shared_config)
+  end
+
+  def delete!
+    api.delete!(id)
   end
 
   def teams
