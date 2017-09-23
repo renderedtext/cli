@@ -2,15 +2,17 @@ class Sem::API::Project < SimpleDelegator
   extend Sem::API::Base
 
   def self.all
-    Sema::API::Org.all.map do |org|
-      client.projects.list_for_org(org.name).map { |project| new(project) }
+    Sem::API::Org.all.map do |org|
+      client.projects.list_for_org(org.username).map { |project| new(org.username, project) }
     end.flatten
   end
 
   def self.find!(project_srn)
-    org_name, project_name = Sem::SRN.parse_project(project_srn)    
+    org_name, project_name = Sem::SRN.parse_project(project_srn)
 
-    project = client.projects.list_for_org(org_name, :name => project_name).first
+    # TODO: fix .to_a bug in client
+
+    project = client.projects.list_for_org(org_name, :name => project_name).to_a.first
 
     raise Sem::Errors::ResourceNotFound.new("Project", [org_name, project_name]) if project.nil?
 

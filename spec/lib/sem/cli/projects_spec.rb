@@ -1,42 +1,68 @@
 require "spec_helper"
 
 describe Sem::CLI::Projects do
-  let(:project) { StubFactory.project }
 
   describe "#list" do
-    context "you have at least one project on semaphore" do
-      let(:another_project) { StubFactory.project }
-      let(:projects) { [project, another_project] }
+    let(:org1) { StubFactory.organization(:username => "rt") }
+    let(:org2) { StubFactory.organization(:username => "z-fighters") }
 
-      before { allow(Sem::API::Project).to receive(:all).and_return(projects) }
+    context "you have at least one project on semaphore" do
+      let(:project1) { StubFactory.project }
+      let(:project2) { StubFactory.project }
+
+      before do
+        stub_api(:get, "/orgs").to_return(200, [org1, org2])
+
+        stub_api(:get, "/orgs/#{org1[:username]}/projects").to_return(200, [project1])
+        stub_api(:get, "/orgs/#{org2[:username]}/projects").to_return(200, [project2])
+      end
 
       it "lists all projects" do
-        expect(Sem::Views::Projects).to receive(:list).with([project, another_project])
+        stdout, stderr = sem_run!("projects:list")
 
-        sem_run("projects:list")
+        expect(stdout).to include("rt/cli")
+        expect(stdout).to include("z-fighters/cli")
       end
     end
 
     context "no projects on semaphore" do
       before do
-        allow(Sem::API::Project).to receive(:all).and_return([])
+        stub_api(:get, "/orgs").to_return(200, [org1, org2])
+
+        stub_api(:get, "/orgs/rt/projects").to_return(200, [])
+        stub_api(:get, "/orgs/z-fighters/projects").to_return(200, [])
       end
 
       it "offers you to set up a project on semaphore" do
-        expect(Sem::Views::Projects).to receive(:setup_first_project)
+        stdout, stderr = sem_run!("projects:list")
 
-        sem_run("projects:list")
+        expect(stdout).to include("Add your first project")
       end
     end
   end
 
   describe "#info" do
-    before { allow(Sem::API::Project).to receive(:find!).with("rt/cli").and_return(project) }
+    context "project exists on semaphore" do
+      let(:project) { StubFactory.project }
 
-    it "shows detailed information about a project" do
-      expect(Sem::Views::Projects).to receive(:info).with(project)
+      it "shows detailed information about a project" do
+        stub_api(:get, "/orgs/rt/projects/?name=cli").to_return(200, [project])
 
-      sem_run("projects:info rt/cli")
+        stdout, stderr = sem_run!("projects:info rt/cli")
+
+        expect(stdout).to include(project[:id])
+      end
+    end
+
+    context "project not found on semaphore" do
+      it "shows project not found" do
+        stub_api(:get, "/orgs/rt/projects/?name=cli").to_return(404, [])
+
+        stdout, stderr, status = sem_run("projects:info rt/cli")
+
+        expect(stdout).to include("Project rt/cli not found")
+        expect(status).to eq(:fail)
+      end
     end
   end
 

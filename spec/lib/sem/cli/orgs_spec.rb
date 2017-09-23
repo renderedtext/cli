@@ -28,7 +28,7 @@ describe Sem::CLI::Orgs do
 
   describe "#info" do
     context "organization exists" do
-      it "get info about an organization" do
+      it "displays the info" do
         stub_api(:get, "/orgs/rt").to_return(200, org)
 
         stdout, stderr, status = sem_run("orgs:info rt")
@@ -38,7 +38,7 @@ describe Sem::CLI::Orgs do
     end
 
     context "organization doesn't exists" do
-      it "get info about an organization" do
+      it "displays org not found" do
         stub_api(:get, "/orgs/rt").to_return(404, org)
 
         stdout, stderr, status = sem_run("orgs:info rt")

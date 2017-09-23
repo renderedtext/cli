@@ -22,7 +22,9 @@ def collect_output
 
   result = yield
 
-  [fake_stdout.string.to_s, fake_stderr.string.to_s, result, :ok]
+  status = result == 0 ? :ok : :fail
+
+  [fake_stdout.string.to_s, fake_stderr.string.to_s, result, status]
 rescue SystemExit
   [fake_stdout.string.to_s, fake_stderr.string.to_s, result, :system_error]
 ensure
@@ -36,6 +38,19 @@ def sem_run(args)
   end
 
   [stdout, stderr, status]
+end
+
+def sem_run!(args)
+  stdout, stderr, status = sem_run(args)
+
+  if status != :ok
+    puts stdout
+    puts stderr
+
+    raise "Non Zero Exit Status"
+  end
+
+  [stdout, stderr]
 end
 
 RSpec.configure do |config|
