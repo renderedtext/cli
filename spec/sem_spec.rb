@@ -25,7 +25,7 @@ RSpec.describe Sem do
     it "handles the Sem::Errors::Auth::NoCredentials exception" do
       allow(Sem::CLI).to receive(:start).and_raise(Sem::Errors::Auth::NoCredentials)
 
-      stdout, _stderr, result = collect_output { Sem.start(["a", "b", "c"]) }
+      stdout, _stderr, result = IOStub.collect_output { Sem.start(["a", "b", "c"]) }
 
       msg = [
         "[ERROR] You are not logged in.",
@@ -41,7 +41,7 @@ RSpec.describe Sem do
     it "handles the Sem::Errors::Auth::InvalidCredentilsCredentials exception" do
       allow(Sem::CLI).to receive(:start).and_raise(Sem::Errors::Auth::InvalidCredentials)
 
-      stdout, _stderr, result = collect_output { Sem.start(["a", "b", "c"]) }
+      stdout, _stderr, result = IOStub.collect_output { Sem.start(["a", "b", "c"]) }
 
       msg = [
         "[ERROR] Your credentials are invalid.",
@@ -57,7 +57,7 @@ RSpec.describe Sem do
     it "handles all exceptions" do
       allow(Sem::CLI).to receive(:start) { raise "Haisenberg" }
 
-      stdout, _stderr, result = collect_output { Sem.start(["a", "b", "c"]) }
+      stdout, _stderr, result = IOStub.collect_output { Sem.start(["a", "b", "c"]) }
 
       msg = [
         "[PANIC] Unhandled error.",
