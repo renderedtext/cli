@@ -4,7 +4,7 @@ class Sem::CLI::Teams < Dracula
   def list
     teams = Sem::API::Team.all
 
-    if teams.size > 0
+    if !teams.empty?
       Sem::Views::Teams.list(teams)
     else
       Sem::Views::Teams.create_first_team
@@ -41,7 +41,7 @@ class Sem::CLI::Teams < Dracula
                       :required => true,
                       :aliases => "p",
                       :desc => "Permission level of the team in the organization"
-  def set_permission(team_name)
+  def set_permission(team_name) # rubocop:disable Style/AccessorMethodName
     team = Sem::API::Team.find!(team_name)
     team = team.update(:permission => options[:permission])
 
@@ -62,7 +62,7 @@ class Sem::CLI::Teams < Dracula
       team = Sem::API::Team.find!(team_name)
       users = team.users
 
-      if users.size > 0
+      if !users.empty?
         Sem::Views::Users.list(users)
       else
         Sem::Views::Teams.add_first_team_member(team)
@@ -92,7 +92,7 @@ class Sem::CLI::Teams < Dracula
       team = Sem::API::Team.find!(team_name)
       projects = team.projects
 
-      if projects.size > 0
+      if !projects.empty?
         Sem::Views::Projects.list(projects)
       else
         Sem::Views::Teams.add_first_project(team)
@@ -126,7 +126,7 @@ class Sem::CLI::Teams < Dracula
       team = Sem::API::Team.find!(team_name)
       configs = team.shared_configs
 
-      if configs.size > 0
+      if !configs.empty?
         Sem::Views::SharedConfigs.list(configs)
       else
         Sem::Views::Teams.add_first_shared_config(team)

@@ -4,7 +4,7 @@ class Sem::CLI::Orgs < Dracula
   def list
     orgs = Sem::API::Org.all
 
-    if orgs.size > 0
+    if !orgs.empty?
       Sem::Views::Orgs.list(orgs)
     else
       Sem::Views::Orgs.create_first_org

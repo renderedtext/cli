@@ -9,7 +9,7 @@ describe Sem::CLI::Orgs do
       it "lists all organizations" do
         stub_api(:get, "/orgs").to_return(200, [org])
 
-        stdout, stderr, status = sem_run("orgs:list")
+        stdout, _stderr = sem_run!("orgs:list")
 
         expect(stdout).to include(org[:username])
       end
@@ -31,7 +31,7 @@ describe Sem::CLI::Orgs do
       it "displays the info" do
         stub_api(:get, "/orgs/rt").to_return(200, org)
 
-        stdout, stderr, status = sem_run("orgs:info rt")
+        stdout, _stderr = sem_run!("orgs:info rt")
 
         expect(stdout).to include(org[:username])
       end
@@ -41,9 +41,10 @@ describe Sem::CLI::Orgs do
       it "displays org not found" do
         stub_api(:get, "/orgs/rt").to_return(404, org)
 
-        stdout, stderr, status = sem_run("orgs:info rt")
+        stdout, _stderr, status = sem_run("orgs:info rt")
 
         expect(stdout).to include("Organization rt not found.")
+        expect(status).to eq(:fail)
       end
     end
   end
@@ -55,7 +56,7 @@ describe Sem::CLI::Orgs do
       stub_api(:get, "/orgs/rt").to_return(200, org)
       stub_api(:get, "/orgs/users").to_return(200, [user])
 
-      stdout, stderr, status = sem_run("orgs:members rt")
+      stdout, _stderr = sem_run!("orgs:members rt")
 
       expect(stdout).to include("john-snow")
     end

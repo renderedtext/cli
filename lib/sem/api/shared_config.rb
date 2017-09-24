@@ -2,7 +2,7 @@ class Sem::API::SharedConfig < SimpleDelegator
   extend Sem::API::Base
 
   def self.all
-    configs = Sem::API::Org.all.pmap do |org|
+    Sem::API::Org.all.pmap do |org|
       client.shared_configs.list_for_org(org.username).map { |config| new(org.username, config) }
     end.flatten
   end
@@ -11,7 +11,7 @@ class Sem::API::SharedConfig < SimpleDelegator
     org_name, shared_config_name = Sem::SRN.parse_shared_config(shared_config_srn)
 
     configs = client.shared_configs.list_for_org(org_name)
-    config = configs.find { |config| config.name == shared_config_name }
+    config = configs.find { |c| c.name == shared_config_name }
 
     if config.nil?
       raise Sem::Errors::ResourceNotFound.new("Shared Configuration", [org_name, shared_config_name])
@@ -55,7 +55,7 @@ class Sem::API::SharedConfig < SimpleDelegator
   end
 
   def remove_config_file(path)
-    file = files.find { |file| file.path == path }
+    file = files.find { |f| f.path == path }
 
     if file.nil?
       raise Sem::Errors::ResourceNotCreated.new("Configuration File", [org_name, path])
@@ -68,7 +68,7 @@ class Sem::API::SharedConfig < SimpleDelegator
     env_var = Sem::API::Base.client.env_vars.create_for_shared_config(id, args)
 
     if env_var.nil?
-      raise Sem::Errors::ResourceNotCreated.new("Environment Variable", [org_name,args[:name]])
+      raise Sem::Errors::ResourceNotCreated.new("Environment Variable", [org_name, args[:name]])
     end
 
     Sem::API::EnvVar.new(env_var)

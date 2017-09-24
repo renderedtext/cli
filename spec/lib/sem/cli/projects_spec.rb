@@ -18,7 +18,7 @@ describe Sem::CLI::Projects do
       end
 
       it "lists all projects" do
-        stdout, stderr = sem_run!("projects:list")
+        stdout, _stderr = sem_run!("projects:list")
 
         expect(stdout).to include("rt/cli")
         expect(stdout).to include("z-fighters/cli")
@@ -34,7 +34,7 @@ describe Sem::CLI::Projects do
       end
 
       it "offers you to set up a project on semaphore" do
-        stdout, stderr = sem_run!("projects:list")
+        stdout, _stderr = sem_run!("projects:list")
 
         expect(stdout).to include("Add your first project")
       end
@@ -48,7 +48,7 @@ describe Sem::CLI::Projects do
       it "shows detailed information about a project" do
         stub_api(:get, "/orgs/rt/projects/?name=cli").to_return(200, [project])
 
-        stdout, stderr = sem_run!("projects:info rt/cli")
+        stdout, _stderr = sem_run!("projects:info rt/cli")
 
         expect(stdout).to include(project[:id])
       end
@@ -58,7 +58,7 @@ describe Sem::CLI::Projects do
       it "shows project not found" do
         stub_api(:get, "/orgs/rt/projects/?name=cli").to_return(404, [])
 
-        stdout, stderr, status = sem_run("projects:info rt/cli")
+        stdout, _stderr, status = sem_run("projects:info rt/cli")
 
         expect(stdout).to include("Project rt/cli not found")
         expect(status).to eq(:fail)
@@ -86,7 +86,7 @@ describe Sem::CLI::Projects do
         end
 
         it "lists all shared configurations on the project" do
-          stdout, stderr = sem_run!("projects:shared-configs:list rt/cli")
+          stdout, _stderr = sem_run!("projects:shared-configs:list rt/cli")
 
           expect(stdout).to include(shared_config1[:id])
           expect(stdout).to include(shared_config2[:id])
@@ -100,7 +100,7 @@ describe Sem::CLI::Projects do
         end
 
         it "offers you to create and attach a shared configuration" do
-          stdout, stderr = sem_run!("projects:shared-configs:list rt/cli")
+          stdout, _stderr = sem_run!("projects:shared-configs:list rt/cli")
 
           expect(stdout).to include("Add your first shared configuration")
         end
@@ -117,7 +117,7 @@ describe Sem::CLI::Projects do
       end
 
       it "adds the shared configuration to the project" do
-        stdout, stderr = sem_run!("projects:shared-configs:add rt/cli rt/tokens")
+        stdout, _stderr = sem_run!("projects:shared-configs:add rt/cli rt/tokens")
 
         expect(stdout).to include("Shared Configuration rt/tokens added to the project.")
       end
@@ -134,7 +134,7 @@ describe Sem::CLI::Projects do
       end
 
       it "adds the shared configuration to the project" do
-        stdout, stderr = sem_run!("projects:shared-configs:remove rt/cli rt/tokens")
+        stdout, _stderr = sem_run!("projects:shared-configs:remove rt/cli rt/tokens")
 
         expect(stdout).to include("Shared Configuration rt/tokens removed from the project.")
       end

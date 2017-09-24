@@ -22,7 +22,7 @@ describe Sem::CLI::Teams do
       end
 
       it "offers the setup of the first team" do
-        stdout, stderr = sem_run!("teams:list")
+        stdout, _stderr = sem_run!("teams:list")
 
         expect(stdout).to include(team1[:id])
         expect(stdout).to include(team2[:id])
@@ -38,7 +38,7 @@ describe Sem::CLI::Teams do
       end
 
       it "lists all teams" do
-        stdout, stderr = sem_run!("teams:list")
+        stdout, _stderr = sem_run!("teams:list")
 
         expect(stdout).to include("Create your first team")
       end
@@ -56,7 +56,7 @@ describe Sem::CLI::Teams do
       end
 
       it "shows detailed information about a project" do
-        stdout, stderr = sem_run!("teams:info rt/devs")
+        stdout, _stderr = sem_run!("teams:info rt/devs")
 
         expect(stdout).to include(team[:id])
       end
@@ -68,7 +68,7 @@ describe Sem::CLI::Teams do
       end
 
       it "displays the error" do
-        stdout, stderr, status = sem_run("teams:info rt/devs")
+        stdout, _stderr, status = sem_run("teams:info rt/devs")
 
         expect(stdout).to include("Team rt/devs not found.")
         expect(status).to eq(:fail)
@@ -87,7 +87,7 @@ describe Sem::CLI::Teams do
       end
 
       it "displays the teams info" do
-        stdout, stderr = sem_run!("teams:create rt/devs --permission admin")
+        stdout, _stderr = sem_run!("teams:create rt/devs --permission admin")
 
         expect(stdout).to include(team[:id])
       end
@@ -99,7 +99,7 @@ describe Sem::CLI::Teams do
       end
 
       it "displays the failure" do
-        stdout, stderr, status = sem_run("teams:create rt/devs --permission owner")
+        stdout, _stderr, status = sem_run("teams:create rt/devs --permission owner")
 
         expect(stdout).to include("Team rt/devs not created.")
         expect(status).to eq(:fail)
@@ -120,7 +120,7 @@ describe Sem::CLI::Teams do
       end
 
       it "displays the team" do
-        stdout, stderr = sem_run!("teams:rename rt/devs rt/admins")
+        stdout, _stderr = sem_run!("teams:rename rt/devs rt/admins")
 
         expect(stdout).to include(team[:id])
       end
@@ -138,7 +138,7 @@ describe Sem::CLI::Teams do
       end
 
       it "displays the team" do
-        stdout, stderr, status = sem_run("teams:rename rt/devs rt/admins")
+        stdout, _stderr, status = sem_run("teams:rename rt/devs rt/admins")
 
         expect(stdout).to include("Team rt/devs not updated.")
         expect(status).to eq(:fail)
@@ -159,7 +159,7 @@ describe Sem::CLI::Teams do
       end
 
       it "displays the team" do
-        stdout, stderr = sem_run!("teams:set-permission rt/devs --permission admin")
+        stdout, _stderr = sem_run!("teams:set-permission rt/devs --permission admin")
 
         expect(stdout).to include(team[:id])
       end
@@ -177,7 +177,7 @@ describe Sem::CLI::Teams do
       end
 
       it "displays the team" do
-        stdout, stderr, status = sem_run("teams:set-permission rt/devs --permission admin")
+        stdout, _stderr, status = sem_run("teams:set-permission rt/devs --permission admin")
 
         expect(stdout).to include("Team rt/devs not updated.")
         expect(status).to eq(:fail)
@@ -194,7 +194,7 @@ describe Sem::CLI::Teams do
     end
 
     it "updates the name of the team" do
-      stdout, stderr = sem_run("teams:delete rt/devs")
+      stdout, _stderr = sem_run("teams:delete rt/devs")
 
       expect(stdout).to include("Team rt/devs deleted")
     end
@@ -217,7 +217,7 @@ describe Sem::CLI::Teams do
         end
 
         it "lists team members" do
-          stdout, stderr = sem_run!("teams:members:list rt/devs")
+          stdout, _stderr = sem_run!("teams:members:list rt/devs")
 
           expect(stdout).to include(user1[:username])
           expect(stdout).to include(user2[:username])
@@ -230,7 +230,7 @@ describe Sem::CLI::Teams do
         end
 
         it "offers a way to add first user" do
-          stdout, stderr = sem_run!("teams:members:list rt/devs")
+          stdout, _stderr = sem_run!("teams:members:list rt/devs")
 
           expect(stdout).to include("Add your first member")
         end
@@ -243,7 +243,7 @@ describe Sem::CLI::Teams do
       end
 
       it "add a user to the team" do
-        stdout, stderr = sem_run!("teams:members:add rt/devs ijovan")
+        stdout, _stderr = sem_run!("teams:members:add rt/devs ijovan")
 
         expect(stdout).to include("User ijovan added to the team")
       end
@@ -255,7 +255,7 @@ describe Sem::CLI::Teams do
       end
 
       it "remove a user from the team" do
-        stdout, stderr = sem_run!("teams:members:remove rt/devs ijovan")
+        stdout, _stderr = sem_run!("teams:members:remove rt/devs ijovan")
 
         expect(stdout).to include("User ijovan removed from the team")
       end
@@ -278,7 +278,7 @@ describe Sem::CLI::Teams do
         end
 
         it "lists team members" do
-          stdout, stderr = sem_run!("teams:projects:list rt/devs")
+          stdout, _stderr = sem_run!("teams:projects:list rt/devs")
 
           expect(stdout).to include(project[:id])
         end
@@ -290,7 +290,7 @@ describe Sem::CLI::Teams do
         end
 
         it "offers a way to add first project" do
-          stdout, stderr = sem_run!("teams:projects:list rt/devs")
+          stdout, _stderr = sem_run!("teams:projects:list rt/devs")
 
           expect(stdout).to include("Add your first project")
         end
@@ -306,7 +306,7 @@ describe Sem::CLI::Teams do
       end
 
       it "add a project to the team" do
-        stdout, stderr = sem_run!("teams:projects:add rt/devs rt/cli")
+        stdout, _stderr = sem_run!("teams:projects:add rt/devs rt/cli")
 
         expect(stdout).to include("Project rt/cli added to the team")
       end
@@ -321,7 +321,7 @@ describe Sem::CLI::Teams do
       end
 
       it "remove a user from the team" do
-        stdout, stderr = sem_run!("teams:projects:remove rt/devs rt/cli")
+        stdout, _stderr = sem_run!("teams:projects:remove rt/devs rt/cli")
 
         expect(stdout).to include("Project rt/cli removed from the team")
       end
@@ -350,7 +350,7 @@ describe Sem::CLI::Teams do
         end
 
         it "lists team's shared configs" do
-          stdout, stderr = sem_run!("teams:shared-configs:list rt/devs")
+          stdout, _stderr = sem_run!("teams:shared-configs:list rt/devs")
 
           expect(stdout).to include(config1[:name])
           expect(stdout).to include(config2[:name])
@@ -363,7 +363,7 @@ describe Sem::CLI::Teams do
         end
 
         it "offers a way to add first project" do
-          stdout, stderr = sem_run!("teams:shared-configs:list rt/devs")
+          stdout, _stderr = sem_run!("teams:shared-configs:list rt/devs")
 
           expect(stdout).to include("Add your first shared configuration")
         end
@@ -379,7 +379,7 @@ describe Sem::CLI::Teams do
       end
 
       it "add a shared_config to the team" do
-        stdout, stderr = sem_run!("teams:shared-configs:add rt/devs rt/tokens")
+        stdout, _stderr = sem_run!("teams:shared-configs:add rt/devs rt/tokens")
 
         expect(stdout).to include("Shared Configuration rt/tokens added to the team")
       end
@@ -394,7 +394,7 @@ describe Sem::CLI::Teams do
       end
 
       it "remove a shared_config from the team" do
-        stdout, stderr = sem_run!("teams:shared-configs:remove rt/devs rt/tokens")
+        stdout, _stderr = sem_run!("teams:shared-configs:remove rt/devs rt/tokens")
 
         expect(stdout).to include("Shared Configuration rt/tokens removed from the team")
       end

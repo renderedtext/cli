@@ -4,7 +4,7 @@ class Sem::CLI::Projects < Dracula
   def list
     projects = Sem::API::Project.all
 
-    if projects.size > 0
+    if !projects.empty?
       Sem::Views::Projects.list(projects)
     else
       Sem::Views::Projects.setup_first_project
@@ -25,7 +25,7 @@ class Sem::CLI::Projects < Dracula
       project = Sem::API::Project.find!(project_name)
       shared_configs = project.shared_configs
 
-      if shared_configs.size > 0
+      if !shared_configs.empty?
         Sem::Views::SharedConfigs.list(shared_configs)
       else
         Sem::Views::Projects.attach_first_shared_config(project)

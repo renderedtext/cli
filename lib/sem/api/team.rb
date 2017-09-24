@@ -2,7 +2,7 @@ class Sem::API::Team < SimpleDelegator
   extend Sem::API::Base
 
   def self.all
-    teams = Sem::API::Org.all.pmap do |org|
+    Sem::API::Org.all.pmap do |org|
       client.teams.list_for_org(org.username).map { |team| new(org.username, team) }
     end.flatten
   end
@@ -10,7 +10,7 @@ class Sem::API::Team < SimpleDelegator
   def self.find!(team_srn)
     org_name, team_name = Sem::SRN.parse_team(team_srn)
 
-    team = client.teams.list_for_org(org_name).find { |team| team.name == team_name }
+    team = client.teams.list_for_org(org_name).find { |t| t.name == team_name }
 
     raise Sem::Errors::ResourceNotFound.new("Team", [org_name, team_name]) if team.nil?
 

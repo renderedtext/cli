@@ -4,7 +4,7 @@ class Sem::CLI::SharedConfigs < Dracula
   def list
     shared_configs = Sem::API::SharedConfig.all
 
-    if shared_configs.size > 0
+    if !shared_configs.empty?
       Sem::Views::SharedConfigs.list(shared_configs)
     else
       Sem::Views::SharedConfigs.setup_first_shared_config
@@ -48,7 +48,7 @@ class Sem::CLI::SharedConfigs < Dracula
       shared_config = Sem::API::SharedConfig.find!(shared_config_name)
       files = shared_config.files
 
-      if files.size > 0
+      if !files.empty?
         Sem::Views::Files.list(files)
       else
         Sem::Views::SharedConfigs.add_first_file(shared_config)
@@ -68,7 +68,7 @@ class Sem::CLI::SharedConfigs < Dracula
       path = options["path-on-semaphore"]
       content = File.read(local_path)
 
-      shared_config.add_config_file(:path => path, :content =>  content)
+      shared_config.add_config_file(:path => path, :content => content)
 
       puts "Added #{path} to #{shared_config_name}"
     end
@@ -92,7 +92,7 @@ class Sem::CLI::SharedConfigs < Dracula
       shared_config = Sem::API::SharedConfig.find!(shared_config_name)
       env_vars = shared_config.env_vars
 
-      if env_vars.size > 0
+      if !env_vars.empty?
         Sem::Views::EnvVars.list(env_vars)
       else
         Sem::Views::SharedConfigs.add_first_env_var(shared_config)

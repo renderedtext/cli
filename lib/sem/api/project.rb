@@ -47,16 +47,4 @@ class Sem::API::Project < SimpleDelegator
     Sem::API::Base.client.shared_configs.detach_from_project(shared_config.id, id)
   end
 
-  def users
-
-  end
-
-  def files
-
-  end
-
-  def env_vars
-
-  end
-
 end

@@ -30,10 +30,6 @@ class Sem::Views::SharedConfigs < Sem::Views::Base
     ]
   end
 
-  def self.file_list(shared_configs, files)
-    Sem::Views::Files.list(files)
-  end
-
   def self.add_first_file(shared_config)
     puts "You don't have any files in this shared configuration."
     puts ""
@@ -41,10 +37,6 @@ class Sem::Views::SharedConfigs < Sem::Views::Base
     puts ""
     puts "  sem shared-config:files:add #{shared_config.full_name} --local-path <file> --path-on-semaphore <path>"
     puts ""
-  end
-
-  def self.env_vars_list(shared_configs, env_vars)
-    Sem::Views::EnvVars.list(env_vars)
   end
 
   def self.add_first_env_var(shared_config)
