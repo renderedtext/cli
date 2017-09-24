@@ -244,55 +244,68 @@ describe Sem::CLI::SharedConfigs do
   end
 
   describe Sem::CLI::SharedConfigs::EnvVars do
-    let(:shared_config) { StubFactory.shared_config }
+    let(:shared_config) { StubFactory.shared_config(:name => "tokens") }
 
-    before { allow(Sem::API::SharedConfig).to receive(:find!).with("rt/tokens").and_return(shared_config) }
+    before do
+      stub_api(:get, "/orgs/rt/shared_configs").to_return(200, [shared_config])
+    end
 
     describe "#list" do
       context "you have at least one env_var added to the shared configuration" do
-        let(:env_vars) { [StubFactory.env_var, StubFactory.env_var] }
+        let(:env_var1) { StubFactory.env_var }
+        let(:env_var2) { StubFactory.env_var }
 
-        before { allow(shared_config).to receive(:env_vars).and_return(env_vars) }
+        before do
+          stub_api(:get, "/shared_configs/#{shared_config[:id]}/env_vars").to_return(200, [env_var1, env_var2])
+        end
 
         it "lists all env vars in a shared_config" do
-          expect(Sem::Views::EnvVars).to receive(:list).with(env_vars).and_call_original
+          stdout, stderr = sem_run("shared-configs:env-vars:list rt/tokens")
 
-          sem_run("shared-configs:env-vars:list rt/tokens")
+          expect(stdout).to include(env_var1[:name])
+          expect(stdout).to include(env_var2[:name])
         end
       end
 
       context "no files are added to the shared configuration" do
-        before { allow(shared_config).to receive(:env_vars).and_return([]) }
+        before do
+          stub_api(:get, "/shared_configs/#{shared_config[:id]}/env_vars").to_return(200, [])
+        end
 
         it "offers you to create and attach an env var" do
-          expect(Sem::Views::SharedConfigs).to receive(:add_first_env_var).with(shared_config)
+          stdout, stderr = sem_run!("shared-configs:env-vars:list rt/tokens")
 
-          sem_run("shared-configs:env-vars:list rt/tokens")
+          expect(stdout).to include("Add your first environment variable")
         end
       end
     end
 
     describe "#add" do
+      let(:env_var) { StubFactory.env_var }
+
       before do
-        allow(Sem::API::SharedConfig).to receive(:find!).with("rt/tokens").and_return(shared_config)
+        stub_api(:post, "/shared_configs/#{shared_config[:id]}/env_vars").to_return(200, env_var)
       end
 
       it "adds the env var to the shared config" do
-        expect(shared_config).to receive(:add_env_var).with(:name => "SECRET", :content => "abc")
+        stdout, stderr = sem_run!("shared-configs:env-vars:add rt/tokens --name SECRET --content abc")
 
-        sem_run("shared-configs:env-vars:add rt/tokens --name SECRET --content abc")
+        expect(stdout).to include("Added SECRET to rt/tokens")
       end
     end
 
     describe "#remove" do
+      let(:env_var) { StubFactory.env_var(:name => "TOKEN") }
+
       before do
-        allow(Sem::API::SharedConfig).to receive(:find!).with("rt/tokens").and_return(shared_config)
+        stub_api(:get, "/shared_configs/#{shared_config[:id]}/env_vars").to_return(200, [env_var])
+        stub_api(:delete, "/env_vars/#{env_var[:id]}").to_return(204, "")
       end
 
       it "removes the env vars from the shared configurations" do
-        expect(shared_config).to receive(:remove_env_var).with("SECRET")
+        stdout, stderr = sem_run!("shared-configs:env-vars:remove rt/tokens --name TOKEN")
 
-        sem_run("shared-configs:env-vars:remove rt/tokens --name SECRET")
+        expect(stdout).to include("Removed TOKEN from rt/tokens")
       end
     end
 

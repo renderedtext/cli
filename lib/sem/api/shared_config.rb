@@ -64,6 +64,26 @@ class Sem::API::SharedConfig < SimpleDelegator
     Sem::API::Base.client.config_files.delete(file.id)
   end
 
+  def add_env_var(args)
+    env_var = Sem::API::Base.client.env_vars.create_for_shared_config(id, args)
+
+    if env_var.nil?
+      raise Sem::Errors::ResourceNotCreated.new("Environment Variable", [org_name,args[:name]])
+    end
+
+    Sem::API::EnvVar.new(env_var)
+  end
+
+  def remove_env_var(name)
+    env_var = env_vars.find { |var| var.name == name }
+
+    if env_var.nil?
+      raise Sem::Errors::ResourceNotCreated.new("Environment Variable", [org_name, name])
+    end
+
+    Sem::API::Base.client.env_vars.delete(env_var.id)
+  end
+
   def update!(args)
     shared_config = Sem::API::Base.client.shared_configs.update(id, args)
 
@@ -83,7 +103,7 @@ class Sem::API::SharedConfig < SimpleDelegator
   end
 
   def env_vars
-    Sem::API::Base.client.env_vars.list_for_shared_config(id).map { |env_var| Sem::API::EnvVars.new(env_var) }
+    Sem::API::Base.client.env_vars.list_for_shared_config(id).map { |env_var| Sem::API::EnvVar.new(env_var) }
   end
 
 end
