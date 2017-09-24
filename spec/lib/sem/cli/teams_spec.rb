@@ -264,48 +264,66 @@ describe Sem::CLI::Teams do
 
   describe Sem::CLI::Teams::Projects do
     let(:team) { StubFactory.team }
-    let(:project) { StubFactory.project }
 
     before do
-      allow(Sem::API::Team).to receive(:find!).with("rt/devs").and_return(team)
-      allow(Sem::API::Project).to receive(:find!).with("rt/cli").and_return(project)
+      stub_api(:get, "/orgs/rt/teams").to_return(200, [team])
     end
 
     describe "#list" do
       context "when the team has several members" do
-        before { allow(team).to receive(:projects).and_return([project]) }
+        let(:project) { StubFactory.project }
+
+        before do
+          stub_api(:get, "/teams/#{team[:id]}/projects").to_return(200, [project])
+        end
 
         it "lists team members" do
-          expect(Sem::Views::Projects).to receive(:list).with([project]).and_call_original
+          stdout, stderr = sem_run!("teams:projects:list rt/devs")
 
-          sem_run("teams:projects:list rt/devs")
+          expect(stdout).to include(project[:id])
         end
       end
 
       context "when the team has no members" do
-        before { allow(team).to receive(:projects).and_return([]) }
+        before do
+          stub_api(:get, "/teams/#{team[:id]}/projects").to_return(200, [])
+        end
 
         it "offers a way to add first project" do
-          expect(Sem::Views::Teams).to receive(:add_first_project).with(team).and_call_original
+          stdout, stderr = sem_run!("teams:projects:list rt/devs")
 
-          sem_run("teams:projects:list rt/devs")
+          expect(stdout).to include("Add your first project")
         end
       end
     end
 
     describe "#add" do
-      it "add a project to the team" do
-        expect(team).to receive(:add_project).with(project)
+      let(:project) { StubFactory.project(:name => "cli") }
 
-        sem_run("teams:projects:add rt/devs rt/cli")
+      before do
+        stub_api(:get, "/orgs/rt/projects/?name=cli").to_return(200, [project])
+        stub_api(:post, "/teams/#{team[:id]}/projects/#{project[:id]}").to_return(204, "")
+      end
+
+      it "add a project to the team" do
+        stdout, stderr = sem_run!("teams:projects:add rt/devs rt/cli")
+
+        expect(stdout).to include("Project rt/cli added to the team")
       end
     end
 
     describe "#remove" do
-      it "remove a user from the team" do
-        expect(team).to receive(:remove_project).with(project)
+      let(:project) { StubFactory.project(:name => "cli") }
 
-        sem_run("teams:projects:remove rt/devs rt/cli")
+      before do
+        stub_api(:get, "/orgs/rt/projects/?name=cli").to_return(200, [project])
+        stub_api(:delete, "/teams/#{team[:id]}/projects/#{project[:id]}").to_return(204, "")
+      end
+
+      it "remove a user from the team" do
+        stdout, stderr = sem_run!("teams:projects:remove rt/devs rt/cli")
+
+        expect(stdout).to include("Project rt/cli removed from the team")
       end
     end
   end

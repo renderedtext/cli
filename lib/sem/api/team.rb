@@ -55,6 +55,14 @@ class Sem::API::Team < SimpleDelegator
     Sem::API::Base.client.users.detach_from_team(username, id)
   end
 
+  def add_project(project)
+    Sem::API::Base.client.projects.attach_to_team(project.id, id)
+  end
+
+  def remove_project(project)
+    Sem::API::Base.client.projects.detach_from_team(project.id, id)
+  end
+
   def delete!
     Sem::API::Base.client.teams.delete(id)
   end
@@ -64,7 +72,7 @@ class Sem::API::Team < SimpleDelegator
   end
 
   def projects
-    client.projects.list_for_team(id).map { |team| Sem::API::Project.new(org_name, project) }
+    Sem::API::Base.client.projects.list_for_team(id).map { |project| Sem::API::Project.new(org_name, project) }
   end
 
 end
