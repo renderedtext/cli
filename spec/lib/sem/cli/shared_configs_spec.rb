@@ -2,77 +2,162 @@ require "spec_helper"
 
 describe Sem::CLI::SharedConfigs do
 
-  let(:shared_config) { StubFactory.shared_config }
-
   describe "#list" do
-    context "you have at least one shared config on semaphore" do
-      let(:another_shared_config) { StubFactory.shared_config}
-      let(:shared_configs) { [shared_config, another_shared_config] }
+    let(:org1) { StubFactory.organization(:username => "rt") }
+    let(:org2) { StubFactory.organization(:username => "z-fighters") }
 
-      before { allow(Sem::API::SharedConfig).to receive(:all).and_return(shared_configs) }
+    context "you have at least one shared config on semaphore" do
+      let(:shared_config1) { StubFactory.shared_config }
+      let(:shared_config2) { StubFactory.shared_config }
+
+      before do
+        stub_api(:get, "/orgs").to_return(200, [org1, org2])
+
+        stub_api(:get, "/orgs/rt/shared_configs").to_return(200, [shared_config1])
+        stub_api(:get, "/orgs/z-fighters/shared_configs").to_return(200, [shared_config2])
+
+        stub_api(:get, "/shared_configs/#{shared_config1[:id]}/config_files").to_return(200, [])
+        stub_api(:get, "/shared_configs/#{shared_config1[:id]}/env_vars").to_return(200, [])
+        stub_api(:get, "/shared_configs/#{shared_config2[:id]}/config_files").to_return(200, [])
+        stub_api(:get, "/shared_configs/#{shared_config2[:id]}/env_vars").to_return(200, [])
+      end
 
       it "lists all shared_configs" do
-        expect(Sem::Views::SharedConfigs).to receive(:list).with(shared_configs)
+        stdout, stderr = sem_run!("shared-configs:list")
 
-        sem_run("shared-configs:list")
+        expect(stdout).to include(shared_config1[:id])
+        expect(stdout).to include(shared_config2[:id])
       end
     end
 
     context "no shared_config on semaphore" do
       before do
-        allow(Sem::API::SharedConfig).to receive(:all).and_return([])
+        stub_api(:get, "/orgs").to_return(200, [org1, org2])
+
+        stub_api(:get, "/orgs/rt/shared_configs").to_return(200, [])
+        stub_api(:get, "/orgs/z-fighters/shared_configs").to_return(200, [])
       end
 
       it "offers you to set up a shared_config on semaphore" do
-        expect(Sem::Views::SharedConfigs).to receive(:setup_first_shared_config)
+        stdout, stderr = sem_run!("shared-configs:list")
 
-        sem_run("shared-configs:list")
+        expect(stdout).to include("Create your first shared configuration")
       end
     end
   end
 
   describe "#info" do
-    before { allow(Sem::API::SharedConfig).to receive(:find!).with("rt/tokens").and_return(shared_config) }
+    context "shared_config exists" do
+      let(:shared_config) { StubFactory.shared_config(:name => "tokens") }
 
-    it "shows detailed information about a shared_config" do
-      expect(Sem::Views::SharedConfigs).to receive(:info).with(shared_config)
+      before do
+        stub_api(:get, "/orgs/rt/shared_configs").to_return(200, [shared_config])
 
-      sem_run("shared-configs:info rt/tokens")
+        stub_api(:get, "/shared_configs/#{shared_config[:id]}/config_files").to_return(200, [])
+        stub_api(:get, "/shared_configs/#{shared_config[:id]}/env_vars").to_return(200, [])
+      end
+
+      it "shows detailed information about a shared_config" do
+        stdout, stderr = sem_run!("shared-configs:info rt/tokens")
+
+        expect(stdout).to include(shared_config[:id])
+      end
+    end
+
+    context "shared_config doesn't exists" do
+      before do
+        stub_api(:get, "/orgs/rt/shared_configs").to_return(200, [])
+      end
+
+      it "displays an error" do
+        stdout, stderr, status = sem_run("shared-configs:info rt/tokens")
+
+        expect(stdout).to include("Shared Configuration rt/tokens not found.")
+        expect(status).to eq(:fail)
+      end
     end
   end
 
   describe "#create" do
-    before { allow(Sem::API::SharedConfig).to receive(:create!).with("rt/tokens").and_return(shared_config) }
+    context "creation succeds" do
+      let(:shared_config) { StubFactory.shared_config(:name => "tokens") }
 
-    it "shows detailed information about a shared_config" do
-      expect(Sem::Views::SharedConfigs).to receive(:info).with(shared_config)
+      before do
+        stub_api(:post, "/orgs/rt/shared_configs").to_return(200, shared_config)
 
-      sem_run("shared-configs:create rt/tokens")
+        stub_api(:get, "/shared_configs/#{shared_config[:id]}/config_files").to_return(200, [])
+        stub_api(:get, "/shared_configs/#{shared_config[:id]}/env_vars").to_return(200, [])
+      end
+
+      it "shows detailed information about a shared_config" do
+        stdout, stderr = sem_run!("shared-configs:create rt/tokens")
+
+        expect(stdout).to include(shared_config[:id])
+      end
+    end
+
+    context "creation fails" do
+      before do
+        stub_api(:post, "/orgs/rt/shared_configs").to_return(422, "")
+      end
+
+      it "displays an error" do
+        stdout, stderr, status = sem_run("shared-configs:create rt/tokens")
+
+        expect(stdout).to include("Shared Configuration rt/tokens not created.")
+        expect(status).to eq(:fail)
+      end
     end
   end
 
   describe "#rename" do
+    let(:shared_config) { StubFactory.shared_config(:name => "tokens") }
+
     before do
-      allow(Sem::API::SharedConfig).to receive(:find!).with("rt/tokens").and_return(shared_config)
-      allow(shared_config).to receive(:update!).with(:name => "rt/secrets").and_return(shared_config)
+      stub_api(:get, "/orgs/rt/shared_configs").to_return(200, [shared_config])
     end
 
-    it "shows detailed information about a shared_config" do
-      expect(Sem::Views::SharedConfigs).to receive(:info).with(shared_config)
+    context "update succeds" do
+      before do
+        stub_api(:patch, "/shared_configs/#{shared_config[:id]}").to_return(200, shared_config)
 
-      sem_run("shared-configs:rename rt/tokens rt/secrets")
+        stub_api(:get, "/shared_configs/#{shared_config[:id]}/config_files").to_return(200, [])
+        stub_api(:get, "/shared_configs/#{shared_config[:id]}/env_vars").to_return(200, [])
+      end
+
+      it "shows detailed information about a shared_config" do
+        stdout, stderr = sem_run!("shared-configs:rename rt/tokens rt/secrets")
+
+        expect(stdout).to include(shared_config[:id])
+      end
+    end
+
+    context "update fails" do
+      before do
+        stub_api(:patch, "/shared_configs/#{shared_config[:id]}").to_return(422, "")
+      end
+
+      it "displays an error" do
+        stdout, stderr, status = sem_run("shared-configs:rename rt/tokens rt/secrets")
+
+        expect(stdout).to include("Shared Configuration rt/tokens not updated")
+        expect(status).to eq(:fail)
+      end
     end
   end
 
   describe "#delete" do
+    let(:shared_config) { StubFactory.shared_config(:name => "tokens") }
+
     before do
-      allow(Sem::API::SharedConfig).to receive(:find!).with("rt/tokens").and_return(shared_config)
+      stub_api(:get, "/orgs/rt/shared_configs").to_return(200, [shared_config])
+      stub_api(:delete, "/shared_configs/#{shared_config[:id]}").to_return(204, "")
     end
 
     it "shows detailed information about a shared_config" do
-      expect(shared_config).to receive(:delete!)
+      stdout, stderr = sem_run!("shared-configs:delete rt/tokens")
 
-      sem_run("shared-configs:delete rt/tokens")
+      expect(stdout).to include("Deleted shared configuration rt/tokens")
     end
   end
 

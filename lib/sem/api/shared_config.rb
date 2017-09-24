@@ -2,9 +2,9 @@ class Sem::API::SharedConfig < SimpleDelegator
   extend Sem::API::Base
 
   def self.all
-    configs = Sem::API::Org.all.pmap { |org| client.shared_configs.list_for_org(org.username) }
-
-    configs.flatten.map { |config| new(config) }
+    configs = Sem::API::Org.all.pmap do |org|
+      client.shared_configs.list_for_org(org.username).map { |config| new(org.username, config) }
+    end.flatten
   end
 
   def self.find!(shared_config_srn)
@@ -20,16 +20,16 @@ class Sem::API::SharedConfig < SimpleDelegator
     new(org_name, config)
   end
 
-  def self.create!(shared_config_srn, args)
+  def self.create!(shared_config_srn, args = {})
     org_name, shared_config_name = Sem::SRN.parse_shared_config(shared_config_srn)
 
-    shared_config = client.shared_configs.create_for_org(org_name, args)
+    shared_config = client.shared_configs.create_for_org(org_name, args.merge(:name => shared_config_name))
 
     if shared_config.nil?
-      raise Sem::Errors::ResourceNotCreated.new("Shared Configuration", [org_name, args[:name]])
+      raise Sem::Errors::ResourceNotCreated.new("Shared Configuration", [org_name, shared_config_name])
     end
 
-    new(shared_config)
+    new(org_name, shared_config)
   end
 
   attr_reader :org_name
@@ -44,18 +44,18 @@ class Sem::API::SharedConfig < SimpleDelegator
     "#{org_name}/#{name}"
   end
 
-  def update(args)
-    shared_config = api.update(id, args)
+  def update!(args)
+    shared_config = Sem::API::Base.client.shared_configs.update(id, args)
 
     if shared_config.nil?
-      raise Sem::Errors::ResourceNotUpdated.new("Shared Configuration", [org_name, shared_config_name])
+      raise Sem::Errors::ResourceNotUpdated.new("Shared Configuration", [org_name, name])
     end
 
-    new(shared_config)
+    self.class.new(org_name, shared_config)
   end
 
   def delete!
-    api.delete!(id)
+    Sem::API::Base.client.shared_configs.delete(id)
   end
 
   def teams
