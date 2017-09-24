@@ -84,9 +84,11 @@ module StubFactory
       :encrypted => true
     }.merge(params)
 
-    api_model = RSpec::Mocks::Double.new(SemaphoreClient::Model::ConfigFile, params)
+    # api_model = RSpec::Mocks::Double.new(SemaphoreClient::Model::ConfigFile, params)
 
-    Sem::API::File.new(api_model)
+    # Sem::API::File.new(api_model)
+
+    params
   end
 
   def env_var(params = {})
@@ -97,9 +99,11 @@ module StubFactory
       :encrypted => true
     }.merge(params)
 
-    api_model = RSpec::Mocks::Double.new(SemaphoreClient::Model::EnvVar, params)
+    # api_model = RSpec::Mocks::Double.new(SemaphoreClient::Model::EnvVar, params)
 
-    Sem::API::EnvVar.new(api_model)
+    # Sem::API::EnvVar.new(api_model)
+
+    params
   end
 
 end

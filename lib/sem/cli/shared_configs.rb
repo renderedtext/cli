@@ -78,9 +78,9 @@ class Sem::CLI::SharedConfigs < Dracula
     def remove(shared_config_name)
       shared_config = Sem::API::SharedConfig.find!(shared_config_name)
 
-      shared_config.remove_file(options[:path])
+      shared_config.remove_config_file(options[:path])
 
-      puts "Removed #{options[:file]} from #{shared_config_name}"
+      puts "Removed #{options[:path]} from #{shared_config_name}"
     end
 
   end

@@ -44,6 +44,26 @@ class Sem::API::SharedConfig < SimpleDelegator
     "#{org_name}/#{name}"
   end
 
+  def add_config_file(args)
+    file = Sem::API::Base.client.config_files.create_for_shared_config(id, args)
+
+    if file.nil?
+      raise Sem::Errors::ResourceNotCreated.new("Configuration File", [org_name, path])
+    end
+
+    Sem::API::File.new(file)
+  end
+
+  def remove_config_file(path)
+    file = files.find { |file| file.path == path }
+
+    if file.nil?
+      raise Sem::Errors::ResourceNotCreated.new("Configuration File", [org_name, path])
+    end
+
+    Sem::API::Base.client.config_files.delete(file.id)
+  end
+
   def update!(args)
     shared_config = Sem::API::Base.client.shared_configs.update(id, args)
 
@@ -58,20 +78,12 @@ class Sem::API::SharedConfig < SimpleDelegator
     Sem::API::Base.client.shared_configs.delete(id)
   end
 
-  def teams
-    client.teams.list_for_shared_config(id).map { |team| Sem::API::Team.new(org_name, team) }
-  end
-
-  def projects
-    client.project.list_for_shared_config(id).map { |project| Sem::API::Project.new(org_name, project) }
-  end
-
   def files
-    Sem::API::Base.client.config_files.list_for_shared_config(id).map { |file| Sem::API::File.new(org_name, file) }
+    Sem::API::Base.client.config_files.list_for_shared_config(id).map { |file| Sem::API::File.new(file) }
   end
 
   def env_vars
-    Sem::API::Base.client.env_vars.list_for_shared_config(id).map { |env_var| Sem::API::EnvVars.new(org_name, env_var) }
+    Sem::API::Base.client.env_vars.list_for_shared_config(id).map { |env_var| Sem::API::EnvVars.new(env_var) }
   end
 
 end

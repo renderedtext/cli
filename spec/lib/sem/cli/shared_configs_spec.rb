@@ -162,46 +162,56 @@ describe Sem::CLI::SharedConfigs do
   end
 
   describe Sem::CLI::SharedConfigs::Files do
-    let(:shared_config) { StubFactory.shared_config }
+    let(:shared_config) { StubFactory.shared_config(:name => "tokens") }
 
-    before { allow(Sem::API::SharedConfig).to receive(:find!).with("rt/tokens").and_return(shared_config) }
+    before do
+      stub_api(:get, "/orgs/rt/shared_configs").to_return(200, [shared_config])
+    end
 
     describe "#list" do
       context "you have at least one file added to the shared configuration" do
-        let(:files) { [StubFactory.file, StubFactory.file] }
+        let(:file1) { StubFactory.file(:path => "/etc/a") }
+        let(:file2) { StubFactory.file(:path => "/tmp/b") }
 
-        before { allow(shared_config).to receive(:files).and_return(files) }
+        before do
+          stub_api(:get, "/shared_configs/#{shared_config[:id]}/config_files").to_return(200, [file1, file2])
+        end
 
         it "lists all shared configurations on the project" do
-          expect(Sem::Views::Files).to receive(:list).with(files).and_call_original
+          stdout, stderr = sem_run("shared-configs:files:list rt/tokens")
 
-          sem_run("shared-configs:files:list rt/tokens")
+          expect(stdout).to include(file1[:path])
+          expect(stdout).to include(file2[:path])
         end
       end
 
       context "no files are added to the shared configuration" do
-        before { allow(shared_config).to receive(:files).and_return([]) }
+        before do
+          stub_api(:get, "/shared_configs/#{shared_config[:id]}/config_files").to_return(200, [])
+        end
 
         it "offers you to create and attach a shared configuration" do
-          expect(Sem::Views::SharedConfigs).to receive(:add_first_file).with(shared_config).and_call_original
+          stdout, stderr = sem_run!("shared-configs:files:list rt/tokens")
 
-          sem_run("shared-configs:files:list rt/tokens")
+          expect(stdout).to include("Add your first file")
         end
       end
     end
 
     describe "#add" do
+      let(:file) { StubFactory.file(:path => "/etc/a") }
+
       before do
-        allow(Sem::API::SharedConfig).to receive(:find!).with("rt/tokens").and_return(shared_config)
+        stub_api(:post, "/shared_configs/#{shared_config[:id]}/config_files").to_return(200, file)
       end
 
       context "local file exists" do
         before { File.write("/tmp/aliases", "abc") }
 
         it "adds the file to the shared config" do
-          expect(shared_config).to receive(:add_config_file).with(:path => "/etc/aliases", :content => "abc")
+          stdout, stderr = sem_run("shared-configs:files:add rt/tokens --path-on-semaphore /etc/aliases --local-path /tmp/aliases")
 
-          sem_run("shared-configs:files:add rt/tokens --path-on-semaphore /etc/aliases --local-path /tmp/aliases")
+          expect(stdout).to include("Added /etc/aliases to rt/tokens")
         end
       end
 
@@ -218,14 +228,17 @@ describe Sem::CLI::SharedConfigs do
     end
 
     describe "#remove" do
+      let(:file) { StubFactory.file(:path => "/etc/a") }
+
       before do
-        allow(Sem::API::SharedConfig).to receive(:find!).with("rt/tokens").and_return(shared_config)
+        stub_api(:get, "/shared_configs/#{shared_config[:id]}/config_files").to_return(200, [file])
+        stub_api(:delete, "/config_files/#{file[:id]}").to_return(204, "")
       end
 
       it "removes the shared configuration to the project" do
-        expect(shared_config).to receive(:remove_file).with("/etc/aliases")
+        stdout, stderr = sem_run!("shared-configs:files:remove rt/tokens --path /etc/a")
 
-        sem_run("shared-configs:files:remove rt/tokens --path /etc/aliases")
+        expect(stdout).to include("Removed /etc/a from rt/tokens")
       end
     end
   end
