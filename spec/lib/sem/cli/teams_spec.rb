@@ -201,48 +201,63 @@ describe Sem::CLI::Teams do
   end
 
   describe Sem::CLI::Teams::Members do
-
-    let(:user) { StubFactory.user }
+    let(:team) { StubFactory.team }
 
     before do
-      allow(Sem::API::Team).to receive(:find!).with("rt/devs").and_return(team)
+      stub_api(:get, "/orgs/rt/teams").to_return(200, [team])
     end
 
     describe "#list" do
       context "when the team has several members" do
-        before { allow(team).to receive(:users).and_return([user]) }
+        let(:user1) { StubFactory.user }
+        let(:user2) { StubFactory.user }
+
+        before do
+          stub_api(:get, "/teams/#{team[:id]}/users").to_return(200, [user1, user2])
+        end
 
         it "lists team members" do
-          expect(Sem::Views::Users).to receive(:list).with([user]).and_call_original
+          stdout, stderr = sem_run!("teams:members:list rt/devs")
 
-          sem_run("teams:members:list rt/devs")
+          expect(stdout).to include(user1[:username])
+          expect(stdout).to include(user2[:username])
         end
       end
 
       context "when the team has no members" do
-        before { allow(team).to receive(:users).and_return([]) }
+        before do
+          stub_api(:get, "/teams/#{team[:id]}/users").to_return(200, [])
+        end
 
         it "offers a way to add first user" do
-          expect(Sem::Views::Teams).to receive(:add_first_team_member).with(team)
+          stdout, stderr = sem_run!("teams:members:list rt/devs")
 
-          sem_run("teams:members:list rt/devs")
+          expect(stdout).to include("Add your first member")
         end
       end
     end
 
     describe "#add" do
-      it "add a user to the team" do
-        expect(team).to receive(:add_user).with("ijovan")
+      before do
+        stub_api(:post, "/teams/#{team[:id]}/users/ijovan").to_return(204, "")
+      end
 
-        sem_run("teams:members:add rt/devs ijovan")
+      it "add a user to the team" do
+        stdout, stderr = sem_run!("teams:members:add rt/devs ijovan")
+
+        expect(stdout).to include("User ijovan added to the team")
       end
     end
 
     describe "#remove" do
-      it "remove a user from the team" do
-        expect(team).to receive(:remove_user).with("ijovan")
+      before do
+        stub_api(:delete, "/teams/#{team[:id]}/users/ijovan").to_return(204, "")
+      end
 
-        sem_run("teams:members:remove rt/devs ijovan")
+      it "remove a user from the team" do
+        stdout, stderr = sem_run!("teams:members:remove rt/devs ijovan")
+
+        expect(stdout).to include("User ijovan removed from the team")
       end
     end
   end

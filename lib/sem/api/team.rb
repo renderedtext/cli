@@ -47,6 +47,14 @@ class Sem::API::Team < SimpleDelegator
     self.class.new(@org_name, new_team)
   end
 
+  def add_user(username)
+    Sem::API::Base.client.users.attach_to_team(username, id)
+  end
+
+  def remove_user(username)
+    Sem::API::Base.client.users.detach_from_team(username, id)
+  end
+
   def delete!
     Sem::API::Base.client.teams.delete(id)
   end
