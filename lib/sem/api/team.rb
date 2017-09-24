@@ -63,6 +63,14 @@ class Sem::API::Team < SimpleDelegator
     Sem::API::Base.client.projects.detach_from_team(project.id, id)
   end
 
+  def add_shared_config(config)
+    Sem::API::Base.client.shared_configs.attach_to_team(config.id, id)
+  end
+
+  def remove_shared_config(config)
+    Sem::API::Base.client.shared_configs.detach_from_team(config.id, id)
+  end
+
   def delete!
     Sem::API::Base.client.teams.delete(id)
   end
@@ -73,6 +81,10 @@ class Sem::API::Team < SimpleDelegator
 
   def projects
     Sem::API::Base.client.projects.list_for_team(id).map { |project| Sem::API::Project.new(org_name, project) }
+  end
+
+  def shared_configs
+    Sem::API::Base.client.shared_configs.list_for_team(id).map { |config| Sem::API::SharedConfig.new(org_name, config) }
   end
 
 end

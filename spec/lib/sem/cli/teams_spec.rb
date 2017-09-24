@@ -330,48 +330,73 @@ describe Sem::CLI::Teams do
 
   describe Sem::CLI::Teams::SharedConfigs do
     let(:team) { StubFactory.team }
-    let(:shared_config) { StubFactory.project }
 
     before do
-      allow(Sem::API::Team).to receive(:find!).with("rt/devs").and_return(team)
-      allow(Sem::API::SharedConfig).to receive(:find!).with("rt/tokens").and_return(shared_config)
+      stub_api(:get, "/orgs/rt/teams").to_return(200, [team])
     end
 
     describe "#list" do
       context "when the team has several shared configs" do
-        before { allow(team).to receive(:shared_configs).and_return([shared_config]) }
+        let(:config1) { StubFactory.shared_config(:name => "tokens") }
+        let(:config2) { StubFactory.shared_config(:name => "secrets") }
+
+        before do
+          stub_api(:get, "/teams/#{team[:id]}/shared_configs").to_return(200, [config1, config2])
+
+          stub_api(:get, "/shared_configs/#{config1[:id]}/config_files").to_return(200, [])
+          stub_api(:get, "/shared_configs/#{config2[:id]}/config_files").to_return(200, [])
+          stub_api(:get, "/shared_configs/#{config1[:id]}/env_vars").to_return(200, [])
+          stub_api(:get, "/shared_configs/#{config2[:id]}/env_vars").to_return(200, [])
+        end
 
         it "lists team's shared configs" do
-          expect(Sem::Views::SharedConfigs).to receive(:list).with([shared_config])
+          stdout, stderr = sem_run!("teams:shared-configs:list rt/devs")
 
-          sem_run("teams:shared-configs:list rt/devs")
+          expect(stdout).to include(config1[:name])
+          expect(stdout).to include(config2[:name])
         end
       end
 
       context "when the team has no members" do
-        before { allow(team).to receive(:shared_configs).and_return([]) }
+        before do
+          stub_api(:get, "/teams/#{team[:id]}/shared_configs").to_return(200, [])
+        end
 
         it "offers a way to add first project" do
-          expect(Sem::Views::Teams).to receive(:add_first_shared_config).with(team).and_call_original
+          stdout, stderr = sem_run!("teams:shared-configs:list rt/devs")
 
-          sem_run("teams:shared-configs:list rt/devs")
+          expect(stdout).to include("Add your first shared configuration")
         end
       end
     end
 
     describe "#add" do
-      it "add a shared_config to the team" do
-        expect(team).to receive(:add_shared_config).with(shared_config)
+      let(:config) { StubFactory.shared_config(:name => "tokens") }
 
-        sem_run("teams:shared-configs:add rt/devs rt/tokens")
+      before do
+        stub_api(:get, "/orgs/rt/shared_configs").to_return(200, [config])
+        stub_api(:post, "/teams/#{team[:id]}/shared_configs/#{config[:id]}").to_return(204, "")
+      end
+
+      it "add a shared_config to the team" do
+        stdout, stderr = sem_run!("teams:shared-configs:add rt/devs rt/tokens")
+
+        expect(stdout).to include("Shared Configuration rt/tokens added to the team")
       end
     end
 
     describe "#remove" do
-      it "remove a shared_config from the team" do
-        expect(team).to receive(:remove_shared_config).with(shared_config)
+      let(:config) { StubFactory.shared_config(:name => "tokens") }
 
-        sem_run("teams:shared-configs:remove rt/devs rt/tokens")
+      before do
+        stub_api(:get, "/orgs/rt/shared_configs").to_return(200, [config])
+        stub_api(:delete, "/teams/#{team[:id]}/shared_configs/#{config[:id]}").to_return(204, "")
+      end
+
+      it "remove a shared_config from the team" do
+        stdout, stderr = sem_run!("teams:shared-configs:remove rt/devs rt/tokens")
+
+        expect(stdout).to include("Shared Configuration rt/tokens removed from the team")
       end
     end
   end
