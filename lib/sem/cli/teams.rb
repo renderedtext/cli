@@ -53,7 +53,7 @@ class Sem::CLI::Teams < Dracula
     team = Sem::API::Team.find!(team_name)
     team.delete!
 
-    puts "Deleted team #{team_name}"
+    puts "Team #{team_name} deleted."
   end
 
   class Members < Dracula

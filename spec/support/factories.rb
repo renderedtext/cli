@@ -31,7 +31,7 @@ module StubFactory
     # Sem::API::User.new(api_model)
   end
 
-  def team(org_name = "rt", params = {})
+  def team(params = {})
     params = {
       :id => "3bc7ed43-ac8a-487e-b488-c38bc757a034",
       :name => "devs",
@@ -40,9 +40,11 @@ module StubFactory
       :updated_at => "2017-08-02 13:14:40 +0200"
     }.merge(params)
 
-    api_model = RSpec::Mocks::Double.new(SemaphoreClient::Model::Team, params)
+    # api_model = RSpec::Mocks::Double.new(SemaphoreClient::Model::Team, params)
 
-    Sem::API::Team.new(org_name, api_model)
+    # Sem::API::Team.new(org_name, api_model)
+
+    params
   end
 
   def project(params = {})

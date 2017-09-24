@@ -4,96 +4,199 @@ describe Sem::CLI::Teams do
   let(:team) { StubFactory.team }
 
   describe "#list" do
+    let(:org1) { StubFactory.organization(:username => "rt") }
+    let(:org2) { StubFactory.organization(:username => "z-fighters") }
+
     context "when the user has no teams" do
+      let(:team1) { StubFactory.team }
+      let(:team2) { StubFactory.team }
+
       before do
-        allow(Sem::API::Team).to receive(:all).and_return([])
+        stub_api(:get, "/orgs").to_return(200, [org1, org2])
+
+        stub_api(:get, "/orgs/#{org1[:username]}/teams").to_return(200, [team1])
+        stub_api(:get, "/orgs/#{org2[:username]}/teams").to_return(200, [team2])
+
+        stub_api(:get, "/teams/#{team1[:id]}/users").to_return(200, [])
+        stub_api(:get, "/teams/#{team2[:id]}/users").to_return(200, [])
       end
 
       it "offers the setup of the first team" do
-        expect(Sem::Views::Teams).to receive(:create_first_team)
+        stdout, stderr = sem_run!("teams:list")
 
-        sem_run("teams:list")
+        expect(stdout).to include(team1[:id])
+        expect(stdout).to include(team2[:id])
       end
     end
 
     context "when the user has at least one team" do
       before do
-        allow(Sem::API::Team).to receive(:all).and_return([team])
+        stub_api(:get, "/orgs").to_return(200, [org1, org2])
+
+        stub_api(:get, "/orgs/#{org1[:username]}/teams").to_return(200, [])
+        stub_api(:get, "/orgs/#{org2[:username]}/teams").to_return(200, [])
       end
 
       it "lists all teams" do
-        expect(Sem::Views::Teams).to receive(:list).with([team])
+        stdout, stderr = sem_run!("teams:list")
 
-        sem_run("teams:list")
+        expect(stdout).to include("Create your first team")
       end
     end
   end
 
   describe "#info" do
-    before { allow(Sem::API::Team).to receive(:find!).with("rt/devs").and_return(team) }
+    context "the team exists" do
+      let(:team) { StubFactory.team(:name => "devs") }
+      let(:user) { StubFactory.user }
 
-    it "shows detailed information about a project" do
-      expect(Sem::Views::Teams).to receive(:info).with(team)
+      before do
+        stub_api(:get, "/orgs/rt/teams").to_return(200, [team])
+        stub_api(:get, "/teams/#{team[:id]}/users").to_return(200, [user])
+      end
 
-      sem_run("teams:info rt/devs")
+      it "shows detailed information about a project" do
+        stdout, stderr = sem_run!("teams:info rt/devs")
+
+        expect(stdout).to include(team[:id])
+      end
+    end
+
+    context "team not found" do
+      before do
+        stub_api(:get, "/orgs/rt/teams").to_return(200, [])
+      end
+
+      it "displays the error" do
+        stdout, stderr, status = sem_run("teams:info rt/devs")
+
+        expect(stdout).to include("Team rt/devs not found.")
+        expect(status).to eq(:fail)
+      end
     end
   end
 
   describe "#create" do
-    context "permission level is passed" do
-      it "creates a new team with the passed permission level" do
-        expect(Sem::API::Team).to receive(:create!).with("rt/devs", :permission => "admin").and_return(team)
-        expect(Sem::Views::Teams).to receive(:info).with(team)
+    context "creation succeds" do
+      let(:team) { StubFactory.team }
+      let(:user) { StubFactory.user }
 
-        sem_run("teams:create rt/devs --permission admin")
+      before do
+        stub_api(:post, "/orgs/rt/teams").to_return(200, team)
+        stub_api(:get, "/teams/#{team[:id]}/users").to_return(200, [user])
+      end
+
+      it "displays the teams info" do
+        stdout, stderr = sem_run!("teams:create rt/devs --permission admin")
+
+        expect(stdout).to include(team[:id])
       end
     end
 
-    context "permission level is not passed" do
-      it "creates a new team with the read permissions" do
-        expect(Sem::API::Team).to receive(:create!).with("rt/devs", :permission => "read").and_return(team)
-        expect(Sem::Views::Teams).to receive(:info).with(team)
+    context "creation failes" do
+      before do
+        stub_api(:post, "/orgs/rt/teams").to_return(422, {})
+      end
 
-        sem_run("teams:create rt/devs")
+      it "displays the failure" do
+        stdout, stderr, status = sem_run("teams:create rt/devs --permission owner")
+
+        expect(stdout).to include("Team rt/devs not created.")
+        expect(status).to eq(:fail)
       end
     end
   end
 
   describe "#rename" do
-    before do
-      allow(Sem::API::Team).to receive(:find!).with("rt/devs").and_return(team)
+    context "update succeds" do
+      let(:team) { StubFactory.team }
+      let(:user) { StubFactory.user }
+
+      before do
+        stub_api(:get, "/orgs/rt/teams").to_return(200, [team])
+        stub_api(:get, "/teams/#{team[:id]}/users").to_return(200, [user])
+
+        stub_api(:patch, "/teams/#{team[:id]}").to_return(200, team)
+      end
+
+      it "displays the team" do
+        stdout, stderr = sem_run!("teams:rename rt/devs rt/admins")
+
+        expect(stdout).to include(team[:id])
+      end
     end
 
-    it "updates the name of the team" do
-      expect(team).to receive(:update).with(:name => "rt/admins").and_return(team)
-      expect(Sem::Views::Teams).to receive(:info).with(team)
+    context "update fails" do
+      let(:team) { StubFactory.team }
+      let(:user) { StubFactory.user }
 
-      sem_run("teams:rename rt/devs rt/admins")
+      before do
+        stub_api(:get, "/orgs/rt/teams").to_return(200, [team])
+        stub_api(:get, "/teams/#{team[:id]}/users").to_return(200, [user])
+
+        stub_api(:patch, "/teams/#{team[:id]}").to_return(422, {})
+      end
+
+      it "displays the team" do
+        stdout, stderr, status = sem_run("teams:rename rt/devs rt/admins")
+
+        expect(stdout).to include("Team rt/devs not updated.")
+        expect(status).to eq(:fail)
+      end
     end
   end
 
   describe "#set-permission" do
-    before do
-      allow(Sem::API::Team).to receive(:find!).with("rt/devs").and_return(team)
+    context "update succeds" do
+      let(:team) { StubFactory.team }
+      let(:user) { StubFactory.user }
+
+      before do
+        stub_api(:get, "/orgs/rt/teams").to_return(200, [team])
+        stub_api(:get, "/teams/#{team[:id]}/users").to_return(200, [user])
+
+        stub_api(:patch, "/teams/#{team[:id]}").to_return(200, team)
+      end
+
+      it "displays the team" do
+        stdout, stderr = sem_run!("teams:set-permission rt/devs --permission admin")
+
+        expect(stdout).to include(team[:id])
+      end
     end
 
-    it "updates the name of the team" do
-      expect(team).to receive(:update).with(:permission => "admin").and_return(team)
-      expect(Sem::Views::Teams).to receive(:info).with(team)
+    context "update fails" do
+      let(:team) { StubFactory.team }
+      let(:user) { StubFactory.user }
 
-      sem_run("teams:set-permission rt/devs --permission admin")
+      before do
+        stub_api(:get, "/orgs/rt/teams").to_return(200, [team])
+        stub_api(:get, "/teams/#{team[:id]}/users").to_return(200, [user])
+
+        stub_api(:patch, "/teams/#{team[:id]}").to_return(422, {})
+      end
+
+      it "displays the team" do
+        stdout, stderr, status = sem_run("teams:set-permission rt/devs --permission admin")
+
+        expect(stdout).to include("Team rt/devs not updated.")
+        expect(status).to eq(:fail)
+      end
     end
   end
 
   describe "#delete" do
+    let(:team) { StubFactory.team }
+
     before do
-      allow(Sem::API::Team).to receive(:find!).with("rt/devs").and_return(team)
+      stub_api(:get, "/orgs/rt/teams").to_return(200, [team])
+      stub_api(:delete, "/teams/#{team[:id]}").to_return(204, team)
     end
 
     it "updates the name of the team" do
-      expect(team).to receive(:delete!)
+      stdout, stderr = sem_run("teams:delete rt/devs")
 
-      sem_run("teams:delete rt/devs")
+      expect(stdout).to include("Team rt/devs deleted")
     end
   end
 
