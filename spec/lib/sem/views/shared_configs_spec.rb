@@ -19,8 +19,8 @@ describe Sem::Views::SharedConfigs do
     it "shows list of shared configs" do
       msg = [
         "ID                                    NAME                CONFIG FILES  ENV VARS",
-        "3bc7ed43-ac8a-487e-b488-c38bc757a034  rt/tokens                      1         0",
-        "3bc7ed43-ac8a-487e-b488-c38bc757a034  z-fighters/secrets             0         1",
+        "99c7ed43-ac8a-487e-b488-c38bc757a034  rt/tokens                      1         0",
+        "99c7ed43-ac8a-487e-b488-c38bc757a034  z-fighters/secrets             0         1",
         ""
       ]
 
@@ -31,7 +31,7 @@ describe Sem::Views::SharedConfigs do
   describe ".info" do
     it "returns the config in table format" do
       msg = [
-        "ID                     3bc7ed43-ac8a-487e-b488-c38bc757a034",
+        "ID                     99c7ed43-ac8a-487e-b488-c38bc757a034",
         "Name                   rt/tokens",
         "Config Files           1",
         "Environment Variables  0",

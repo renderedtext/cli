@@ -8,8 +8,8 @@ describe Sem::Views::Projects do
     it "displays a table of projects" do
       msg = [
         "ID                                    NAME",
-        "3bc7ed43-ac8a-487e-b488-c38bc757a034  rt/cli",
-        "3bc7ed43-ac8a-487e-b488-c38bc757a034  rt/api",
+        "99c7ed43-ac8a-487e-b488-c38bc757a034  rt/cli",
+        "99c7ed43-ac8a-487e-b488-c38bc757a034  rt/api",
         ""
       ]
 
@@ -20,7 +20,7 @@ describe Sem::Views::Projects do
   describe ".info" do
     it "prints the team in table format" do
       msg = [
-        "ID       3bc7ed43-ac8a-487e-b488-c38bc757a034",
+        "ID       99c7ed43-ac8a-487e-b488-c38bc757a034",
         "Name     rt/cli",
         "Created  2017-08-01 13:14:40 +0200",
         "Updated  2017-08-02 13:14:40 +0200",

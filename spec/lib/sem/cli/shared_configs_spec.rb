@@ -3,12 +3,12 @@ require "spec_helper"
 describe Sem::CLI::SharedConfigs do
 
   describe "#list" do
-    let(:org1) { StubFactory.organization(:username => "rt") }
-    let(:org2) { StubFactory.organization(:username => "z-fighters") }
+    let(:org1) { ApiResponse.organization(:username => "rt") }
+    let(:org2) { ApiResponse.organization(:username => "z-fighters") }
 
     context "you have at least one shared config on semaphore" do
-      let(:shared_config1) { StubFactory.shared_config }
-      let(:shared_config2) { StubFactory.shared_config }
+      let(:shared_config1) { ApiResponse.shared_config }
+      let(:shared_config2) { ApiResponse.shared_config }
 
       before do
         stub_api(:get, "/orgs").to_return(200, [org1, org2])
@@ -48,7 +48,7 @@ describe Sem::CLI::SharedConfigs do
 
   describe "#info" do
     context "shared_config exists" do
-      let(:shared_config) { StubFactory.shared_config(:name => "tokens") }
+      let(:shared_config) { ApiResponse.shared_config(:name => "tokens") }
 
       before do
         stub_api(:get, "/orgs/rt/shared_configs").to_return(200, [shared_config])
@@ -80,7 +80,7 @@ describe Sem::CLI::SharedConfigs do
 
   describe "#create" do
     context "creation succeds" do
-      let(:shared_config) { StubFactory.shared_config(:name => "tokens") }
+      let(:shared_config) { ApiResponse.shared_config(:name => "tokens") }
 
       before do
         stub_api(:post, "/orgs/rt/shared_configs").to_return(200, shared_config)
@@ -111,7 +111,7 @@ describe Sem::CLI::SharedConfigs do
   end
 
   describe "#rename" do
-    let(:shared_config) { StubFactory.shared_config(:name => "tokens") }
+    let(:shared_config) { ApiResponse.shared_config(:name => "tokens") }
 
     before do
       stub_api(:get, "/orgs/rt/shared_configs").to_return(200, [shared_config])
@@ -147,7 +147,7 @@ describe Sem::CLI::SharedConfigs do
   end
 
   describe "#delete" do
-    let(:shared_config) { StubFactory.shared_config(:name => "tokens") }
+    let(:shared_config) { ApiResponse.shared_config(:name => "tokens") }
 
     before do
       stub_api(:get, "/orgs/rt/shared_configs").to_return(200, [shared_config])
@@ -162,7 +162,7 @@ describe Sem::CLI::SharedConfigs do
   end
 
   describe Sem::CLI::SharedConfigs::Files do
-    let(:shared_config) { StubFactory.shared_config(:name => "tokens") }
+    let(:shared_config) { ApiResponse.shared_config(:name => "tokens") }
 
     before do
       stub_api(:get, "/orgs/rt/shared_configs").to_return(200, [shared_config])
@@ -170,8 +170,8 @@ describe Sem::CLI::SharedConfigs do
 
     describe "#list" do
       context "you have at least one file added to the shared configuration" do
-        let(:file1) { StubFactory.file(:path => "/etc/a") }
-        let(:file2) { StubFactory.file(:path => "/tmp/b") }
+        let(:file1) { ApiResponse.file(:path => "/etc/a") }
+        let(:file2) { ApiResponse.file(:path => "/tmp/b") }
 
         before do
           stub_api(:get, "/shared_configs/#{shared_config[:id]}/config_files").to_return(200, [file1, file2])
@@ -199,7 +199,7 @@ describe Sem::CLI::SharedConfigs do
     end
 
     describe "#add" do
-      let(:file) { StubFactory.file(:path => "/etc/a") }
+      let(:file) { ApiResponse.file(:path => "/etc/a") }
 
       before do
         stub_api(:post, "/shared_configs/#{shared_config[:id]}/config_files").to_return(200, file)
@@ -228,7 +228,7 @@ describe Sem::CLI::SharedConfigs do
     end
 
     describe "#remove" do
-      let(:file) { StubFactory.file(:path => "/etc/a") }
+      let(:file) { ApiResponse.file(:path => "/etc/a") }
 
       before do
         stub_api(:get, "/shared_configs/#{shared_config[:id]}/config_files").to_return(200, [file])
@@ -244,7 +244,7 @@ describe Sem::CLI::SharedConfigs do
   end
 
   describe Sem::CLI::SharedConfigs::EnvVars do
-    let(:shared_config) { StubFactory.shared_config(:name => "tokens") }
+    let(:shared_config) { ApiResponse.shared_config(:name => "tokens") }
 
     before do
       stub_api(:get, "/orgs/rt/shared_configs").to_return(200, [shared_config])
@@ -252,8 +252,8 @@ describe Sem::CLI::SharedConfigs do
 
     describe "#list" do
       context "you have at least one env_var added to the shared configuration" do
-        let(:env_var1) { StubFactory.env_var }
-        let(:env_var2) { StubFactory.env_var }
+        let(:env_var1) { ApiResponse.env_var }
+        let(:env_var2) { ApiResponse.env_var }
 
         before do
           stub_api(:get, "/shared_configs/#{shared_config[:id]}/env_vars").to_return(200, [env_var1, env_var2])
@@ -281,7 +281,7 @@ describe Sem::CLI::SharedConfigs do
     end
 
     describe "#add" do
-      let(:env_var) { StubFactory.env_var }
+      let(:env_var) { ApiResponse.env_var }
 
       before do
         stub_api(:post, "/shared_configs/#{shared_config[:id]}/env_vars").to_return(200, env_var)
@@ -295,7 +295,7 @@ describe Sem::CLI::SharedConfigs do
     end
 
     describe "#remove" do
-      let(:env_var) { StubFactory.env_var(:name => "TOKEN") }
+      let(:env_var) { ApiResponse.env_var(:name => "TOKEN") }
 
       before do
         stub_api(:get, "/shared_configs/#{shared_config[:id]}/env_vars").to_return(200, [env_var])

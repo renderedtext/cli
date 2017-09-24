@@ -1,15 +1,15 @@
 require "spec_helper"
 
 describe Sem::CLI::Teams do
-  let(:team) { StubFactory.team }
+  let(:team) { ApiResponse.team }
 
   describe "#list" do
-    let(:org1) { StubFactory.organization(:username => "rt") }
-    let(:org2) { StubFactory.organization(:username => "z-fighters") }
+    let(:org1) { ApiResponse.organization(:username => "rt") }
+    let(:org2) { ApiResponse.organization(:username => "z-fighters") }
 
     context "when the user has no teams" do
-      let(:team1) { StubFactory.team }
-      let(:team2) { StubFactory.team }
+      let(:team1) { ApiResponse.team }
+      let(:team2) { ApiResponse.team }
 
       before do
         stub_api(:get, "/orgs").to_return(200, [org1, org2])
@@ -47,8 +47,8 @@ describe Sem::CLI::Teams do
 
   describe "#info" do
     context "the team exists" do
-      let(:team) { StubFactory.team(:name => "devs") }
-      let(:user) { StubFactory.user }
+      let(:team) { ApiResponse.team(:name => "devs") }
+      let(:user) { ApiResponse.user }
 
       before do
         stub_api(:get, "/orgs/rt/teams").to_return(200, [team])
@@ -78,8 +78,8 @@ describe Sem::CLI::Teams do
 
   describe "#create" do
     context "creation succeds" do
-      let(:team) { StubFactory.team }
-      let(:user) { StubFactory.user }
+      let(:team) { ApiResponse.team }
+      let(:user) { ApiResponse.user }
 
       before do
         stub_api(:post, "/orgs/rt/teams").to_return(200, team)
@@ -109,8 +109,8 @@ describe Sem::CLI::Teams do
 
   describe "#rename" do
     context "update succeds" do
-      let(:team) { StubFactory.team }
-      let(:user) { StubFactory.user }
+      let(:team) { ApiResponse.team }
+      let(:user) { ApiResponse.user }
 
       before do
         stub_api(:get, "/orgs/rt/teams").to_return(200, [team])
@@ -127,8 +127,8 @@ describe Sem::CLI::Teams do
     end
 
     context "update fails" do
-      let(:team) { StubFactory.team }
-      let(:user) { StubFactory.user }
+      let(:team) { ApiResponse.team }
+      let(:user) { ApiResponse.user }
 
       before do
         stub_api(:get, "/orgs/rt/teams").to_return(200, [team])
@@ -148,8 +148,8 @@ describe Sem::CLI::Teams do
 
   describe "#set-permission" do
     context "update succeds" do
-      let(:team) { StubFactory.team }
-      let(:user) { StubFactory.user }
+      let(:team) { ApiResponse.team }
+      let(:user) { ApiResponse.user }
 
       before do
         stub_api(:get, "/orgs/rt/teams").to_return(200, [team])
@@ -166,8 +166,8 @@ describe Sem::CLI::Teams do
     end
 
     context "update fails" do
-      let(:team) { StubFactory.team }
-      let(:user) { StubFactory.user }
+      let(:team) { ApiResponse.team }
+      let(:user) { ApiResponse.user }
 
       before do
         stub_api(:get, "/orgs/rt/teams").to_return(200, [team])
@@ -186,7 +186,7 @@ describe Sem::CLI::Teams do
   end
 
   describe "#delete" do
-    let(:team) { StubFactory.team }
+    let(:team) { ApiResponse.team }
 
     before do
       stub_api(:get, "/orgs/rt/teams").to_return(200, [team])
@@ -201,7 +201,7 @@ describe Sem::CLI::Teams do
   end
 
   describe Sem::CLI::Teams::Members do
-    let(:team) { StubFactory.team }
+    let(:team) { ApiResponse.team }
 
     before do
       stub_api(:get, "/orgs/rt/teams").to_return(200, [team])
@@ -209,8 +209,8 @@ describe Sem::CLI::Teams do
 
     describe "#list" do
       context "when the team has several members" do
-        let(:user1) { StubFactory.user }
-        let(:user2) { StubFactory.user }
+        let(:user1) { ApiResponse.user }
+        let(:user2) { ApiResponse.user }
 
         before do
           stub_api(:get, "/teams/#{team[:id]}/users").to_return(200, [user1, user2])
@@ -263,7 +263,7 @@ describe Sem::CLI::Teams do
   end
 
   describe Sem::CLI::Teams::Projects do
-    let(:team) { StubFactory.team }
+    let(:team) { ApiResponse.team }
 
     before do
       stub_api(:get, "/orgs/rt/teams").to_return(200, [team])
@@ -271,7 +271,7 @@ describe Sem::CLI::Teams do
 
     describe "#list" do
       context "when the team has several members" do
-        let(:project) { StubFactory.project }
+        let(:project) { ApiResponse.project }
 
         before do
           stub_api(:get, "/teams/#{team[:id]}/projects").to_return(200, [project])
@@ -298,7 +298,7 @@ describe Sem::CLI::Teams do
     end
 
     describe "#add" do
-      let(:project) { StubFactory.project(:name => "cli") }
+      let(:project) { ApiResponse.project(:name => "cli") }
 
       before do
         stub_api(:get, "/orgs/rt/projects/?name=cli").to_return(200, [project])
@@ -313,7 +313,7 @@ describe Sem::CLI::Teams do
     end
 
     describe "#remove" do
-      let(:project) { StubFactory.project(:name => "cli") }
+      let(:project) { ApiResponse.project(:name => "cli") }
 
       before do
         stub_api(:get, "/orgs/rt/projects/?name=cli").to_return(200, [project])
@@ -329,7 +329,7 @@ describe Sem::CLI::Teams do
   end
 
   describe Sem::CLI::Teams::SharedConfigs do
-    let(:team) { StubFactory.team }
+    let(:team) { ApiResponse.team }
 
     before do
       stub_api(:get, "/orgs/rt/teams").to_return(200, [team])
@@ -337,8 +337,8 @@ describe Sem::CLI::Teams do
 
     describe "#list" do
       context "when the team has several shared configs" do
-        let(:config1) { StubFactory.shared_config(:name => "tokens") }
-        let(:config2) { StubFactory.shared_config(:name => "secrets") }
+        let(:config1) { ApiResponse.shared_config(:name => "tokens") }
+        let(:config2) { ApiResponse.shared_config(:name => "secrets") }
 
         before do
           stub_api(:get, "/teams/#{team[:id]}/shared_configs").to_return(200, [config1, config2])
@@ -371,7 +371,7 @@ describe Sem::CLI::Teams do
     end
 
     describe "#add" do
-      let(:config) { StubFactory.shared_config(:name => "tokens") }
+      let(:config) { ApiResponse.shared_config(:name => "tokens") }
 
       before do
         stub_api(:get, "/orgs/rt/shared_configs").to_return(200, [config])
@@ -386,7 +386,7 @@ describe Sem::CLI::Teams do
     end
 
     describe "#remove" do
-      let(:config) { StubFactory.shared_config(:name => "tokens") }
+      let(:config) { ApiResponse.shared_config(:name => "tokens") }
 
       before do
         stub_api(:get, "/orgs/rt/shared_configs").to_return(200, [config])

@@ -8,8 +8,8 @@ describe Sem::Views::EnvVars do
     it "prints the files in table format" do
       msg = [
         "ID                                    NAME    ENCRYPTED?  CONTENT",
-        "3bc7ed43-ac8a-487e-b488-c38bc757a034  SECRET  true        s3kr3t",
-        "3bc7ed43-ac8a-487e-b488-c38bc757a034  TOKEN   true        s3kr3t",
+        "9997ed43-ac8a-487e-b488-c38bc757a034  SECRET  true        s3kr3t",
+        "9997ed43-ac8a-487e-b488-c38bc757a034  TOKEN   true        s3kr3t",
         ""
       ]
 

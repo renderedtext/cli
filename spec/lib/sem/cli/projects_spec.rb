@@ -3,12 +3,12 @@ require "spec_helper"
 describe Sem::CLI::Projects do
 
   describe "#list" do
-    let(:org1) { StubFactory.organization(:username => "rt") }
-    let(:org2) { StubFactory.organization(:username => "z-fighters") }
+    let(:org1) { ApiResponse.organization(:username => "rt") }
+    let(:org2) { ApiResponse.organization(:username => "z-fighters") }
 
     context "you have at least one project on semaphore" do
-      let(:project1) { StubFactory.project }
-      let(:project2) { StubFactory.project }
+      let(:project1) { ApiResponse.project }
+      let(:project2) { ApiResponse.project }
 
       before do
         stub_api(:get, "/orgs").to_return(200, [org1, org2])
@@ -43,7 +43,7 @@ describe Sem::CLI::Projects do
 
   describe "#info" do
     context "project exists on semaphore" do
-      let(:project) { StubFactory.project }
+      let(:project) { ApiResponse.project }
 
       it "shows detailed information about a project" do
         stub_api(:get, "/orgs/rt/projects/?name=cli").to_return(200, [project])
@@ -67,12 +67,12 @@ describe Sem::CLI::Projects do
   end
 
   describe Sem::CLI::Projects::SharedConfigs do
-    let(:project) { StubFactory.project(:name => "cli") }
+    let(:project) { ApiResponse.project(:name => "cli") }
 
     describe "#list" do
       context "you have at least one shared_config attached to a project" do
-        let(:shared_config1) { StubFactory.shared_config }
-        let(:shared_config2) { StubFactory.shared_config }
+        let(:shared_config1) { ApiResponse.shared_config }
+        let(:shared_config2) { ApiResponse.shared_config }
 
         before do
           stub_api(:get, "/orgs/rt/projects/?name=cli").to_return(200, [project])
@@ -108,7 +108,7 @@ describe Sem::CLI::Projects do
     end
 
     describe "#add" do
-      let(:shared_config) { StubFactory.shared_config(:name => "tokens") }
+      let(:shared_config) { ApiResponse.shared_config(:name => "tokens") }
 
       before do
         stub_api(:get, "/orgs/rt/projects/?name=cli").to_return(200, [project])
@@ -124,7 +124,7 @@ describe Sem::CLI::Projects do
     end
 
     describe "#remove" do
-      let(:shared_config) { StubFactory.shared_config(:name => "tokens") }
+      let(:shared_config) { ApiResponse.shared_config(:name => "tokens") }
 
       before do
         stub_api(:get, "/orgs/rt/projects/?name=cli").to_return(200, [project])

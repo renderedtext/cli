@@ -8,8 +8,8 @@ describe Sem::Views::Files do
     it "prints the files in table format" do
       msg = [
         "ID                                    PATH              ENCRYPTED?",
-        "3bc7ed43-ac8a-487e-b488-c38bc757a034  /etc/a            true",
-        "3bc7ed43-ac8a-487e-b488-c38bc757a034  /var/secrets.txt  true",
+        "77c7ed43-ac8a-487e-b488-c38bc757a034  /etc/a            true",
+        "77c7ed43-ac8a-487e-b488-c38bc757a034  /var/secrets.txt  true",
         ""
       ]
 

@@ -16,8 +16,8 @@ describe Sem::Views::Teams do
     it "displays a table of teams" do
       msg = [
         "ID                                    NAME       PERMISSION  MEMBERS",
-        "3bc7ed43-ac8a-487e-b488-c38bc757a034  rt/devs    write       2 members",
-        "3bc7ed43-ac8a-487e-b488-c38bc757a034  rt/admins  write       0 members",
+        "1bc7ed43-ac8a-487e-b488-c38bc757a034  rt/devs    write       2 members",
+        "1bc7ed43-ac8a-487e-b488-c38bc757a034  rt/admins  write       0 members",
         ""
       ]
 
@@ -28,7 +28,7 @@ describe Sem::Views::Teams do
   describe ".info" do
     it "prints the team in table format" do
       msg = [
-        "ID          3bc7ed43-ac8a-487e-b488-c38bc757a034",
+        "ID          1bc7ed43-ac8a-487e-b488-c38bc757a034",
         "Name        rt/devs",
         "Permission  write",
         "Members     2",

@@ -7,6 +7,7 @@ require "webmock/rspec"
 require_relative "support/coverage"
 require_relative "support/factories"
 require_relative "support/web_stubs"
+require_relative "support/api_response"
 
 SimpleCov.start do
   add_filter "/spec/"

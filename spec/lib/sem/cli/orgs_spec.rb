@@ -2,7 +2,7 @@ require "spec_helper"
 
 describe Sem::CLI::Orgs do
 
-  let(:org) { StubFactory.organization }
+  let(:org) { ApiResponse.organization }
 
   describe "#list" do
     context "you have one or more orgs" do
@@ -49,7 +49,7 @@ describe Sem::CLI::Orgs do
   end
 
   describe "#members" do
-    let(:user) { StubFactory.user }
+    let(:user) { ApiResponse.user }
 
     it "list members of an organization" do
       stub_api(:get, "/orgs/rt").to_return(200, org)
