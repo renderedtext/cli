@@ -3,7 +3,7 @@ module StubFactory
 
   def organization(params = {})
     params = {
-      :id => "3bc7ed43-ac8a-487e-b488-c38bc757a034",
+      :id => "5bc7ed43-ac8a-487e-b488-c38bc757a034",
       :username => "rt",
       :created_at => "2017-08-01 13:14:40 +0200",
       :updated_at => "2017-08-02 13:14:40 +0200"
@@ -18,7 +18,7 @@ module StubFactory
 
   def user(params = {})
     params = {
-      :id => "3bc7ed43-ac8a-487e-b488-c38bc757a034",
+      :id => "2bc7ed43-ac8a-487e-b488-c38bc757a034",
       :username => "john-snow",
       :created_at => "2017-08-01 13:14:40 +0200",
       :updated_at => "2017-08-02 13:14:40 +0200"
@@ -33,7 +33,7 @@ module StubFactory
 
   def team(params = {})
     params = {
-      :id => "3bc7ed43-ac8a-487e-b488-c38bc757a034",
+      :id => "1bc7ed43-ac8a-487e-b488-c38bc757a034",
       :name => "devs",
       :permission => "write",
       :created_at => "2017-08-01 13:14:40 +0200",
@@ -49,7 +49,7 @@ module StubFactory
 
   def project(params = {})
     params = {
-      :id => "3bc7ed43-ac8a-487e-b488-c38bc757a034",
+      :id => "99c7ed43-ac8a-487e-b488-c38bc757a034",
       :name => "cli",
       :created_at => "2017-08-01 13:14:40 +0200",
       :updated_at => "2017-08-02 13:14:40 +0200"
@@ -64,7 +64,7 @@ module StubFactory
 
   def shared_config(params = {})
     params = {
-      :id => "3bc7ed43-ac8a-487e-b488-c38bc757a034",
+      :id => "33c7ed43-ac8a-487e-b488-c38bc757a034",
       :name => "cli",
       :created_at => "2017-08-01 13:14:40 +0200",
       :updated_at => "2017-08-02 13:14:40 +0200"
@@ -79,7 +79,7 @@ module StubFactory
 
   def file(params = {})
     params = {
-      :id => "3bc7ed43-ac8a-487e-b488-c38bc757a034",
+      :id => "77c7ed43-ac8a-487e-b488-c38bc757a034",
       :path => "/var/secrets.txt",
       :encrypted => true
     }.merge(params)
@@ -91,7 +91,7 @@ module StubFactory
 
   def env_var(params = {})
     params = {
-      :id => "3bc7ed43-ac8a-487e-b488-c38bc757a034",
+      :id => "9997ed43-ac8a-487e-b488-c38bc757a034",
       :name => "GEM_TOKEN",
       :content => "s3kr3t",
       :encrypted => true

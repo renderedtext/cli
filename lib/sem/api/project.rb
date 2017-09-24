@@ -40,11 +40,11 @@ class Sem::API::Project < SimpleDelegator
   end
 
   def add_shared_config(shared_config)
-    Sem::API::Base.client.shared_configs.attach_to_project(id, shared_config.id)
+    Sem::API::Base.client.shared_configs.attach_to_project(shared_config.id, id)
   end
 
   def remove_shared_config(shared_config)
-    Sem::API::Base.client.shared_configs.detach_from_project(id, shared_config.id)
+    Sem::API::Base.client.shared_configs.detach_from_project(shared_config.id, id)
   end
 
   def users
