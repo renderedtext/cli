@@ -1,11 +1,11 @@
 class Sem::Views::Users < Sem::Views::Base
-  class << self
-    def list(users)
-      header = ["NAME"]
+  def self.list(users)
+    header = ["NAME"]
 
-      body = users.map { |user| [user[:id]] }
-
-      print_table [header, *body]
+    body = users.map do |user|
+      [user.username]
     end
+
+    print_table [header, *body]
   end
 end

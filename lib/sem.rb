@@ -3,6 +3,7 @@ require "dracula"
 require "semaphore_client"
 require "fileutils"
 require "pmap"
+require "delegate"
 
 module Sem
   require "sem/errors"
@@ -33,6 +34,10 @@ module Sem
       Sem::CLI.start(args)
 
       0
+    rescue Sem::Errors::ResourceNotFound => e
+      puts e.message
+
+      1
     rescue Sem::Errors::ResourceException => e
       puts e.message
 

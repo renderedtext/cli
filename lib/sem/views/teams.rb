@@ -1,76 +1,58 @@
 class Sem::Views::Teams < Sem::Views::Base
-  class << self
-    def list(teams)
-      if teams.empty?
-        puts "You don't have any teams on Semaphore."
-        puts ""
-        puts "Create your first team:"
-        puts ""
-        puts "  sem teams:create ORG_NAME/TEAM"
-        puts ""
+  def self.create_first_team
+    puts "You don't have any teams on Semaphore."
+    puts ""
+    puts "Create your first team:"
+    puts ""
+    puts "  sem teams:create ORG_NAME/TEAM"
+    puts ""
+  end
 
-        return
-      end
+  def self.list(teams)
+    header = ["ID", "NAME", "PERMISSION", "MEMBERS"]
 
-      header = ["ID", "NAME", "PERMISSION", "MEMBERS"]
-
-      body = teams.map do |team|
-        [team[:id], "#{team[:org]}/#{team[:name]}", permission(team), "#{team[:members]} members"]
-      end
-
-      print_table [header, *body]
+    body = teams.map do |team|
+      [team.id, team.full_name, team.permission, "#{team.users.count} members"]
     end
 
-    def info(team)
-      print_table [
-        ["ID", team[:id]],
-        ["Name", name(team)],
-        ["Permission", permission(team)],
-        ["Members", members(team)],
-        ["Created", team[:created_at]],
-        ["Updated", team[:updated_at]]
-      ]
-    end
+    print_table [header, *body]
+  end
 
-    def list_members(team, members)
-      if members.empty?
-        puts "You don't have any members in the team."
-        puts ""
-        puts "Add your first member:"
-        puts ""
-        puts "  sem teams:members:add #{team} USERNAME"
-        puts ""
+  def self.info(team)
+    print_table [
+      ["ID", team.id],
+      ["Name", team.full_name],
+      ["Permission", team.permission],
+      ["Members", team.users.count.to_s],
+      ["Created", team.created_at],
+      ["Updated", team.updated_at]
+    ]
+  end
 
-        return
-      end
+  def self.add_first_team_member(team)
+    puts "You don't have any members in the team."
+    puts ""
+    puts "Add your first member:"
+    puts ""
+    puts "  sem teams:members:add #{team.full_name} USERNAME"
+    puts ""
+  end
 
-      header = ["NAME"]
+  def self.add_first_project(team)
+    puts "You don't have any projects in this team."
+    puts ""
+    puts "Add your first project:"
+    puts ""
+    puts "  sem teams:projects:add #{team.full_name} PROJECT_NAME"
+    puts ""
+  end
 
-      body = members.map do |user|
-        [user[:id]]
-      end
-
-      print_table [header, *body]
-    end
-
-    private
-
-    def name(team)
-      return unless team[:org] && team[:name]
-
-      "#{team[:org]}/#{team[:name]}"
-    end
-
-    def members(team)
-      return unless team[:members]
-
-      "#{team[:members]} members"
-    end
-
-    def permission(team)
-      return "write" if team[:permission] == "edit"
-
-      team[:permission]
-    end
+  def self.add_first_shared_config(team)
+    puts "You don't have any shared configurations in this team."
+    puts ""
+    puts "Add your first shared configuration:"
+    puts ""
+    puts "  sem teams:shared-configs:add #{team.full_name} SHARED_CONFIG_NAME"
+    puts ""
   end
 end

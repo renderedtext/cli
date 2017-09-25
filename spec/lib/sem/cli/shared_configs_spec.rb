@@ -2,370 +2,312 @@ require "spec_helper"
 
 describe Sem::CLI::SharedConfigs do
 
-  let(:shared_config) do
-    {
-      :id => "3bc7ed43-ac8a-487e-b488-c38bc757a034",
-      :org => "rt",
-      :name => "aws-tokens",
-      :config_files => 3,
-      :env_vars => 1,
-      :created_at => "2017-08-01 13:14:40 +0200",
-      :updated_at => "2017-08-02 13:14:40 +0200"
-    }
-  end
-
   describe "#list" do
-    context "when the user has multiple shared configs" do
-      let(:another_shared_config) do
-        {
-          :id => "37d8fdc0-4a96-4535-a4bc-601d1c7c7058",
-          :org => "rt",
-          :name => "rubygems",
-          :config_files => 1,
-          :env_vars => 0
-        }
+    let(:org1) { ApiResponse.organization(:username => "rt") }
+    let(:org2) { ApiResponse.organization(:username => "z-fighters") }
+
+    context "you have at least one shared config on semaphore" do
+      let(:shared_config1) { ApiResponse.shared_config }
+      let(:shared_config2) { ApiResponse.shared_config }
+
+      before do
+        stub_api(:get, "/orgs").to_return(200, [org1, org2])
+
+        stub_api(:get, "/orgs/rt/shared_configs").to_return(200, [shared_config1])
+        stub_api(:get, "/orgs/z-fighters/shared_configs").to_return(200, [shared_config2])
+
+        stub_api(:get, "/shared_configs/#{shared_config1[:id]}/config_files").to_return(200, [])
+        stub_api(:get, "/shared_configs/#{shared_config1[:id]}/env_vars").to_return(200, [])
+        stub_api(:get, "/shared_configs/#{shared_config2[:id]}/config_files").to_return(200, [])
+        stub_api(:get, "/shared_configs/#{shared_config2[:id]}/env_vars").to_return(200, [])
       end
 
-      before { allow(Sem::API::SharedConfigs).to receive(:list).and_return([shared_config, another_shared_config]) }
+      it "lists all shared_configs" do
+        stdout, _stderr = sem_run!("shared-configs:list")
 
-      it "calls the API" do
-        expect(Sem::API::SharedConfigs).to receive(:list)
-
-        sem_run("shared-configs:list")
-      end
-
-      it "lists shared configurations" do
-        stdout, stderr, status = sem_run("shared-configs:list")
-
-        msg = [
-          "ID                                    NAME           CONFIG FILES  ENV VARS",
-          "3bc7ed43-ac8a-487e-b488-c38bc757a034  rt/aws-tokens             3         1",
-          "37d8fdc0-4a96-4535-a4bc-601d1c7c7058  rt/rubygems               1         0"
-        ]
-
-        expect(stdout.strip).to eq(msg.join("\n"))
-        expect(stderr).to eq("")
-        expect(status).to eq(:ok)
+        expect(stdout).to include(shared_config1[:id])
+        expect(stdout).to include(shared_config2[:id])
       end
     end
 
-    context "when the user has no shared configs" do
-      before { allow(Sem::API::SharedConfigs).to receive(:list).and_return([]) }
+    context "no shared_config on semaphore" do
+      before do
+        stub_api(:get, "/orgs").to_return(200, [org1, org2])
 
-      it "offers to create your first shared config" do
-        stdout, stderr, status = sem_run("shared-configs:list")
+        stub_api(:get, "/orgs/rt/shared_configs").to_return(200, [])
+        stub_api(:get, "/orgs/z-fighters/shared_configs").to_return(200, [])
+      end
 
-        msg = [
-          "You don't have any shared configurations on Semaphore.",
-          "",
-          "Create your first shared configuration:",
-          "",
-          "  sem shared-config:create ORG_NAME/SHARED_CONFIG",
-          "",
-          ""
-        ]
+      it "offers you to set up a shared_config on semaphore" do
+        stdout, _stderr = sem_run!("shared-configs:list")
 
-        expect(stdout).to eq(msg.join("\n"))
-        expect(stderr).to eq("")
-        expect(status).to eq(:ok)
+        expect(stdout).to include("Create your first shared configuration")
       end
     end
   end
 
   describe "#info" do
-    before { allow(Sem::API::SharedConfigs).to receive(:info).and_return(shared_config) }
+    context "shared_config exists" do
+      let(:shared_config) { ApiResponse.shared_config(:name => "tokens") }
 
-    it "calls the API" do
-      expect(Sem::API::SharedConfigs).to receive(:info).with("rt", "aws-tokens")
+      before do
+        stub_api(:get, "/orgs/rt/shared_configs").to_return(200, [shared_config])
 
-      sem_run("shared-configs:info rt/aws-tokens")
+        stub_api(:get, "/shared_configs/#{shared_config[:id]}/config_files").to_return(200, [])
+        stub_api(:get, "/shared_configs/#{shared_config[:id]}/env_vars").to_return(200, [])
+      end
+
+      it "shows detailed information about a shared_config" do
+        stdout, _stderr = sem_run!("shared-configs:info rt/tokens")
+
+        expect(stdout).to include(shared_config[:id])
+      end
     end
 
-    it "shows information about a shared configuration" do
-      stdout, stderr, status = sem_run("shared-configs:info rt/aws-tokens")
+    context "shared_config doesn't exists" do
+      before do
+        stub_api(:get, "/orgs/rt/shared_configs").to_return(200, [])
+      end
 
-      msg = [
-        "ID                     3bc7ed43-ac8a-487e-b488-c38bc757a034",
-        "Name                   rt/aws-tokens",
-        "Config Files           3",
-        "Environment Variables  1",
-        "Created                2017-08-01 13:14:40 +0200",
-        "Updated                2017-08-02 13:14:40 +0200"
-      ]
+      it "displays an error" do
+        stdout, _stderr, status = sem_run("shared-configs:info rt/tokens")
 
-      expect(stdout.strip).to eq(msg.join("\n"))
-      expect(stderr).to eq("")
-      expect(status).to eq(:ok)
+        expect(stdout).to include("Shared Configuration rt/tokens not found.")
+        expect(status).to eq(:fail)
+      end
     end
   end
 
   describe "#create" do
-    before { allow(Sem::API::SharedConfigs).to receive(:create).and_return(shared_config) }
+    context "creation succeds" do
+      let(:shared_config) { ApiResponse.shared_config(:name => "tokens") }
 
-    it "calls the API" do
-      expect(Sem::API::SharedConfigs).to receive(:create).with("rt", :name => "aws-tokens")
+      before do
+        stub_api(:post, "/orgs/rt/shared_configs").to_return(200, shared_config)
 
-      sem_run("shared-configs:create rt/aws-tokens")
+        stub_api(:get, "/shared_configs/#{shared_config[:id]}/config_files").to_return(200, [])
+        stub_api(:get, "/shared_configs/#{shared_config[:id]}/env_vars").to_return(200, [])
+      end
+
+      it "shows detailed information about a shared_config" do
+        stdout, _stderr = sem_run!("shared-configs:create rt/tokens")
+
+        expect(stdout).to include(shared_config[:id])
+      end
     end
 
-    it "create a new shared configuration" do
-      stdout, stderr, status = sem_run("shared-configs:create rt/aws-tokens")
+    context "creation fails" do
+      before do
+        stub_api(:post, "/orgs/rt/shared_configs").to_return(422, "")
+      end
 
-      msg = [
-        "ID                     3bc7ed43-ac8a-487e-b488-c38bc757a034",
-        "Name                   rt/aws-tokens",
-        "Config Files           3",
-        "Environment Variables  1",
-        "Created                2017-08-01 13:14:40 +0200",
-        "Updated                2017-08-02 13:14:40 +0200"
-      ]
+      it "displays an error" do
+        stdout, _stderr, status = sem_run("shared-configs:create rt/tokens")
 
-      expect(stdout.strip).to eq(msg.join("\n"))
-      expect(stderr).to eq("")
-      expect(status).to eq(:ok)
+        expect(stdout).to include("Shared Configuration rt/tokens not created.")
+        expect(status).to eq(:fail)
+      end
     end
   end
 
   describe "#rename" do
-    before { allow(Sem::API::SharedConfigs).to receive(:update).and_return(shared_config) }
+    let(:shared_config) { ApiResponse.shared_config(:name => "tokens") }
 
-    it "calls the API" do
-      expect(Sem::API::SharedConfigs).to receive(:update).with("rt", "tokens", :name => "aws-tokens")
-
-      sem_run("shared-configs:rename rt/tokens rt/aws-tokens")
+    before do
+      stub_api(:get, "/orgs/rt/shared_configs").to_return(200, [shared_config])
     end
 
-    context "org names are not matching" do
-      it "raises an exception" do
-        stdout, stderr, status = sem_run("shared-configs:rename rt/tokens org/aws-tokens")
+    context "update succeds" do
+      before do
+        stub_api(:patch, "/shared_configs/#{shared_config[:id]}").to_return(200, shared_config)
 
-        msg = [
-          "[ERROR] Organization names not matching.",
-          "",
-          "Old shared configuration name \"rt/tokens\" and new shared configuration name \"org/aws-tokens\"" \
-          " are not in the same organization."
-        ]
+        stub_api(:get, "/shared_configs/#{shared_config[:id]}/config_files").to_return(200, [])
+        stub_api(:get, "/shared_configs/#{shared_config[:id]}/env_vars").to_return(200, [])
+      end
 
-        expect(stderr.strip).to eq(msg.join("\n"))
-        expect(stdout.strip).to eq("")
-        expect(status).to eq(:system_error)
+      it "shows detailed information about a shared_config" do
+        stdout, _stderr = sem_run!("shared-configs:rename rt/tokens rt/secrets")
+
+        expect(stdout).to include(shared_config[:id])
       end
     end
 
-    it "renames a shared configuration" do
-      stdout, stderr, status = sem_run("shared-configs:rename rt/tokens rt/aws-tokens")
+    context "update fails" do
+      before do
+        stub_api(:patch, "/shared_configs/#{shared_config[:id]}").to_return(422, "")
+      end
 
-      msg = [
-        "ID                     3bc7ed43-ac8a-487e-b488-c38bc757a034",
-        "Name                   rt/aws-tokens",
-        "Config Files           3",
-        "Environment Variables  1",
-        "Created                2017-08-01 13:14:40 +0200",
-        "Updated                2017-08-02 13:14:40 +0200"
-      ]
+      it "displays an error" do
+        stdout, _stderr, status = sem_run("shared-configs:rename rt/tokens rt/secrets")
 
-      expect(stdout.strip).to eq(msg.join("\n"))
-      expect(stderr).to eq("")
-      expect(status).to eq(:ok)
+        expect(stdout).to include("Shared Configuration rt/tokens not updated")
+        expect(status).to eq(:fail)
+      end
     end
   end
 
   describe "#delete" do
-    before { allow(Sem::API::SharedConfigs).to receive(:delete) }
+    let(:shared_config) { ApiResponse.shared_config(:name => "tokens") }
 
-    it "calls the API" do
-      expect(Sem::API::SharedConfigs).to receive(:delete).with("rt", "tokens")
-
-      sem_run("shared-configs:delete rt/tokens")
+    before do
+      stub_api(:get, "/orgs/rt/shared_configs").to_return(200, [shared_config])
+      stub_api(:delete, "/shared_configs/#{shared_config[:id]}").to_return(204, "")
     end
 
-    it "deletes the shared configuration" do
-      stdout, stderr, status = sem_run("shared-configs:delete rt/tokens")
+    it "shows detailed information about a shared_config" do
+      stdout, _stderr = sem_run!("shared-configs:delete rt/tokens")
 
-      expect(stdout.strip).to eq("Deleted shared configuration rt/tokens")
-      expect(stderr).to eq("")
-      expect(status).to eq(:ok)
+      expect(stdout).to include("Deleted shared configuration rt/tokens")
     end
   end
 
   describe Sem::CLI::SharedConfigs::Files do
+    let(:shared_config) { ApiResponse.shared_config(:name => "tokens") }
+
+    before do
+      stub_api(:get, "/orgs/rt/shared_configs").to_return(200, [shared_config])
+    end
 
     describe "#list" do
-      let(:file_0) do
-        {
-          :id => "3bc7ed43-ac8a-487e-b488-c38bc757a034",
-          :name => "secrets.txt",
-          :encrypted? => true
-        }
+      context "you have at least one file added to the shared configuration" do
+        let(:file1) { ApiResponse.file(:path => "/etc/a") }
+        let(:file2) { ApiResponse.file(:path => "/tmp/b") }
+
+        before do
+          stub_api(:get, "/shared_configs/#{shared_config[:id]}/config_files").to_return(200, [file1, file2])
+        end
+
+        it "lists all shared configurations on the project" do
+          stdout, _stderr = sem_run("shared-configs:files:list rt/tokens")
+
+          expect(stdout).to include(file1[:path])
+          expect(stdout).to include(file2[:path])
+        end
       end
 
-      let(:file_1) do
-        {
-          :id => "37d8fdc0-4a96-4535-a4bc-601d1c7c7058",
-          :name => "config.yml",
-          :encrypted? => true
-        }
-      end
+      context "no files are added to the shared configuration" do
+        before do
+          stub_api(:get, "/shared_configs/#{shared_config[:id]}/config_files").to_return(200, [])
+        end
 
-      before { allow(Sem::API::SharedConfigs).to receive(:list_files).and_return([file_0, file_1]) }
+        it "offers you to create and attach a shared configuration" do
+          stdout, _stderr = sem_run!("shared-configs:files:list rt/tokens")
 
-      it "calls the configs API" do
-        expect(Sem::API::SharedConfigs).to receive(:list_files).with("rt", "tokens")
-
-        sem_run("shared-configs:files:list rt/tokens")
-      end
-
-      it "lists files in a shared_configuration" do
-        stdout, stderr, status = sem_run("shared-configs:files:list rt/tokens")
-
-        msg = [
-          "ID                                    NAME         ENCRYPTED?",
-          "3bc7ed43-ac8a-487e-b488-c38bc757a034  secrets.txt  true",
-          "37d8fdc0-4a96-4535-a4bc-601d1c7c7058  config.yml   true"
-        ]
-
-        expect(stdout.strip).to eq(msg.join("\n"))
-        expect(stderr).to eq("")
-        expect(status).to eq(:ok)
+          expect(stdout).to include("Add your first file")
+        end
       end
     end
 
     describe "#add" do
-      let(:content) { "content" }
+      let(:file) { ApiResponse.file(:path => "/etc/a") }
 
       before do
-        allow(File).to receive(:read).and_return(content)
-        allow(Sem::API::Files).to receive(:add_to_shared_config)
+        stub_api(:post, "/shared_configs/#{shared_config[:id]}/config_files").to_return(200, file)
       end
 
-      it "reads the file" do
-        expect(File).to receive(:read).with("secrets.yml")
+      context "local file exists" do
+        before { File.write("/tmp/aliases", "abc") }
 
-        sem_run("shared-configs:files:add rt/tokens secrets.yml -f secrets.yml")
+        it "adds the file to the shared config" do
+          stdout, _stderr = sem_run("shared-configs:files:add rt/tokens --path-on-semaphore /etc/aliases --local-path /tmp/aliases")
+
+          expect(stdout).to include("Added /etc/aliases to rt/tokens")
+        end
       end
 
-      it "calls the projects API" do
-        expect(Sem::API::Files).to receive(:add_to_shared_config).with("rt",
-                                                                       "tokens",
-                                                                       :path => "secrets.yml",
-                                                                       :content => content)
+      context "local file does not exists" do
+        before { FileUtils.rm_f("/tmp/aliases") }
 
-        sem_run("shared-configs:files:add rt/tokens secrets.yml -f secrets.yml")
-      end
+        it "aborts and displays an error" do
+          _stdout, stderr, status = sem_run("shared-configs:files:add rt/tokens --path-on-semaphore /etc/aliases --local-path /tmp/aliases")
 
-      it "adds a file to the shared configuration" do
-        stdout, stderr, status = sem_run("shared-configs:files:add rt/tokens secrets.yml -f secrets.yml")
-
-        expect(stdout.strip).to eq("Added secrets.yml to rt/tokens")
-        expect(stderr).to eq("")
-        expect(status).to eq(:ok)
+          expect(status).to be(:system_error)
+          expect(stderr.strip).to eq("File /tmp/aliases not found")
+        end
       end
     end
 
     describe "#remove" do
-      before { allow(Sem::API::Files).to receive(:remove_from_shared_config) }
+      let(:file) { ApiResponse.file(:path => "/etc/a") }
 
-      it "calls the projects API" do
-        expect(Sem::API::Files).to receive(:remove_from_shared_config).with("rt", "tokens", "secrets.yml")
-
-        sem_run("shared-configs:files:remove rt/tokens secrets.yml")
+      before do
+        stub_api(:get, "/shared_configs/#{shared_config[:id]}/config_files").to_return(200, [file])
+        stub_api(:delete, "/config_files/#{file[:id]}").to_return(204, "")
       end
 
-      it "deletes a file from the shared configuration" do
-        stdout, stderr, status = sem_run("shared-configs:files:remove rt/tokens secrets.yml")
+      it "removes the shared configuration to the project" do
+        stdout, _stderr = sem_run!("shared-configs:files:remove rt/tokens --path /etc/a")
 
-        expect(stdout.strip).to eq("Removed secrets.yml from rt/tokens")
-        expect(stderr).to eq("")
-        expect(status).to eq(:ok)
+        expect(stdout).to include("Removed /etc/a from rt/tokens")
       end
     end
-
   end
 
   describe Sem::CLI::SharedConfigs::EnvVars do
+    let(:shared_config) { ApiResponse.shared_config(:name => "tokens") }
+
+    before do
+      stub_api(:get, "/orgs/rt/shared_configs").to_return(200, [shared_config])
+    end
 
     describe "#list" do
-      let(:env_var_0) do
-        {
-          :id => "3bc7ed43-ac8a-487e-b488-c38bc757a034",
-          :name => "AWS_CLIENT_ID",
-          :encrypted? => true,
-          :content => "-"
-        }
+      context "you have at least one env_var added to the shared configuration" do
+        let(:env_var1) { ApiResponse.env_var }
+        let(:env_var2) { ApiResponse.env_var }
+
+        before do
+          stub_api(:get, "/shared_configs/#{shared_config[:id]}/env_vars").to_return(200, [env_var1, env_var2])
+        end
+
+        it "lists all env vars in a shared_config" do
+          stdout, _stderr = sem_run("shared-configs:env-vars:list rt/tokens")
+
+          expect(stdout).to include(env_var1[:name])
+          expect(stdout).to include(env_var2[:name])
+        end
       end
 
-      let(:env_var_1) do
-        {
-          :id => "37d8fdc0-4a96-4535-a4bc-601d1c7c7058",
-          :name => "EMAIL",
-          :encrypted? => false,
-          :content => "admin@semaphoreci.com"
-        }
-      end
+      context "no files are added to the shared configuration" do
+        before do
+          stub_api(:get, "/shared_configs/#{shared_config[:id]}/env_vars").to_return(200, [])
+        end
 
-      before { allow(Sem::API::SharedConfigs).to receive(:list_env_vars).and_return([env_var_0, env_var_1]) }
+        it "offers you to create and attach an env var" do
+          stdout, _stderr = sem_run!("shared-configs:env-vars:list rt/tokens")
 
-      it "calls the configs API" do
-        expect(Sem::API::SharedConfigs).to receive(:list_env_vars).with("rt", "tokens")
-
-        sem_run("shared-configs:env-vars:list rt/tokens")
-      end
-
-      it "lists env vars in a shared_configuration" do
-        stdout, stderr, status = sem_run("shared-configs:env-vars:list rt/tokens")
-
-        msg = [
-          "ID                                    NAME           ENCRYPTED?  CONTENT",
-          "3bc7ed43-ac8a-487e-b488-c38bc757a034  AWS_CLIENT_ID  true        -",
-          "37d8fdc0-4a96-4535-a4bc-601d1c7c7058  EMAIL          false       admin@semaphoreci.com"
-        ]
-
-        expect(stdout.strip).to eq(msg.join("\n"))
-        expect(stderr).to eq("")
-        expect(status).to eq(:ok)
+          expect(stdout).to include("Add your first environment variable")
+        end
       end
     end
 
     describe "#add" do
-      before { allow(Sem::API::EnvVars).to receive(:add_to_shared_config) }
+      let(:env_var) { ApiResponse.env_var }
 
-      it "calls the projects API" do
-        expect(Sem::API::EnvVars).to receive(:add_to_shared_config).with("rt",
-                                                                         "tokens",
-                                                                         :name => "AWS_CLIENT_ID",
-                                                                         :content => "3412341234123")
-
-        sem_run("shared-configs:env-vars:add rt/tokens --name AWS_CLIENT_ID --content 3412341234123")
+      before do
+        stub_api(:post, "/shared_configs/#{shared_config[:id]}/env_vars").to_return(200, env_var)
       end
 
-      it "adds an env var to the shared configuration" do
-        stdout, stderr, status =
-          sem_run("shared-configs:env-vars:add rt/tokens --name AWS_CLIENT_ID --content 3412341234123")
+      it "adds the env var to the shared config" do
+        stdout, _stderr = sem_run!("shared-configs:env-vars:add rt/tokens --name SECRET --content abc")
 
-        expect(stderr).to eq("")
-        expect(stdout.strip).to eq("Added AWS_CLIENT_ID to rt/tokens")
-        expect(status).to eq(:ok)
+        expect(stdout).to include("Added SECRET to rt/tokens")
       end
     end
 
     describe "#remove" do
-      before { allow(Sem::API::EnvVars).to receive(:remove_from_shared_config) }
+      let(:env_var) { ApiResponse.env_var(:name => "TOKEN") }
 
-      it "calls the projects API" do
-        expect(Sem::API::EnvVars).to receive(:remove_from_shared_config).with("rt", "tokens", "AWS_CLIENT_ID")
-
-        sem_run("shared-configs:env-vars:remove rt/tokens AWS_CLIENT_ID")
+      before do
+        stub_api(:get, "/shared_configs/#{shared_config[:id]}/env_vars").to_return(200, [env_var])
+        stub_api(:delete, "/env_vars/#{env_var[:id]}").to_return(204, "")
       end
 
-      it "deletes an env var from the shared configuration" do
-        stdout, stderr, status = sem_run("shared-configs:env-vars:remove rt/tokens AWS_CLIENT_ID")
+      it "removes the env vars from the shared configurations" do
+        stdout, _stderr = sem_run!("shared-configs:env-vars:remove rt/tokens --name TOKEN")
 
-        expect(stdout.strip).to eq("Removed AWS_CLIENT_ID from rt/tokens")
-        expect(stderr).to eq("")
-        expect(status).to eq(:ok)
+        expect(stdout).to include("Removed TOKEN from rt/tokens")
       end
     end
 
   end
-
 end

@@ -2,59 +2,57 @@ class Sem::CLI::Projects < Dracula
 
   desc "list", "list projects"
   def list
-    projects = Sem::API::Projects.list
+    projects = Sem::API::Project.all
 
-    Sem::Views::Projects.list(projects)
+    if !projects.empty?
+      Sem::Views::Projects.list(projects)
+    else
+      Sem::Views::Projects.setup_first_project
+    end
   end
 
   desc "info", "shows detailed information about a project"
-  def info(project)
-    org_name, project_name = Sem::SRN.parse_project(project)
+  def info(project_name)
+    project = Sem::API::Project.find!(project_name)
 
-    project_instance = Sem::API::Projects.info(org_name, project_name).to_h
-
-    Sem::Views::Projects.info(project_instance)
+    Sem::Views::Projects.info(project)
   end
 
   class SharedConfigs < Dracula
+
     desc "list", "list shared configurations on a project"
-    def list(project)
-      org_name, project_name = Sem::SRN.parse_project(project)
+    def list(project_name)
+      project = Sem::API::Project.find!(project_name)
+      shared_configs = project.shared_configs
 
-      configs = Sem::API::SharedConfigs.list_for_project(org_name, project_name)
-
-      Sem::Views::SharedConfigs.list(configs)
+      if !shared_configs.empty?
+        Sem::Views::SharedConfigs.list(shared_configs)
+      else
+        Sem::Views::Projects.attach_first_shared_config(project)
+      end
     end
 
     desc "add", "attach a shared configuration to a project"
-    def add(project, shared_config)
-      project_org_name, project_name = Sem::SRN.parse_project(project)
-      shared_config_org_name, shared_config_name = Sem::SRN.parse_shared_config(shared_config)
+    def add(project_name, shared_config_name)
+      project = Sem::API::Project.find!(project_name)
+      shared_config = Sem::API::SharedConfig.find!(shared_config_name)
 
-      if project_org_name != shared_config_org_name
-        abort Sem::Views::Projects.org_names_not_matching("project", "shared configuration", project, shared_config)
-      end
+      project.add_shared_config(shared_config)
 
-      Sem::API::SharedConfigs.add_to_project(project_org_name, project_name, shared_config_name)
-
-      puts "Shared Configuration #{project_org_name}/#{shared_config_name} added to the project."
+      puts "Shared Configuration #{shared_config_name} added to the project."
     end
 
     desc "remove", "removes a shared configuration from the project"
-    def remove(project, shared_config)
-      project_org_name, project_name = Sem::SRN.parse_project(project)
-      shared_config_org_name, shared_config_name = Sem::SRN.parse_shared_config(shared_config)
+    def remove(project_name, shared_config_name)
+      project = Sem::API::Project.find!(project_name)
+      shared_config = Sem::API::SharedConfig.find!(shared_config_name)
 
-      if project_org_name != shared_config_org_name
-        abort Sem::Views::Projects.org_names_not_matching("project", "shared configuration", project, shared_config)
-      end
+      project.remove_shared_config(shared_config)
 
-      Sem::API::SharedConfigs.remove_from_project(project_org_name, project_name, shared_config_name)
-
-      puts "Shared Configuration #{project_org_name}/#{shared_config_name} removed from the project."
+      puts "Shared Configuration #{shared_config_name} removed from the project."
     end
+
   end
 
   register "shared-configs", "manage shared configurations", SharedConfigs
-
 end

@@ -32,4 +32,8 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency "rubocop-rspec", "1.5.0"
   spec.add_development_dependency "simplecov", "~> 0.13"
   spec.add_development_dependency "byebug", "~> 9.0.0"
+
+  # lock down version to support ruby 2.0
+  spec.add_development_dependency "public_suffix", "~> 2.0.5"
+  spec.add_development_dependency "webmock", "~> 3.0.1"
 end

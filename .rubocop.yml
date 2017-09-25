@@ -30,7 +30,7 @@ Style/CollectionMethods:
   Enabled: true
 
 Metrics/LineLength:
-  Max: 120
+  Max: 160
 
 Style/EmptyLinesAroundClassBody:
   Enabled: false

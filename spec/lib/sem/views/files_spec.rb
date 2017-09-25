@@ -1,18 +1,19 @@
 require "spec_helper"
 
 describe Sem::Views::Files do
-  let(:file) { { :id => "3bc7ed43-ac8a-487e-b488-c38bc757a034", :name => "renderedtext/cli", :encrypted? => true } }
+  let(:file1) { StubFactory.file(:path => "/etc/a") }
+  let(:file2) { StubFactory.file(:name => "/var/b") }
 
   describe ".list" do
-    it "returns the files in table format" do
-      expected_value = [
-        ["ID", "NAME", "ENCRYPTED?"],
-        [file[:id], file[:name], file[:encrypted?]]
+    it "prints the files in table format" do
+      msg = [
+        "ID                                    PATH              ENCRYPTED?",
+        "77c7ed43-ac8a-487e-b488-c38bc757a034  /etc/a            true",
+        "77c7ed43-ac8a-487e-b488-c38bc757a034  /var/secrets.txt  true",
+        ""
       ]
 
-      expect(Sem::Views::Files).to receive(:print_table).with(expected_value)
-
-      described_class.list([file])
+      expect { Sem::Views::Files.list([file1, file2]) }.to output(msg.join("\n")).to_stdout
     end
   end
 end

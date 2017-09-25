@@ -1,531 +1,402 @@
 require "spec_helper"
 
 describe Sem::CLI::Teams do
-  let(:team) do
-    {
-      :id => "3bc7ed43-ac8a-487e-b488-c38bc757a034",
-      :name => "developers",
-      :org => "renderedtext",
-      :permission => "write",
-      :members => "72",
-      :created_at => "2017-08-01 13:14:40 +0200",
-      :updated_at => "2017-08-02 13:14:40 +0200"
-    }
-  end
+  let(:team) { ApiResponse.team }
 
   describe "#list" do
-    context "when the user has several teams" do
-      let(:another_team) do
-        {
-          :id => "fe3624cf-0cea-4d87-9dde-cb9ddacfefc0",
-          :name => "developers",
-          :org => "tb-render",
-          :permission => "admin",
-          :members => "3"
-        }
+    let(:org1) { ApiResponse.organization(:username => "rt") }
+    let(:org2) { ApiResponse.organization(:username => "z-fighters") }
+
+    context "when the user has no teams" do
+      let(:team1) { ApiResponse.team }
+      let(:team2) { ApiResponse.team }
+
+      before do
+        stub_api(:get, "/orgs").to_return(200, [org1, org2])
+
+        stub_api(:get, "/orgs/#{org1[:username]}/teams").to_return(200, [team1])
+        stub_api(:get, "/orgs/#{org2[:username]}/teams").to_return(200, [team2])
+
+        stub_api(:get, "/teams/#{team1[:id]}/users").to_return(200, [])
+        stub_api(:get, "/teams/#{team2[:id]}/users").to_return(200, [])
       end
 
-      before { allow(Sem::API::Teams).to receive(:list).and_return([team, another_team]) }
+      it "offers the setup of the first team" do
+        stdout, _stderr = sem_run!("teams:list")
 
-      it "calls the API" do
-        expect(Sem::API::Teams).to receive(:list)
-
-        sem_run("teams:list")
-      end
-
-      it "lists the teams" do
-        stdout, stderr, status = sem_run("teams:list")
-
-        msg = [
-          "ID                                    NAME                     PERMISSION  MEMBERS",
-          "3bc7ed43-ac8a-487e-b488-c38bc757a034  renderedtext/developers  write       72 members",
-          "fe3624cf-0cea-4d87-9dde-cb9ddacfefc0  tb-render/developers     admin       3 members"
-        ]
-
-        expect(stdout.strip).to eq(msg.join("\n"))
-        expect(stderr).to eq("")
-        expect(status).to eq(:ok)
+        expect(stdout).to include(team1[:id])
+        expect(stdout).to include(team2[:id])
       end
     end
 
-    context "when the user doesn't have any team" do
-      before { allow(Sem::API::Teams).to receive(:list).and_return([]) }
+    context "when the user has at least one team" do
+      before do
+        stub_api(:get, "/orgs").to_return(200, [org1, org2])
 
-      it "offers you to set up a team on sempaphore" do
-        stdout, stderr, status = sem_run("teams:list")
+        stub_api(:get, "/orgs/#{org1[:username]}/teams").to_return(200, [])
+        stub_api(:get, "/orgs/#{org2[:username]}/teams").to_return(200, [])
+      end
 
-        msg = [
-          "You don't have any teams on Semaphore.",
-          "",
-          "Create your first team:",
-          "",
-          "  sem teams:create ORG_NAME/TEAM",
-          "",
-          ""
-        ]
+      it "lists all teams" do
+        stdout, _stderr = sem_run!("teams:list")
 
-        expect(stdout).to eq(msg.join("\n"))
-        expect(stderr).to eq("")
-        expect(status).to eq(:ok)
+        expect(stdout).to include("Create your first team")
       end
     end
   end
 
   describe "#info" do
-    before { allow(Sem::API::Teams).to receive(:info).and_return(team) }
+    context "the team exists" do
+      let(:team) { ApiResponse.team(:name => "devs") }
+      let(:user) { ApiResponse.user }
 
-    it "calls the API" do
-      expect(Sem::API::Teams).to receive(:info).with("renderedtext", "developers")
+      before do
+        stub_api(:get, "/orgs/rt/teams").to_return(200, [team])
+        stub_api(:get, "/teams/#{team[:id]}/users").to_return(200, [user])
+      end
 
-      sem_run("teams:info renderedtext/developers")
+      it "shows detailed information about a project" do
+        stdout, _stderr = sem_run!("teams:info rt/devs")
+
+        expect(stdout).to include(team[:id])
+      end
     end
 
-    it "shows information about a team" do
-      stdout, stderr, status = sem_run("teams:info renderedtext/developers")
+    context "team not found" do
+      before do
+        stub_api(:get, "/orgs/rt/teams").to_return(200, [])
+      end
 
-      msg = [
-        "ID          3bc7ed43-ac8a-487e-b488-c38bc757a034",
-        "Name        renderedtext/developers",
-        "Permission  write",
-        "Members     72 members",
-        "Created     2017-08-01 13:14:40 +0200",
-        "Updated     2017-08-02 13:14:40 +0200"
-      ]
+      it "displays the error" do
+        stdout, _stderr, status = sem_run("teams:info rt/devs")
 
-      expect(stderr).to eq("")
-      expect(stdout.strip).to eq(msg.join("\n"))
-      expect(status).to eq(:ok)
+        expect(stdout).to include("Team rt/devs not found.")
+        expect(status).to eq(:fail)
+      end
     end
   end
 
   describe "#create" do
-    before { allow(Sem::API::Teams).to receive(:create).and_return(team) }
+    context "creation succeds" do
+      let(:team) { ApiResponse.team }
+      let(:user) { ApiResponse.user }
 
-    it "calls the API" do
-      expect(Sem::API::Teams).to receive(:create).with("renderedtext", :name => "developers", :permission => "write")
+      before do
+        stub_api(:post, "/orgs/rt/teams").to_return(200, team)
+        stub_api(:get, "/teams/#{team[:id]}/users").to_return(200, [user])
+      end
 
-      sem_run("teams:create renderedtext/developers --permission write")
+      it "displays the teams info" do
+        stdout, _stderr = sem_run!("teams:create rt/devs --permission admin")
+
+        expect(stdout).to include(team[:id])
+      end
     end
 
-    it "creates a team and displays it" do
-      stdout, stderr, status = sem_run("teams:create renderedtext/developers --permission write")
+    context "creation failes" do
+      before do
+        stub_api(:post, "/orgs/rt/teams").to_return(422, {})
+      end
 
-      msg = [
-        "ID          3bc7ed43-ac8a-487e-b488-c38bc757a034",
-        "Name        renderedtext/developers",
-        "Permission  write",
-        "Members     72 members",
-        "Created     2017-08-01 13:14:40 +0200",
-        "Updated     2017-08-02 13:14:40 +0200"
-      ]
+      it "displays the failure" do
+        stdout, _stderr, status = sem_run("teams:create rt/devs --permission owner")
 
-      expect(stderr).to eq("")
-      expect(stdout.strip).to eq(msg.join("\n"))
-      expect(status).to eq(:ok)
+        expect(stdout).to include("Team rt/devs not created.")
+        expect(status).to eq(:fail)
+      end
     end
   end
 
   describe "#rename" do
-    before { allow(Sem::API::Teams).to receive(:update).and_return(team) }
+    context "update succeds" do
+      let(:team) { ApiResponse.team }
+      let(:user) { ApiResponse.user }
 
-    it "calls the API" do
-      expect(Sem::API::Teams).to receive(:update).with("renderedtext", "admins", :name => "developers")
+      before do
+        stub_api(:get, "/orgs/rt/teams").to_return(200, [team])
+        stub_api(:get, "/teams/#{team[:id]}/users").to_return(200, [user])
 
-      sem_run("teams:rename renderedtext/admins renderedtext/developers")
-    end
+        stub_api(:patch, "/teams/#{team[:id]}").to_return(200, team)
+      end
 
-    context "org names are not matching" do
-      it "raises an exception" do
-        stdout, stderr, status = sem_run("teams:rename renderedtext/admins org/developers")
+      it "displays the team" do
+        stdout, _stderr = sem_run!("teams:rename rt/devs rt/admins")
 
-        msg = [
-          "[ERROR] Organization names not matching.",
-          "",
-          "Old team name \"renderedtext/admins\" and new team name \"org/developers\" are not in the same organization."
-        ]
-
-        expect(stderr.strip).to eq(msg.join("\n"))
-        expect(stdout.strip).to eq("")
-        expect(status).to eq(:system_error)
+        expect(stdout).to include(team[:id])
       end
     end
 
-    it "changes the team name" do
-      stdout, stderr, status = sem_run("teams:rename renderedtext/developers renderedtext/admins")
+    context "update fails" do
+      let(:team) { ApiResponse.team }
+      let(:user) { ApiResponse.user }
 
-      msg = [
-        "ID          3bc7ed43-ac8a-487e-b488-c38bc757a034",
-        "Name        renderedtext/developers",
-        "Permission  write",
-        "Members     72 members",
-        "Created     2017-08-01 13:14:40 +0200",
-        "Updated     2017-08-02 13:14:40 +0200"
-      ]
+      before do
+        stub_api(:get, "/orgs/rt/teams").to_return(200, [team])
+        stub_api(:get, "/teams/#{team[:id]}/users").to_return(200, [user])
 
-      expect(stderr).to eq("")
-      expect(stdout.strip).to eq(msg.join("\n"))
-      expect(status).to eq(:ok)
+        stub_api(:patch, "/teams/#{team[:id]}").to_return(422, {})
+      end
+
+      it "displays the team" do
+        stdout, _stderr, status = sem_run("teams:rename rt/devs rt/admins")
+
+        expect(stdout).to include("Team rt/devs not updated.")
+        expect(status).to eq(:fail)
+      end
     end
   end
 
   describe "#set-permission" do
-    before { allow(Sem::API::Teams).to receive(:update).and_return(team) }
+    context "update succeds" do
+      let(:team) { ApiResponse.team }
+      let(:user) { ApiResponse.user }
 
-    it "calls the API" do
-      expect(Sem::API::Teams).to receive(:update).with("renderedtext", "developers", :permission => "admin")
+      before do
+        stub_api(:get, "/orgs/rt/teams").to_return(200, [team])
+        stub_api(:get, "/teams/#{team[:id]}/users").to_return(200, [user])
 
-      sem_run("teams:set-permission renderedtext/developers admin")
-    end
+        stub_api(:patch, "/teams/#{team[:id]}").to_return(200, team)
+      end
 
-    context "setting an invalid permission" do
-      it "raises an exception" do
-        stdout, stderr, status = sem_run("teams:set-permission renderedtext/developers something")
+      it "displays the team" do
+        stdout, _stderr = sem_run!("teams:set-permission rt/devs --permission admin")
 
-        expected_message = "Permission \"something\" doesn't exist.\n" \
-          "Choose one of the following: read, write, admin."
-
-        expect(stderr.strip).to eql(expected_message)
-        expect(stdout.strip).to eql("")
-        expect(status).to eq(:system_error)
+        expect(stdout).to include(team[:id])
       end
     end
 
-    it "sets the permisssion level of the team" do
-      stdout, stderr, status = sem_run("teams:set-permission renderedtext/developers write")
+    context "update fails" do
+      let(:team) { ApiResponse.team }
+      let(:user) { ApiResponse.user }
 
-      msg = [
-        "ID          3bc7ed43-ac8a-487e-b488-c38bc757a034",
-        "Name        renderedtext/developers",
-        "Permission  write",
-        "Members     72 members",
-        "Created     2017-08-01 13:14:40 +0200",
-        "Updated     2017-08-02 13:14:40 +0200"
-      ]
+      before do
+        stub_api(:get, "/orgs/rt/teams").to_return(200, [team])
+        stub_api(:get, "/teams/#{team[:id]}/users").to_return(200, [user])
 
-      expect(stderr).to eq("")
-      expect(stdout.strip).to eq(msg.join("\n"))
-      expect(status).to eq(:ok)
+        stub_api(:patch, "/teams/#{team[:id]}").to_return(422, {})
+      end
+
+      it "displays the team" do
+        stdout, _stderr, status = sem_run("teams:set-permission rt/devs --permission admin")
+
+        expect(stdout).to include("Team rt/devs not updated.")
+        expect(status).to eq(:fail)
+      end
     end
   end
 
   describe "#delete" do
-    before { allow(Sem::API::Teams).to receive(:delete) }
+    let(:team) { ApiResponse.team }
 
-    it "calls the API" do
-      expect(Sem::API::Teams).to receive(:delete).with("renderedtext", "old-developers")
-
-      sem_run("teams:delete renderedtext/old-developers")
+    before do
+      stub_api(:get, "/orgs/rt/teams").to_return(200, [team])
+      stub_api(:delete, "/teams/#{team[:id]}").to_return(204, team)
     end
 
-    it "deletes the team" do
-      stdout, stderr, status = sem_run("teams:delete renderedtext/old-developers")
+    it "updates the name of the team" do
+      stdout, _stderr = sem_run("teams:delete rt/devs")
 
-      msg = [
-        "Deleted team renderedtext/old-developers"
-      ]
-
-      expect(stderr).to eq("")
-      expect(stdout.strip).to eq(msg.join("\n"))
-      expect(status).to eq(:ok)
+      expect(stdout).to include("Team rt/devs deleted")
     end
   end
 
   describe Sem::CLI::Teams::Members do
+    let(:team) { ApiResponse.team }
+
+    before do
+      stub_api(:get, "/orgs/rt/teams").to_return(200, [team])
+    end
+
     describe "#list" do
       context "when the team has several members" do
-        let(:user_0) { { :id => "ijovan" } }
-        let(:user_1) { { :id => "shiroyasha" } }
+        let(:user1) { ApiResponse.user }
+        let(:user2) { ApiResponse.user }
 
-        before { allow(Sem::API::Users).to receive(:list_for_team).and_return([user_0, user_1]) }
-
-        it "calls the users API" do
-          expect(Sem::API::Users).to receive(:list_for_team).with("renderedtext", "cli")
-
-          sem_run("teams:members:list renderedtext/cli")
+        before do
+          stub_api(:get, "/teams/#{team[:id]}/users").to_return(200, [user1, user2])
         end
 
         it "lists team members" do
-          stdout, stderr, status = sem_run("teams:members:list renderedtext/cli")
+          stdout, _stderr = sem_run!("teams:members:list rt/devs")
 
-          msg = [
-            "NAME",
-            "ijovan",
-            "shiroyasha"
-          ]
-
-          expect(stderr).to eq("")
-          expect(stdout.strip).to eq(msg.join("\n"))
-          expect(status).to eq(:ok)
+          expect(stdout).to include(user1[:username])
+          expect(stdout).to include(user2[:username])
         end
       end
 
       context "when the team has no members" do
-        before { allow(Sem::API::Users).to receive(:list_for_team).and_return([]) }
+        before do
+          stub_api(:get, "/teams/#{team[:id]}/users").to_return(200, [])
+        end
 
-        it "offers help adding your first member" do
-          stdout, stderr, status = sem_run("teams:members:list renderedtext/devs")
+        it "offers a way to add first user" do
+          stdout, _stderr = sem_run!("teams:members:list rt/devs")
 
-          msg = [
-            "You don't have any members in the team.",
-            "",
-            "Add your first member:",
-            "",
-            "  sem teams:members:add renderedtext/devs USERNAME",
-            "",
-            ""
-          ]
-
-          expect(stderr).to eq("")
-          expect(stdout).to eq(msg.join("\n"))
-          expect(status).to eq(:ok)
+          expect(stdout).to include("Add your first member")
         end
       end
     end
 
     describe "#add" do
-      before { allow(Sem::API::Users).to receive(:add_to_team) }
-
-      it "calls the users API" do
-        expect(Sem::API::Users).to receive(:add_to_team).with("renderedtext", "developers", "ijovan")
-
-        sem_run("teams:members:add renderedtext/developers ijovan")
+      before do
+        stub_api(:post, "/teams/#{team[:id]}/users/ijovan").to_return(204, "")
       end
 
       it "add a user to the team" do
-        stdout, stderr, status = sem_run("teams:members:add renderedtext/developers ijovan")
+        stdout, _stderr = sem_run!("teams:members:add rt/devs ijovan")
 
-        expect(stderr).to eq("")
-        expect(stdout.strip).to eq("User ijovan added to the team.")
-        expect(status).to eq(:ok)
+        expect(stdout).to include("User ijovan added to the team")
       end
     end
 
     describe "#remove" do
-      before { allow(Sem::API::Users).to receive(:remove_from_team) }
-
-      it "calls the users API" do
-        expect(Sem::API::Users).to receive(:remove_from_team).with("renderedtext", "developers", "ijovan")
-
-        sem_run("teams:members:remove renderedtext/developers ijovan")
+      before do
+        stub_api(:delete, "/teams/#{team[:id]}/users/ijovan").to_return(204, "")
       end
 
-      it "removes a user from the team" do
-        stdout, stderr, status = sem_run("teams:members:remove renderedtext/developers ijovan")
+      it "remove a user from the team" do
+        stdout, _stderr = sem_run!("teams:members:remove rt/devs ijovan")
 
-        expect(stderr).to eq("")
-        expect(stdout.strip).to eq("User ijovan removed from the team.")
-        expect(status).to eq(:ok)
+        expect(stdout).to include("User ijovan removed from the team")
       end
     end
   end
 
   describe Sem::CLI::Teams::Projects do
+    let(:team) { ApiResponse.team }
+
+    before do
+      stub_api(:get, "/orgs/rt/teams").to_return(200, [team])
+    end
+
     describe "#list" do
-      let(:project_0) { { :id => "3bc7ed43-ac8a-487e-b488-c38bc757a034", :name => "cli", :org => "renderedtext" } }
-      let(:project_1) { { :id => "fe3624cf-0cea-4d87-9dde-cb9ddacfefc0", :name => "api", :org => "renderedtext" } }
+      context "when the team has several members" do
+        let(:project) { ApiResponse.project }
 
-      before { allow(Sem::API::Projects).to receive(:list_for_team).and_return([project_0, project_1]) }
+        before do
+          stub_api(:get, "/teams/#{team[:id]}/projects").to_return(200, [project])
+        end
 
-      it "calls the projects API" do
-        expect(Sem::API::Projects).to receive(:list_for_team).with("renderedtext", "cli")
+        it "lists team members" do
+          stdout, _stderr = sem_run!("teams:projects:list rt/devs")
 
-        sem_run("teams:projects:list renderedtext/cli")
+          expect(stdout).to include(project[:id])
+        end
       end
 
-      it "lists projects in the team" do
-        stdout, stderr, status = sem_run("teams:projects:list renderedtext/cli")
+      context "when the team has no members" do
+        before do
+          stub_api(:get, "/teams/#{team[:id]}/projects").to_return(200, [])
+        end
 
-        msg = [
-          "ID                                    NAME",
-          "3bc7ed43-ac8a-487e-b488-c38bc757a034  renderedtext/cli",
-          "fe3624cf-0cea-4d87-9dde-cb9ddacfefc0  renderedtext/api"
-        ]
+        it "offers a way to add first project" do
+          stdout, _stderr = sem_run!("teams:projects:list rt/devs")
 
-        expect(stderr).to eq("")
-        expect(stdout.strip).to eq(msg.join("\n"))
-        expect(status).to eq(:ok)
+          expect(stdout).to include("Add your first project")
+        end
       end
     end
 
     describe "#add" do
-      before { allow(Sem::API::Projects).to receive(:add_to_team) }
+      let(:project) { ApiResponse.project(:name => "cli") }
 
-      it "calls the projects API" do
-        expect(Sem::API::Projects).to receive(:add_to_team).with("renderedtext", "developers", "cli")
-
-        sem_run("teams:projects:add renderedtext/developers renderedtext/cli")
-      end
-
-      context "org names are not matching" do
-        it "raises an exception" do
-          stdout, stderr, status = sem_run("teams:projects:add renderedtext/developers org/cli")
-
-          msg = [
-            "[ERROR] Organization names not matching.",
-            "",
-            "Team \"renderedtext/developers\" and project \"org/cli\" are not in the same organization."
-          ]
-
-          expect(stderr.strip).to eq(msg.join("\n"))
-          expect(stdout.strip).to eq("")
-          expect(status).to eq(:system_error)
-        end
+      before do
+        stub_api(:get, "/orgs/rt/projects/?name=cli").to_return(200, [project])
+        stub_api(:post, "/teams/#{team[:id]}/projects/#{project[:id]}").to_return(204, "")
       end
 
       it "add a project to the team" do
-        stdout, stderr, status = sem_run("teams:projects:add renderedtext/developers renderedtext/cli")
+        stdout, _stderr = sem_run!("teams:projects:add rt/devs rt/cli")
 
-        expect(stderr).to eq("")
-        expect(stdout.strip).to eq("Project renderedtext/cli added to the team.")
-        expect(status).to eq(:ok)
+        expect(stdout).to include("Project rt/cli added to the team")
       end
     end
 
     describe "#remove" do
-      before { allow(Sem::API::Projects).to receive(:remove_from_team) }
+      let(:project) { ApiResponse.project(:name => "cli") }
 
-      it "calls the projects API" do
-        expect(Sem::API::Projects).to receive(:remove_from_team).with("renderedtext", "developers", "api")
-
-        sem_run("teams:projects:remove renderedtext/developers renderedtext/api")
+      before do
+        stub_api(:get, "/orgs/rt/projects/?name=cli").to_return(200, [project])
+        stub_api(:delete, "/teams/#{team[:id]}/projects/#{project[:id]}").to_return(204, "")
       end
 
-      context "org names are not matching" do
-        it "raises an exception" do
-          stdout, stderr, status = sem_run("teams:projects:remove renderedtext/developers org/api")
+      it "remove a user from the team" do
+        stdout, _stderr = sem_run!("teams:projects:remove rt/devs rt/cli")
 
-          msg = [
-            "[ERROR] Organization names not matching.",
-            "",
-            "Team \"renderedtext/developers\" and project \"org/api\" are not in the same organization."
-          ]
-
-          expect(stderr.strip).to eq(msg.join("\n"))
-          expect(stdout.strip).to eq("")
-          expect(status).to eq(:system_error)
-        end
-      end
-
-      it "removes a project from the team" do
-        stdout, stderr, status = sem_run("teams:projects:remove renderedtext/developers renderedtext/api")
-
-        expect(stderr).to eq("")
-        expect(stdout.strip).to eq("Project renderedtext/api removed from the team.")
-        expect(status).to eq(:ok)
+        expect(stdout).to include("Project rt/cli removed from the team")
       end
     end
   end
 
   describe Sem::CLI::Teams::SharedConfigs do
+    let(:team) { ApiResponse.team }
+
+    before do
+      stub_api(:get, "/orgs/rt/teams").to_return(200, [team])
+    end
+
     describe "#list" do
-      let(:config_0) do
-        {
-          :id => "3bc7ed43-ac8a-487e-b488-c38bc757a034",
-          :org => "renderedtext",
-          :name => "aws-tokens",
-          :config_files => 2,
-          :env_vars => 1
-        }
+      context "when the team has several shared configs" do
+        let(:config1) { ApiResponse.shared_config(:name => "tokens") }
+        let(:config2) { ApiResponse.shared_config(:name => "secrets") }
+
+        before do
+          stub_api(:get, "/teams/#{team[:id]}/shared_configs").to_return(200, [config1, config2])
+
+          stub_api(:get, "/shared_configs/#{config1[:id]}/config_files").to_return(200, [])
+          stub_api(:get, "/shared_configs/#{config2[:id]}/config_files").to_return(200, [])
+          stub_api(:get, "/shared_configs/#{config1[:id]}/env_vars").to_return(200, [])
+          stub_api(:get, "/shared_configs/#{config2[:id]}/env_vars").to_return(200, [])
+        end
+
+        it "lists team's shared configs" do
+          stdout, _stderr = sem_run!("teams:shared-configs:list rt/devs")
+
+          expect(stdout).to include(config1[:name])
+          expect(stdout).to include(config2[:name])
+        end
       end
 
-      let(:config_1) do
-        {
-          :id => "fe3624cf-0cea-4d87-9dde-cb9ddacfefc0",
-          :org => "renderedtext",
-          :name => "gemfury",
-          :config_files => 1,
-          :env_vars => 2
-        }
-      end
+      context "when the team has no members" do
+        before do
+          stub_api(:get, "/teams/#{team[:id]}/shared_configs").to_return(200, [])
+        end
 
-      before { allow(Sem::API::SharedConfigs).to receive(:list_for_team).and_return([config_0, config_1]) }
+        it "offers a way to add first project" do
+          stdout, _stderr = sem_run!("teams:shared-configs:list rt/devs")
 
-      it "calls the configs API" do
-        expect(Sem::API::SharedConfigs).to receive(:list_for_team).with("renderedtext", "aws-tokens")
-
-        sem_run("teams:shared-configs:list renderedtext/aws-tokens")
-      end
-
-      it "lists shared configurations in the team" do
-        stdout, stderr, status = sem_run("teams:shared-configs:list renderedtext/aws-tokens")
-
-        msg = [
-          "ID                                    NAME                     CONFIG FILES  ENV VARS",
-          "3bc7ed43-ac8a-487e-b488-c38bc757a034  renderedtext/aws-tokens             2         1",
-          "fe3624cf-0cea-4d87-9dde-cb9ddacfefc0  renderedtext/gemfury                1         2"
-        ]
-
-        expect(stderr).to eq("")
-        expect(stdout.strip).to eq(msg.join("\n"))
-        expect(status).to eq(:ok)
+          expect(stdout).to include("Add your first shared configuration")
+        end
       end
     end
 
     describe "#add" do
-      before { allow(Sem::API::SharedConfigs).to receive(:add_to_team) }
+      let(:config) { ApiResponse.shared_config(:name => "tokens") }
 
-      it "calls the projects API" do
-        expect(Sem::API::SharedConfigs).to receive(:add_to_team).with("rt", "developers", "aws-tokens")
-
-        sem_run("teams:shared-configs:add rt/developers rt/aws-tokens")
+      before do
+        stub_api(:get, "/orgs/rt/shared_configs").to_return(200, [config])
+        stub_api(:post, "/teams/#{team[:id]}/shared_configs/#{config[:id]}").to_return(204, "")
       end
 
-      context "org names are not matching" do
-        it "raises an exception" do
-          stdout, stderr, status = sem_run("teams:shared-configs:add rt/developers org/aws-tokens")
+      it "add a shared_config to the team" do
+        stdout, _stderr = sem_run!("teams:shared-configs:add rt/devs rt/tokens")
 
-          msg = [
-            "[ERROR] Organization names not matching.",
-            "",
-            "Team \"rt/developers\" and shared configuration \"org/aws-tokens\" are not in the same organization."
-          ]
-
-          expect(stderr.strip).to eq(msg.join("\n"))
-          expect(stdout.strip).to eq("")
-          expect(status).to eq(:system_error)
-        end
-      end
-
-      it "add a project to the team" do
-        stdout, stderr, status = sem_run("teams:shared-configs:add renderedtext/developers renderedtext/aws-tokens")
-
-        expect(stderr).to eq("")
-        expect(stdout.strip).to eq("Shared Configuration renderedtext/aws-tokens added to the team.")
-        expect(status).to eq(:ok)
+        expect(stdout).to include("Shared Configuration rt/tokens added to the team")
       end
     end
 
     describe "#remove" do
-      before { allow(Sem::API::SharedConfigs).to receive(:remove_from_team) }
+      let(:config) { ApiResponse.shared_config(:name => "tokens") }
 
-      it "calls the projects API" do
-        expect(Sem::API::SharedConfigs).to receive(:remove_from_team).with("rt", "developers", "tokens")
-
-        sem_run("teams:shared-configs:remove rt/developers rt/tokens")
+      before do
+        stub_api(:get, "/orgs/rt/shared_configs").to_return(200, [config])
+        stub_api(:delete, "/teams/#{team[:id]}/shared_configs/#{config[:id]}").to_return(204, "")
       end
 
-      context "org names are not matching" do
-        it "raises an exception" do
-          stdout, stderr, status = sem_run("teams:shared-configs:remove rt/developers org/tokens")
+      it "remove a shared_config from the team" do
+        stdout, _stderr = sem_run!("teams:shared-configs:remove rt/devs rt/tokens")
 
-          msg = [
-            "[ERROR] Organization names not matching.",
-            "",
-            "Team \"rt/developers\" and shared configuration \"org/tokens\" are not in the same organization."
-          ]
-
-          expect(stderr.strip).to eq(msg.join("\n"))
-          expect(stdout.strip).to eq("")
-          expect(status).to eq(:system_error)
-        end
-      end
-
-      it "removes a project from the team" do
-        stdout, stderr, status = sem_run("teams:shared-configs:remove renderedtext/developers renderedtext/aws-tokens")
-
-        expect(stderr).to eq("")
-        expect(stdout.strip).to eq("Shared Configuration renderedtext/aws-tokens removed from the team.")
-        expect(status).to eq(:ok)
+        expect(stdout).to include("Shared Configuration rt/tokens removed from the team")
       end
     end
   end
