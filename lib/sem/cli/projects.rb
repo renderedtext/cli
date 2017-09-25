@@ -61,6 +61,9 @@ class Sem::CLI::Projects < Dracula
 
       project.add_shared_config(shared_config)
 
+      shared_config.env_vars.each { |var| project.add_env_var(var) }
+      shared_config.files.each { |file| project.add_config_file(file) }
+
       puts "Shared Configuration #{shared_config_name} added to the project."
     end
 

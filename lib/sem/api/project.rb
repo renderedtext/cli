@@ -55,4 +55,12 @@ class Sem::API::Project < SimpleDelegator
     Sem::API::Base.client.env_vars.list_for_project(id).map { |var| Sem::API::EnvVar.new(var) }
   end
 
+  def add_env_var(env_var)
+    Sem::API::Base.client.env_vars.attach_to_project(env_var.id, id)
+  end
+
+  def add_config_file(config_file)
+    Sem::API::Base.client.config_files.attach_to_project(config_file.id, id)
+  end
+
 end

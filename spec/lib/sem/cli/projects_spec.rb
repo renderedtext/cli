@@ -141,11 +141,19 @@ describe Sem::CLI::Projects do
 
     describe "#add" do
       let(:shared_config) { ApiResponse.shared_config(:name => "tokens") }
+      let(:file) { ApiResponse.file }
+      let(:env_var) { ApiResponse.env_var }
 
       before do
         stub_api(:get, "/orgs/rt/projects/?name=cli").to_return(200, [project])
         stub_api(:get, "/orgs/rt/shared_configs").to_return(200, [shared_config])
         stub_api(:post, "/projects/#{project[:id]}/shared_configs/#{shared_config[:id]}").to_return(204, "")
+
+        stub_api(:get, "/shared_configs/#{shared_config[:id]}/config_files").to_return(200, [file])
+        stub_api(:get, "/shared_configs/#{shared_config[:id]}/env_vars").to_return(200, [env_var])
+
+        stub_api(:post, "/projects/#{project[:id]}/env_vars/#{env_var[:id]}").to_return(204, "")
+        stub_api(:post, "/projects/#{project[:id]}/config_files/#{file[:id]}").to_return(204, "")
       end
 
       it "adds the shared configuration to the project" do
