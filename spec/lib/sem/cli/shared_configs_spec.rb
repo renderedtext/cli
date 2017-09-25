@@ -119,7 +119,7 @@ describe Sem::CLI::SharedConfigs do
 
     context "update succeds" do
       before do
-        stub_api(:patch, "/shared_configs/#{shared_config[:id]}").to_return(200, shared_config)
+        stub_api(:patch, "/shared_configs/#{shared_config[:id]}", :name => "secrets").to_return(200, shared_config)
 
         stub_api(:get, "/shared_configs/#{shared_config[:id]}/config_files").to_return(200, [])
         stub_api(:get, "/shared_configs/#{shared_config[:id]}/env_vars").to_return(200, [])

@@ -42,7 +42,7 @@ class Sem::API::Team < SimpleDelegator
   def update(args)
     new_team = Sem::API::Base.client.teams.update(id, args)
 
-    raise Sem::Errors::ResourceNotUpdated.new("Team", [@org_name, name]) if new_team.nil?
+    raise Sem::Errors::ResourceNotUpdated.new("Team", [@org_name, name]) unless new_team
 
     self.class.new(@org_name, new_team)
   end
