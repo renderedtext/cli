@@ -21,7 +21,7 @@ Gem::Specification.new do |spec|
   spec.executables   = spec.files.grep(%r{^exe/}) { |f| File.basename(f) }
   spec.require_paths = ["lib"]
 
-  spec.add_dependency "semaphore_client", "2.1.3"
+  spec.add_dependency "semaphore_client", "2.3.1"
   spec.add_dependency "dracula", "~> 0.3.0"
   spec.add_dependency "pmap", "~> 1.1.1"
 
