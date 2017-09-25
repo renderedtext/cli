@@ -18,6 +18,28 @@ class Sem::CLI::Projects < Dracula
     Sem::Views::Projects.info(project)
   end
 
+  class Files < Dracula
+
+    desc "list", "list configuration files on project"
+    def list(project_name)
+      project = Sem::API::Project.find!(project_name)
+
+      Sem::Views::Files.list(project.config_files)
+    end
+
+  end
+
+  class EnvVars < Dracula
+
+    desc "list", "list environment variables on project"
+    def list(project_name)
+      project = Sem::API::Project.find!(project_name)
+
+      Sem::Views::EnvVars.list(project.env_vars)
+    end
+
+  end
+
   class SharedConfigs < Dracula
 
     desc "list", "list shared configurations on a project"
@@ -39,6 +61,9 @@ class Sem::CLI::Projects < Dracula
 
       project.add_shared_config(shared_config)
 
+      shared_config.env_vars.each { |var| project.add_env_var(var) }
+      shared_config.files.each { |file| project.add_config_file(file) }
+
       puts "Shared Configuration #{shared_config_name} added to the project."
     end
 
@@ -55,4 +80,6 @@ class Sem::CLI::Projects < Dracula
   end
 
   register "shared-configs", "manage shared configurations", SharedConfigs
+  register "files", "manage projects' config files", Files
+  register "env-vars", "manage projects' environment variables", EnvVars
 end

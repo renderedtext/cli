@@ -25,6 +25,10 @@ class IOStub
     @data = ""
   end
 
+  def tty?
+    @original_io.tty?
+  end
+
   def write(data)
     @data += data
     @original_io.write(data)

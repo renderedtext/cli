@@ -66,6 +66,38 @@ describe Sem::CLI::Projects do
     end
   end
 
+  describe Sem::CLI::Projects::Files do
+    let(:project) { ApiResponse.project(:name => "cli") }
+    let(:file) { ApiResponse.file }
+
+    before do
+      stub_api(:get, "/orgs/rt/projects/?name=cli").to_return(200, [project])
+      stub_api(:get, "/projects/#{project[:id]}/config_files").to_return(200, [file])
+    end
+
+    it "lists files on project" do
+      stdout, _stderr = sem_run!("projects:files:list rt/cli")
+
+      expect(stdout).to include(file[:id])
+    end
+  end
+
+  describe Sem::CLI::Projects::EnvVars do
+    let(:project) { ApiResponse.project(:name => "cli") }
+    let(:env_var) { ApiResponse.env_var }
+
+    before do
+      stub_api(:get, "/orgs/rt/projects/?name=cli").to_return(200, [project])
+      stub_api(:get, "/projects/#{project[:id]}/env_vars").to_return(200, [env_var])
+    end
+
+    it "lists files on project" do
+      stdout, _stderr = sem_run!("projects:env-vars:list rt/cli")
+
+      expect(stdout).to include(env_var[:id])
+    end
+  end
+
   describe Sem::CLI::Projects::SharedConfigs do
     let(:project) { ApiResponse.project(:name => "cli") }
 
@@ -109,11 +141,19 @@ describe Sem::CLI::Projects do
 
     describe "#add" do
       let(:shared_config) { ApiResponse.shared_config(:name => "tokens") }
+      let(:file) { ApiResponse.file }
+      let(:env_var) { ApiResponse.env_var }
 
       before do
         stub_api(:get, "/orgs/rt/projects/?name=cli").to_return(200, [project])
         stub_api(:get, "/orgs/rt/shared_configs").to_return(200, [shared_config])
         stub_api(:post, "/projects/#{project[:id]}/shared_configs/#{shared_config[:id]}").to_return(204, "")
+
+        stub_api(:get, "/shared_configs/#{shared_config[:id]}/config_files").to_return(200, [file])
+        stub_api(:get, "/shared_configs/#{shared_config[:id]}/env_vars").to_return(200, [env_var])
+
+        stub_api(:post, "/projects/#{project[:id]}/env_vars/#{env_var[:id]}").to_return(204, "")
+        stub_api(:post, "/projects/#{project[:id]}/config_files/#{file[:id]}").to_return(204, "")
       end
 
       it "adds the shared configuration to the project" do
