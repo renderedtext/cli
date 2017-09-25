@@ -23,7 +23,7 @@ class Sem::Views::Teams < Sem::Views::Base
       ["ID", team.id],
       ["Name", team.full_name],
       ["Permission", team.permission],
-      ["Members", team.users.count.to_s],
+      ["Members", "#{team.users.count} members"],
       ["Created", team.created_at],
       ["Updated", team.updated_at]
     ]
