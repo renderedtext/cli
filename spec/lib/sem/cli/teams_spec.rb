@@ -116,7 +116,7 @@ describe Sem::CLI::Teams do
         stub_api(:get, "/orgs/rt/teams").to_return(200, [team])
         stub_api(:get, "/teams/#{team[:id]}/users").to_return(200, [user])
 
-        stub_api(:patch, "/teams/#{team[:id]}").to_return(200, team)
+        stub_api(:patch, "/teams/#{team[:id]}", :name => "admins").to_return(200, team)
       end
 
       it "displays the team" do
