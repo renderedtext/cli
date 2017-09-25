@@ -85,14 +85,6 @@ class Sem::API::SharedConfig < SimpleDelegator
   end
 
   def update!(args)
-    if args[:name]
-      new_org_name, new_name = Sem::SRN.parse_shared_config(args[:name])
-
-      abort "Shared Configuration can't change its organization" unless new_org_name == org_name
-
-      args[:name] = new_name
-    end
-
     shared_config = Sem::API::Base.client.shared_configs.update(id, args)
 
     if shared_config.nil?

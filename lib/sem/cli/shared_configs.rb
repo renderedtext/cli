@@ -27,8 +27,13 @@ class Sem::CLI::SharedConfigs < Dracula
 
   desc "rename", "rename a shared configuration"
   def rename(old_shared_config_name, new_shared_config_name)
+    old_org_name, _old_name = Sem::SRN.parse_shared_config(old_shared_config_name)
+    new_org_name, new_name = Sem::SRN.parse_shared_config(new_shared_config_name)
+
+    abort "Shared Configuration can't change its organization" unless new_org_name == old_org_name
+
     shared_config = Sem::API::SharedConfig.find!(old_shared_config_name)
-    shared_config = shared_config.update!(:name => new_shared_config_name)
+    shared_config = shared_config.update!(:name => new_name)
 
     Sem::Views::SharedConfigs.info(shared_config)
   end

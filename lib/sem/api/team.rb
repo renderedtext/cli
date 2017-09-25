@@ -40,14 +40,6 @@ class Sem::API::Team < SimpleDelegator
   end
 
   def update(args)
-    if args[:name]
-      new_org_name, new_name = Sem::SRN.parse_team(args[:name])
-
-      abort "Team can't change its organization" unless new_org_name == org_name
-
-      args[:name] = new_name
-    end
-
     new_team = Sem::API::Base.client.teams.update(id, args)
 
     raise Sem::Errors::ResourceNotUpdated.new("Team", [@org_name, name]) unless new_team

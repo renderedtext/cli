@@ -30,8 +30,13 @@ class Sem::CLI::Teams < Dracula
 
   desc "rename", "change the name of the team"
   def rename(old_team_name, new_team_name)
+    old_org_name, _old_name = Sem::SRN.parse_team(old_team_name)
+    new_org_name, new_name = Sem::SRN.parse_team(new_team_name)
+
+    abort "Team can't change its organization" unless new_org_name == old_org_name
+
     team = Sem::API::Team.find!(old_team_name)
-    team = team.update(:name => new_team_name)
+    team = team.update(:name => new_name)
 
     Sem::Views::Teams.info(team)
   end
