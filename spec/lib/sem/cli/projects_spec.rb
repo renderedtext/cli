@@ -66,6 +66,38 @@ describe Sem::CLI::Projects do
     end
   end
 
+  describe Sem::CLI::Projects::Files do
+    let(:project) { ApiResponse.project(:name => "cli") }
+    let(:file) { ApiResponse.file }
+
+    before do
+      stub_api(:get, "/orgs/rt/projects/?name=cli").to_return(200, [project])
+      stub_api(:get, "/projects/#{project[:id]}/config_files").to_return(200, [file])
+    end
+
+    it "lists files on project" do
+      stdout, _stderr = sem_run!("projects:files:list rt/cli")
+
+      expect(stdout).to include(file[:id])
+    end
+  end
+
+  describe Sem::CLI::Projects::EnvVars do
+    let(:project) { ApiResponse.project(:name => "cli") }
+    let(:env_var) { ApiResponse.env_var }
+
+    before do
+      stub_api(:get, "/orgs/rt/projects/?name=cli").to_return(200, [project])
+      stub_api(:get, "/projects/#{project[:id]}/env_vars").to_return(200, [env_var])
+    end
+
+    it "lists files on project" do
+      stdout, _stderr = sem_run!("projects:env-vars:list rt/cli")
+
+      expect(stdout).to include(env_var[:id])
+    end
+  end
+
   describe Sem::CLI::Projects::SharedConfigs do
     let(:project) { ApiResponse.project(:name => "cli") }
 
