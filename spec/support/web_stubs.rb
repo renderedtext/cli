@@ -11,13 +11,13 @@ module WebStubs
       @request_body = request_body
     end
 
-    def to_return(code, body)
+    def to_return(code, body, headers = {})
       url = "https://api.semaphoreci.com/v2#{@path}"
 
       stub = WebMock.stub_request(@method, url)
       stub = stub.with(:body => @request_body.to_json) if @request_body
 
-      stub.to_return(:status => code, :body => body.to_json)
+      stub.to_return(:status => code, :body => body.to_json, :headers => headers)
     end
   end
 

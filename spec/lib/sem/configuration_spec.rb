@@ -18,7 +18,7 @@ describe Sem::Configuration do
     end
 
     context "listing orgs fails" do
-      before { allow(orgs_api).to receive(:list!).and_raise(SemaphoreClient::Exceptions::RequestFailed) }
+      before { allow(orgs_api).to receive(:list!).and_raise(SemaphoreClient::Exceptions::Base) }
 
       it "return false" do
         expect(Sem::Configuration.valid_auth_token?(auth_token)).to eq(false)

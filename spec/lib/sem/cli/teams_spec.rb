@@ -8,8 +8,8 @@ describe Sem::CLI::Teams do
     let(:org2) { ApiResponse.organization(:username => "z-fighters") }
 
     context "when the user has no teams" do
-      let(:team1) { ApiResponse.team }
-      let(:team2) { ApiResponse.team }
+      let(:team1) { ApiResponse.team(:name => "team-a") }
+      let(:team2) { ApiResponse.team(:name => "team-b") }
 
       before do
         stub_api(:get, "/orgs").to_return(200, [org1, org2])
@@ -21,11 +21,34 @@ describe Sem::CLI::Teams do
         stub_api(:get, "/teams/#{team2[:id]}/users").to_return(200, [])
       end
 
-      it "offers the setup of the first team" do
+      it "lists the teams" do
         stdout, _stderr = sem_run!("teams:list")
 
-        expect(stdout).to include(team1[:id])
-        expect(stdout).to include(team2[:id])
+        expect(stdout).to include(team1[:name])
+        expect(stdout).to include(team2[:name])
+      end
+    end
+
+    context "when the user has so many teams that it needs to be paginated via api" do
+      let(:team1) { ApiResponse.team(:name => "team-a") }
+      let(:team2) { ApiResponse.team(:name => "team-b") }
+
+      before do
+        stub_api(:get, "/orgs").to_return(200, [org1])
+
+        next_link = "<https://api.semaphoreci.com/v2/orgs/#{org1[:username]}/teams?page=2>; rel=\"next\""
+        stub_api(:get, "/orgs/#{org1[:username]}/teams").to_return(200, [team1], "Link" => next_link)
+        stub_api(:get, "/orgs/#{org1[:username]}/teams?page=2").to_return(200, [team2])
+
+        stub_api(:get, "/teams/#{team1[:id]}/users").to_return(200, [])
+        stub_api(:get, "/teams/#{team2[:id]}/users").to_return(200, [])
+      end
+
+      it "lists all teams" do
+        stdout, _stderr = sem_run!("teams:list")
+
+        expect(stdout).to include(team1[:name])
+        expect(stdout).to include(team2[:name])
       end
     end
 
@@ -301,7 +324,7 @@ describe Sem::CLI::Teams do
       let(:project) { ApiResponse.project(:name => "cli") }
 
       before do
-        stub_api(:get, "/orgs/rt/projects/?name=cli").to_return(200, [project])
+        stub_api(:get, "/orgs/rt/projects?name=cli").to_return(200, [project])
         stub_api(:post, "/teams/#{team[:id]}/projects/#{project[:id]}").to_return(204, "")
       end
 
@@ -316,7 +339,7 @@ describe Sem::CLI::Teams do
       let(:project) { ApiResponse.project(:name => "cli") }
 
       before do
-        stub_api(:get, "/orgs/rt/projects/?name=cli").to_return(200, [project])
+        stub_api(:get, "/orgs/rt/projects?name=cli").to_return(200, [project])
         stub_api(:delete, "/teams/#{team[:id]}/projects/#{project[:id]}").to_return(204, "")
       end
 

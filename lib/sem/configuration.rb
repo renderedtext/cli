@@ -16,7 +16,7 @@ module Sem
         client.orgs.list!
 
         true
-      rescue SemaphoreClient::Exceptions::RequestFailed
+      rescue SemaphoreClient::Exceptions::Base
         false
       end
 
