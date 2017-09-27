@@ -46,7 +46,7 @@ describe Sem::CLI::Projects do
       let(:project) { ApiResponse.project }
 
       it "shows detailed information about a project" do
-        stub_api(:get, "/orgs/rt/projects/?name=cli").to_return(200, [project])
+        stub_api(:get, "/orgs/rt/projects?name=cli").to_return(200, [project])
 
         stdout, _stderr = sem_run!("projects:info rt/cli")
 
@@ -56,7 +56,7 @@ describe Sem::CLI::Projects do
 
     context "project not found on semaphore" do
       it "shows project not found" do
-        stub_api(:get, "/orgs/rt/projects/?name=cli").to_return(404, [])
+        stub_api(:get, "/orgs/rt/projects?name=cli").to_return(404, [])
 
         stdout, _stderr, status = sem_run("projects:info rt/cli")
 
@@ -71,7 +71,7 @@ describe Sem::CLI::Projects do
     let(:file) { ApiResponse.file }
 
     before do
-      stub_api(:get, "/orgs/rt/projects/?name=cli").to_return(200, [project])
+      stub_api(:get, "/orgs/rt/projects?name=cli").to_return(200, [project])
       stub_api(:get, "/projects/#{project[:id]}/config_files").to_return(200, [file])
     end
 
@@ -87,7 +87,7 @@ describe Sem::CLI::Projects do
     let(:env_var) { ApiResponse.env_var }
 
     before do
-      stub_api(:get, "/orgs/rt/projects/?name=cli").to_return(200, [project])
+      stub_api(:get, "/orgs/rt/projects?name=cli").to_return(200, [project])
       stub_api(:get, "/projects/#{project[:id]}/env_vars").to_return(200, [env_var])
     end
 
@@ -107,7 +107,7 @@ describe Sem::CLI::Projects do
         let(:shared_config2) { ApiResponse.shared_config }
 
         before do
-          stub_api(:get, "/orgs/rt/projects/?name=cli").to_return(200, [project])
+          stub_api(:get, "/orgs/rt/projects?name=cli").to_return(200, [project])
           stub_api(:get, "/projects/#{project[:id]}/shared_configs").to_return(200, [shared_config1, shared_config2])
 
           stub_api(:get, "/shared_configs/#{shared_config1[:id]}/config_files").to_return(200, [])
@@ -127,7 +127,7 @@ describe Sem::CLI::Projects do
 
       context "no shared_configuration attached to the project" do
         before do
-          stub_api(:get, "/orgs/rt/projects/?name=cli").to_return(200, [project])
+          stub_api(:get, "/orgs/rt/projects?name=cli").to_return(200, [project])
           stub_api(:get, "/projects/#{project[:id]}/shared_configs").to_return(200, [])
         end
 
@@ -145,7 +145,7 @@ describe Sem::CLI::Projects do
       let(:env_var) { ApiResponse.env_var }
 
       before do
-        stub_api(:get, "/orgs/rt/projects/?name=cli").to_return(200, [project])
+        stub_api(:get, "/orgs/rt/projects?name=cli").to_return(200, [project])
         stub_api(:get, "/orgs/rt/shared_configs").to_return(200, [shared_config])
         stub_api(:post, "/projects/#{project[:id]}/shared_configs/#{shared_config[:id]}").to_return(204, "")
 
@@ -167,7 +167,7 @@ describe Sem::CLI::Projects do
       let(:shared_config) { ApiResponse.shared_config(:name => "tokens") }
 
       before do
-        stub_api(:get, "/orgs/rt/projects/?name=cli").to_return(200, [project])
+        stub_api(:get, "/orgs/rt/projects?name=cli").to_return(200, [project])
         stub_api(:get, "/orgs/rt/shared_configs").to_return(200, [shared_config])
 
         stub_api(:delete, "/projects/#{project[:id]}/shared_configs/#{shared_config[:id]}").to_return(204, "")

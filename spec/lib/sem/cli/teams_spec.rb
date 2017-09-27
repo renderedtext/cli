@@ -301,7 +301,7 @@ describe Sem::CLI::Teams do
       let(:project) { ApiResponse.project(:name => "cli") }
 
       before do
-        stub_api(:get, "/orgs/rt/projects/?name=cli").to_return(200, [project])
+        stub_api(:get, "/orgs/rt/projects?name=cli").to_return(200, [project])
         stub_api(:post, "/teams/#{team[:id]}/projects/#{project[:id]}").to_return(204, "")
       end
 
@@ -316,7 +316,7 @@ describe Sem::CLI::Teams do
       let(:project) { ApiResponse.project(:name => "cli") }
 
       before do
-        stub_api(:get, "/orgs/rt/projects/?name=cli").to_return(200, [project])
+        stub_api(:get, "/orgs/rt/projects?name=cli").to_return(200, [project])
         stub_api(:delete, "/teams/#{team[:id]}/projects/#{project[:id]}").to_return(204, "")
       end
 
