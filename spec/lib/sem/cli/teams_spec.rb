@@ -273,14 +273,31 @@ describe Sem::CLI::Teams do
     end
 
     describe "#remove" do
-      before do
-        stub_api(:delete, "/teams/#{team[:id]}/users/ijovan").to_return(204, "")
+      context "user is a member of the team" do
+        let(:user) { ApiResponse.user }
+
+        before do
+          stub_api(:get, "/teams/#{team[:id]}/users").to_return(200, [user])
+          stub_api(:delete, "/teams/#{team[:id]}/users/john-snow").to_return(204, "")
+        end
+
+        it "remove a user from the team" do
+          stdout, _stderr = sem_run!("teams:members:remove rt/devs john-snow")
+
+          expect(stdout).to include("User john-snow removed from the team.")
+        end
       end
 
-      it "remove a user from the team" do
-        stdout, _stderr = sem_run!("teams:members:remove rt/devs ijovan")
+      context "user isn't a member of the team" do
+        before do
+          stub_api(:get, "/teams/#{team[:id]}/users").to_return(200, [])
+        end
 
-        expect(stdout).to include("User ijovan removed from the team")
+        it "remove a user from the team" do
+          stdout, _stderr = sem_run!("teams:members:remove rt/devs john-snow")
+
+          expect(stdout).to include("User john-snow is not a member of the team.")
+        end
       end
     end
   end

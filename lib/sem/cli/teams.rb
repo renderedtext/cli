@@ -85,9 +85,14 @@ class Sem::CLI::Teams < Dracula
     desc "remove", "removes a user from the team"
     def remove(team_name, username)
       team = Sem::API::Team.find!(team_name)
-      team.remove_user(username)
 
-      puts "User #{username} removed from the team."
+      if team.users.map(&:username).include?(username)
+        team.remove_user(username)
+
+        puts "User #{username} removed from the team."
+      else
+        puts "User #{username} is not a member of the team."
+      end
     end
   end
 
