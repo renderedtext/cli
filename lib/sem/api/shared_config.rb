@@ -78,7 +78,7 @@ class Sem::API::SharedConfig < SimpleDelegator
     env_var = env_vars.find { |var| var.name == name }
 
     if env_var.nil?
-      raise Sem::Errors::ResourceNotCreated.new("Environment Variable", [org_name, name])
+      raise Sem::Errors::ResourceNotFound.new("Environment Variable", [org_name, name])
     end
 
     Sem::API::Base.client.env_vars.delete(env_var.id)
