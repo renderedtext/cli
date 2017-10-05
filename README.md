@@ -13,8 +13,36 @@ For more info about Semaphore see <https://semaphoreci.com>
 
 ## Usage
 
-``` ruby
+First, install the gem on your local machine:
+
+``` bash
 gem install sem
+```
+
+Login to Semaphore:
+
+``` bash
+$ sem login --auth-token <your-auth-token>
+```
+
+Display the help screen:
+
+``` txt
+$ sem help
+
+Usage: sem [command]
+
+Command list, type sem help [command] for more details:
+
+  version         Check cli version
+  login           Log in to semaphore from the command line
+  logout          Log out from semaphore
+
+  orgs            Manage organizations
+  teams           Manage teams and team membership
+  shared-configs  Manage shared configurations
+  projects        Manage projects
+
 ```
 
 ## Issues
