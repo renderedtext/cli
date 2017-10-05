@@ -13,20 +13,17 @@ module Sem
   require "sem/api"
   require "sem/views"
 
-  LOG_LEVEL_TRACE = :trace
-  LOG_LEVEL_ERROR = :error
-
   class << self
     attr_writer :log_level
 
-    def log_level
-      @log_level || LOG_LEVEL_ERROR
+    def trace?
+      @trace_mode == true
     end
 
     # Returns exit status as a number.
     def start(args)
       if args.include?("--trace")
-        @log_level = LOG_LEVEL_TRACE
+        @trace_mode = true
 
         args.delete("--trace")
       end

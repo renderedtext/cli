@@ -3,30 +3,21 @@ require "spec_helper"
 describe Sem::Configuration do
   let(:credentials_path) { File.expand_path(Sem::Configuration::CREDENTIALS_PATH) }
   let(:api_url_path) { File.expand_path(Sem::Configuration::API_URL_PATH) }
-
-  let(:auth_token) { "auth_token" }
-  let(:api_url) { "api_url" }
+  let(:auth_token) { "vodafone" }
 
   describe ".valid_auth_token?" do
-    let(:orgs_api) { instance_double(SemaphoreClient::Api::Org, :list! => nil) }
-    let(:client) { instance_double(SemaphoreClient, :orgs => orgs_api) }
-
-    before do
-      options = { :api_url => api_url, :verbose => false }
-      allow(described_class).to receive(:api_url).and_return(api_url)
-      allow(SemaphoreClient).to receive(:new).with(auth_token, options).and_return(client)
-    end
-
     context "listing orgs fails" do
-      before { allow(orgs_api).to receive(:list!).and_raise(SemaphoreClient::Exceptions::Base) }
-
       it "return false" do
+        stub_api(:get, "/orgs").to_return(404, "")
+
         expect(Sem::Configuration.valid_auth_token?(auth_token)).to eq(false)
       end
     end
 
     context "listing orgs succeds" do
       it "return true" do
+        stub_api(:get, "/orgs").to_return(200, [])
+
         expect(Sem::Configuration.valid_auth_token?(auth_token)).to eq(true)
       end
     end
@@ -99,13 +90,13 @@ describe Sem::Configuration do
     context "api_url file exists" do
       before do
         allow(File).to receive(:file?).with(api_url_path).and_return(true)
-        allow(File).to receive(:read).with(api_url_path).and_return(api_url)
+        allow(File).to receive(:read).with(api_url_path).and_return("stg1-semaphore.semaphoreci.com")
       end
 
       it "returns the custom api url" do
         return_value = described_class.api_url
 
-        expect(return_value).to eql(api_url)
+        expect(return_value).to eql("stg1-semaphore.semaphoreci.com")
       end
     end
 
