@@ -16,7 +16,7 @@ For more info about Semaphore see <https://semaphoreci.com>
 First, install the gem on your local machine:
 
 ``` bash
-gem install sem
+$ gem install sem
 ```
 
 Login to Semaphore:
