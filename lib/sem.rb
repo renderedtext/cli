@@ -9,10 +9,10 @@ module Sem
   require "sem/errors"
   require "sem/configuration"
   require "sem/srn"
-  require "sem/pagination"
   require "sem/cli"
   require "sem/api"
   require "sem/views"
+
   LOG_LEVEL_TRACE = :trace
   LOG_LEVEL_ERROR = :error
 
