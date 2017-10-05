@@ -63,6 +63,7 @@ class Sem::CLI::SharedConfigs < Dracula
     desc "add", "add a file to the shared configuration"
     option "path-on-semaphore", :aliases => "p", :desc => "Path of the file in builds", :required => true
     option "local-path", :aliases => "l", :desc => "Location of the file on the local machine", :required => true
+    option "encrypted", :desc => "Encrypt the file", :default => true, :type => :boolean
     def add(shared_config_name)
       shared_config = Sem::API::SharedConfig.find!(shared_config_name)
 
@@ -73,7 +74,7 @@ class Sem::CLI::SharedConfigs < Dracula
       path = options["path-on-semaphore"]
       content = File.read(local_path)
 
-      shared_config.add_config_file(:path => path, :content => content)
+      shared_config.add_config_file(:path => path, :content => content, :encrypted => options["encrypted"])
 
       puts "Added #{path} to #{shared_config_name}"
     end
@@ -107,10 +108,11 @@ class Sem::CLI::SharedConfigs < Dracula
     desc "add", "add an environment variable to the shared configuration"
     option :name, :aliases => "n", :desc => "Name of the variable", :required => true
     option :content, :aliases => "c", :desc => "Content of the variable", :required => true
+    option :encrypted, :desc => "Encrypt the environment variable", :default => true, :type => :boolean
     def add(shared_config_name)
       shared_config = Sem::API::SharedConfig.find!(shared_config_name)
 
-      shared_config.add_env_var(:name => options[:name], :content => options[:content])
+      shared_config.add_env_var(:name => options[:name], :content => options[:content], :encrypted => options[:encrypted])
 
       puts "Added #{options[:name]} to #{shared_config_name}"
     end
