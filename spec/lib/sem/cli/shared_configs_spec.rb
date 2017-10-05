@@ -286,7 +286,9 @@ describe Sem::CLI::SharedConfigs do
       let(:env_var) { ApiResponse.env_var }
 
       before do
-        stub_api(:post, "/shared_configs/#{shared_config[:id]}/env_vars").to_return(200, env_var)
+        body = { :name => "SECRET", :content => "abc", :encrypted => true }
+
+        stub_api(:post, "/shared_configs/#{shared_config[:id]}/env_vars", body).to_return(200, env_var)
       end
 
       it "adds the env var to the shared config" do
