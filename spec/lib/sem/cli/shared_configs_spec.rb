@@ -202,7 +202,9 @@ describe Sem::CLI::SharedConfigs do
       let(:file) { ApiResponse.file(:path => "/etc/a") }
 
       before do
-        stub_api(:post, "/shared_configs/#{shared_config[:id]}/config_files").to_return(200, file)
+        body = { :path => "/etc/aliases", :content => "abc", :encrypted => true }
+
+        stub_api(:post, "/shared_configs/#{shared_config[:id]}/config_files", body).to_return(200, file)
       end
 
       context "local file exists" do
