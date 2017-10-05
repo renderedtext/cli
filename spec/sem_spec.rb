@@ -9,10 +9,7 @@ RSpec.describe Sem do
   describe ".start" do
     describe "--trace argument" do
       it "sets the output to trace level" do
-        expect { Sem.start(["--trace"]) }
-          .to change { Sem.log_level }
-          .from(Sem::LOG_LEVEL_ERROR)
-          .to(Sem::LOG_LEVEL_TRACE)
+        expect { Sem.start(["--trace"]) }.to change { Sem.trace? }.from(false).to(true)
       end
     end
 

@@ -2,7 +2,7 @@ module Sem::API::Base
   module_function
 
   def client
-    @client ||= create_api_client(
+    @client ||= create_new_api_client(
       Sem::Configuration.api_url,
       Sem::Configuration.auth_token)
   end
