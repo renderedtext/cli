@@ -66,6 +66,32 @@ describe Sem::CLI::Projects do
     end
   end
 
+  describe "#create" do
+    context "invalid git url passed" do
+    end
+
+    context "git url is valid" do
+      let(:project) { ApiResponse.project }
+
+      before do
+        body = {
+          "repo_provider" => "github",
+          "repo_owner" => "renderedtext",
+          "repo_name" => "cli",
+          "name" => "cli"
+        }
+
+        stub_api(:post, "/orgs/rt/projects", body).to_return(200, project)
+      end
+
+      it "creates a project" do
+        stdout, _stderr, status = sem_run!("projects:create rt/cli --url git@github.com:renderedtext/cli.git")
+
+        expect(stdout).to include(project[:id])
+      end
+    end
+  end
+
   describe Sem::CLI::Projects::Files do
     let(:project) { ApiResponse.project(:name => "cli") }
     let(:file) { ApiResponse.file }

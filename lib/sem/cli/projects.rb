@@ -20,17 +20,18 @@ class Sem::CLI::Projects < Dracula
 
   desc "create", "create a project"
   option :url, :aliases => "-u", :desc => "Git url to the repository"
-  def create(project)
-    org_name, project_name = Sem::SRN.parse_project(project)
+  def create(project_name)
     repo_provider, repo_owner, repo_name = Sem::Helpers::Git.parse_url(options[:url])
 
-    project = Sem::API::Projects.create(org_name,
-                                        :name => project_name,
-                                        :repo_provider => repo_provider,
-                                        :repo_owner => repo_owner,
-                                        :repo_name => repo_name)
+    args = {
+      :repo_provider => repo_provider,
+      :repo_owner => repo_owner,
+      :repo_name => repo_name
+    }
 
-    Sem::Views::Projects.create(project)
+    project = Sem::API::Project.create!(project_name, args)
+
+    Sem::Views::Projects.info(project)
   rescue Sem::Helpers::Git::InvalidGitUrl
     abort "Git URL #{options[:url]} is invalid."
   end
