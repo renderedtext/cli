@@ -6,6 +6,7 @@ require "pmap"
 require "delegate"
 
 module Sem
+  require "sem/helpers"
   require "sem/errors"
   require "sem/configuration"
   require "sem/srn"

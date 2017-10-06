@@ -19,6 +19,16 @@ class Sem::API::Project < SimpleDelegator
     new(org_name, project)
   end
 
+  def self.create!(project_srn, args)
+    org_name, name = Sem::SRN.parse_project(project_srn)
+
+    project = client.projects.create_for_org(org_name, args.merge(:name => name))
+
+    raise Sem::Errors::ResourceNotCreated.new("Project", [org_name, name]) if project.nil?
+
+    new(org_name, project)
+  end
+
   attr_reader :org_name
 
   def initialize(org_name, project)
