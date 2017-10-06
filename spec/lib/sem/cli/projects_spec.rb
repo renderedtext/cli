@@ -68,6 +68,12 @@ describe Sem::CLI::Projects do
 
   describe "#create" do
     context "invalid git url passed" do
+      it "prints an error" do
+        _stdout, stderr, status = sem_run("projects:create rt/cli --url github.com:renderedtext")
+
+        expect(stderr).to include("Git URL github.com:renderedtext is invalid.")
+        expect(status).to eq(:system_error)
+      end
     end
 
     context "git url is valid" do
@@ -85,7 +91,7 @@ describe Sem::CLI::Projects do
       end
 
       it "creates a project" do
-        stdout, _stderr, status = sem_run!("projects:create rt/cli --url git@github.com:renderedtext/cli.git")
+        stdout, _stderr = sem_run!("projects:create rt/cli --url git@github.com:renderedtext/cli.git")
 
         expect(stdout).to include(project[:id])
       end
