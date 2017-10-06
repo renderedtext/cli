@@ -21,19 +21,19 @@ class Sem::CLI::Projects < Dracula
   desc "create", "create a project"
   option :url, :aliases => "-u", :desc => "Git url to the repository"
   def create(project_name)
-    repo_provider, repo_owner, repo_name = Sem::Helpers::Git.parse_url(options[:url])
+    url = Sem::Helpers::GitUrl.new(options[:url])
+
+    abort "Git URL #{options[:url]} is invalid." unless url.valid?
 
     args = {
-      :repo_provider => repo_provider,
-      :repo_owner => repo_owner,
-      :repo_name => repo_name
+      :repo_provider => url.repo_provider,
+      :repo_owner => url.repo_owner,
+      :repo_name => url.repo_name
     }
 
     project = Sem::API::Project.create!(project_name, args)
 
     Sem::Views::Projects.info(project)
-  rescue Sem::Helpers::Git::InvalidGitUrl
-    abort "Git URL #{options[:url]} is invalid."
   end
 
   class Files < Dracula
