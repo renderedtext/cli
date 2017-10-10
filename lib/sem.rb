@@ -52,6 +52,10 @@ module Sem
       on_invalid_credentials
 
       1
+    rescue SemaphoreClient::Exceptions::ServerError => e
+      on_server_error(e)
+
+      1
     rescue StandardError => e
       on_unhandled_error(e)
 
@@ -64,6 +68,14 @@ module Sem
       puts "[ERROR] Invalid parameter formatting."
       puts ""
       puts exception.message
+    end
+
+    def on_server_error(exception)
+      puts "[ERROR] Semaphore API returned status #{exception.code}."
+      puts ""
+      puts "#{exception.message}"
+      puts ""
+      puts "Please report this issue to https://semaphoreci.com/support."
     end
 
     def on_no_credentials

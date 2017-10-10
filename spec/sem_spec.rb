@@ -51,6 +51,24 @@ RSpec.describe Sem do
       expect(result).to eq(1)
     end
 
+    it "handles http 500 from api" do
+      stub_api(:get, "/orgs").to_return(500, :message => "Server errror.")
+
+      stdout, _stderr, result = IOStub.collect_output { Sem.start(["orgs:list"]) }
+
+      msg = [
+        "[ERROR] Semaphore API returned status 500.",
+        "",
+        "Server errror.",
+        "",
+        "Please report this issue to https://semaphoreci.com/support.",
+        ""
+      ]
+
+      expect(stdout).to eq(msg.join("\n"))
+      expect(result).to eq(1)
+    end
+
     it "handles all exceptions" do
       allow(Sem::CLI).to receive(:start) { raise "Haisenberg" }
 
