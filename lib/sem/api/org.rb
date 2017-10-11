@@ -2,7 +2,7 @@ class Sem::API::Org < SimpleDelegator
   extend Sem::API::Base
 
   def self.all
-    client.orgs.list.map { |org| new(org) }
+    client.orgs.list!.map { |org| new(org) }
   end
 
   def self.find!(org_name)
