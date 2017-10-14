@@ -98,13 +98,14 @@ describe Sem::CLI::SharedConfigs do
 
     context "creation fails" do
       before do
-        stub_api(:post, "/orgs/rt/shared_configs").to_return(422, "")
+        error = { "message" => "Validation Failed. Name not unique." }
+        stub_api(:post, "/orgs/rt/shared_configs").to_return(422, error)
       end
 
       it "displays an error" do
         _stdout, stderr, status = sem_run("shared-configs:create rt/tokens")
 
-        expect(stderr).to include("Shared Configuration rt/tokens not created.")
+        expect(stderr).to include("Validation Failed. Name not unique.")
         expect(status).to eq(:fail)
       end
     end
@@ -134,13 +135,14 @@ describe Sem::CLI::SharedConfigs do
 
     context "update fails" do
       before do
-        stub_api(:patch, "/shared_configs/#{shared_config[:id]}").to_return(422, "")
+        error = { "message" => "Validation Failed. Name contains spaces" }
+        stub_api(:patch, "/shared_configs/#{shared_config[:id]}").to_return(422, error)
       end
 
       it "displays an error" do
         _stdout, stderr, status = sem_run("shared-configs:rename rt/tokens rt/secrets")
 
-        expect(stderr).to include("Shared Configuration rt/tokens not updated")
+        expect(stderr).to include("Validation Failed. Name contains spaces")
         expect(status).to eq(:fail)
       end
     end

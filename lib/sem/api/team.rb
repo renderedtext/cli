@@ -2,9 +2,7 @@ class Sem::API::Team < SimpleDelegator
   extend Sem::API::Base
 
   def self.all
-    Sem::API::Org.all.pmap do |org|
-      client.teams.list_for_org(org.username).map { |team| new(org.username, team) }
-    end.flatten
+    Sem::API::Org.all.pmap(&:teams).flatten
   end
 
   def self.find!(team_srn)
@@ -86,15 +84,15 @@ class Sem::API::Team < SimpleDelegator
   end
 
   def users
-    Sem::API::Base.client.users.list_for_team(id).map { |user| Sem::API::User.new(user) }
+    Sem::API::Base.client.users.list_for_team!(id).map { |user| Sem::API::User.new(user) }
   end
 
   def projects
-    Sem::API::Base.client.projects.list_for_team(id).map { |project| Sem::API::Project.new(org_name, project) }
+    Sem::API::Base.client.projects.list_for_team!(id).map { |project| Sem::API::Project.new(org_name, project) }
   end
 
   def shared_configs
-    Sem::API::Base.client.shared_configs.list_for_team(id).map { |config| Sem::API::SharedConfig.new(org_name, config) }
+    Sem::API::Base.client.shared_configs.list_for_team!(id).map { |config| Sem::API::SharedConfig.new(org_name, config) }
   end
 
 end

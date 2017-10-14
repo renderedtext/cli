@@ -54,7 +54,7 @@ describe Sem::CLI::Orgs do
 
     it "list members of an organization" do
       stub_api(:get, "/orgs/rt").to_return(200, org)
-      stub_api(:get, "/orgs/users").to_return(200, [user])
+      stub_api(:get, "/orgs/rt/users").to_return(200, [user])
 
       stdout, _stderr = sem_run!("orgs:members rt")
 
