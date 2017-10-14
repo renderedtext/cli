@@ -347,7 +347,7 @@ describe Sem::CLI::Teams do
     end
 
     describe "#list" do
-      context "when the team has several members" do
+      context "when the team has several projects" do
         let(:project) { ApiResponse.project }
 
         before do
@@ -361,7 +361,7 @@ describe Sem::CLI::Teams do
         end
       end
 
-      context "when the team has no members" do
+      context "when the team has no projects" do
         before do
           stub_api(:get, "/teams/#{team[:id]}/projects").to_return(200, [])
         end
@@ -372,35 +372,88 @@ describe Sem::CLI::Teams do
           expect(stdout).to include("Add your first project")
         end
       end
+
+      context "team does not exists" do
+        before do
+          stub_api(:get, "/orgs/rt/teams").to_return(200, [])
+        end
+
+        it "offers a way to add first project" do
+          stdout, _stderr = sem_run("teams:projects:list rt/devs")
+
+          expect(stdout).to include("Team rt/devs not found")
+        end
+      end
     end
 
     describe "#add" do
       let(:project) { ApiResponse.project(:name => "cli") }
 
-      before do
-        stub_api(:get, "/orgs/rt/projects?name=cli").to_return(200, [project])
-        stub_api(:post, "/teams/#{team[:id]}/projects/#{project[:id]}").to_return(204, "")
+      context "project exists" do
+        before do
+          stub_api(:get, "/orgs/rt/projects?name=cli").to_return(200, [project])
+          stub_api(:post, "/teams/#{team[:id]}/projects/#{project[:id]}").to_return(204, "")
+        end
+
+        it "add a project to the team" do
+          stdout, _stderr = sem_run!("teams:projects:add rt/devs rt/cli")
+
+          expect(stdout).to include("Project rt/cli added to the team")
+        end
       end
 
-      it "add a project to the team" do
-        stdout, _stderr = sem_run!("teams:projects:add rt/devs rt/cli")
+      context "project doesn't exists" do
+        before do
+          stub_api(:get, "/orgs/rt/projects?name=cli").to_return(200, [])
+        end
 
-        expect(stdout).to include("Project rt/cli added to the team")
+        it "displays the error" do
+          stdout, _stderr = sem_run("teams:projects:add rt/devs rt/cli")
+
+          expect(stdout).to include("Project rt/cli not found")
+        end
       end
     end
 
     describe "#remove" do
       let(:project) { ApiResponse.project(:name => "cli") }
 
-      before do
-        stub_api(:get, "/orgs/rt/projects?name=cli").to_return(200, [project])
-        stub_api(:delete, "/teams/#{team[:id]}/projects/#{project[:id]}").to_return(204, "")
+      context "project exists" do
+        before do
+          stub_api(:get, "/orgs/rt/projects?name=cli").to_return(200, [project])
+          stub_api(:delete, "/teams/#{team[:id]}/projects/#{project[:id]}").to_return(204, "")
+        end
+
+        it "remove a user from the team" do
+          stdout, _stderr = sem_run!("teams:projects:remove rt/devs rt/cli")
+
+          expect(stdout).to include("Project rt/cli removed from the team")
+        end
       end
 
-      it "remove a user from the team" do
-        stdout, _stderr = sem_run!("teams:projects:remove rt/devs rt/cli")
+      context "project doesn't exists" do
+        before do
+          stub_api(:get, "/orgs/rt/projects?name=cli").to_return(200, [])
+        end
 
-        expect(stdout).to include("Project rt/cli removed from the team")
+        it "displays the error" do
+          stdout, _stderr = sem_run("teams:projects:add rt/devs rt/cli")
+
+          expect(stdout).to include("Project rt/cli not found")
+        end
+      end
+
+      context "project is not part of the team" do
+        before do
+          stub_api(:get, "/orgs/rt/projects?name=cli").to_return(200, [project])
+          stub_api(:delete, "/teams/#{team[:id]}/projects/#{project[:id]}").to_return(404, "")
+        end
+
+        it "add a project to the team" do
+          stdout, _stderr = sem_run("teams:projects:remove rt/devs rt/cli")
+
+          expect(stdout).to include("Project rt/cli not found")
+        end
       end
     end
   end
@@ -434,7 +487,7 @@ describe Sem::CLI::Teams do
         end
       end
 
-      context "when the team has no members" do
+      context "when the team has no shared configs" do
         before do
           stub_api(:get, "/teams/#{team[:id]}/shared_configs").to_return(200, [])
         end
@@ -445,35 +498,75 @@ describe Sem::CLI::Teams do
           expect(stdout).to include("Add your first shared configuration")
         end
       end
+
+      context "team not found" do
+        before do
+          stub_api(:get, "/orgs/rt/teams").to_return(200, [])
+        end
+
+        it "displays an error" do
+          stdout, _stderr = sem_run("teams:shared-configs:list rt/devs")
+
+          expect(stdout).to include("Team rt/devs not found")
+        end
+      end
     end
 
     describe "#add" do
       let(:config) { ApiResponse.shared_config(:name => "tokens") }
 
-      before do
-        stub_api(:get, "/orgs/rt/shared_configs").to_return(200, [config])
-        stub_api(:post, "/teams/#{team[:id]}/shared_configs/#{config[:id]}").to_return(204, "")
+      context "shared config exists" do
+        before do
+          stub_api(:get, "/orgs/rt/shared_configs").to_return(200, [config])
+          stub_api(:post, "/teams/#{team[:id]}/shared_configs/#{config[:id]}").to_return(204, "")
+        end
+
+        it "add a shared_config to the team" do
+          stdout, _stderr = sem_run!("teams:shared-configs:add rt/devs rt/tokens")
+
+          expect(stdout).to include("Shared Configuration rt/tokens added to the team")
+        end
       end
 
-      it "add a shared_config to the team" do
-        stdout, _stderr = sem_run!("teams:shared-configs:add rt/devs rt/tokens")
+      context "shared config doesn't exists" do
+        before do
+          stub_api(:get, "/orgs/rt/shared_configs").to_return(200, [])
+        end
 
-        expect(stdout).to include("Shared Configuration rt/tokens added to the team")
+        it "displays and error" do
+          stdout, _stderr = sem_run("teams:shared-configs:add rt/devs rt/tokens")
+
+          expect(stdout).to include("Shared Configuration rt/tokens not found")
+        end
       end
     end
 
     describe "#remove" do
-      let(:config) { ApiResponse.shared_config(:name => "tokens") }
+      context "shared config exists" do
+        let(:config) { ApiResponse.shared_config(:name => "tokens") }
 
-      before do
-        stub_api(:get, "/orgs/rt/shared_configs").to_return(200, [config])
-        stub_api(:delete, "/teams/#{team[:id]}/shared_configs/#{config[:id]}").to_return(204, "")
+        before do
+          stub_api(:get, "/orgs/rt/shared_configs").to_return(200, [config])
+          stub_api(:delete, "/teams/#{team[:id]}/shared_configs/#{config[:id]}").to_return(204, "")
+        end
+
+        it "remove a shared_config from the team" do
+          stdout, _stderr = sem_run!("teams:shared-configs:remove rt/devs rt/tokens")
+
+          expect(stdout).to include("Shared Configuration rt/tokens removed from the team")
+        end
       end
 
-      it "remove a shared_config from the team" do
-        stdout, _stderr = sem_run!("teams:shared-configs:remove rt/devs rt/tokens")
+      context "shared config doesn't exists" do
+        before do
+          stub_api(:get, "/orgs/rt/shared_configs").to_return(200, [])
+        end
 
-        expect(stdout).to include("Shared Configuration rt/tokens removed from the team")
+        it "displays and error" do
+          stdout, _stderr = sem_run("teams:shared-configs:remove rt/devs rt/tokens")
+
+          expect(stdout).to include("Shared Configuration rt/tokens not found")
+        end
       end
     end
   end

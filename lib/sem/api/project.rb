@@ -11,8 +11,13 @@ class Sem::API::Project < SimpleDelegator
     org_name, project_name = Sem::SRN.parse_project(project_srn)
 
     projects = client.projects.list_for_org!(org_name, :name => project_name)
+    project = projects.to_a.first
 
-    new(org_name, projects.to_a.first)
+    if project.nil?
+      raise Sem::Errors::ResourceNotFound.new("Project", [org_name, project_name])
+    end
+
+    new(org_name, project)
   rescue SemaphoreClient::Exceptions::NotFound => e
     raise Sem::Errors::ResourceNotFound.new("Project", [org_name, project_name])
   end
