@@ -10,23 +10,21 @@ class Sem::API::Project < SimpleDelegator
   def self.find!(project_srn)
     org_name, project_name = Sem::SRN.parse_project(project_srn)
 
-    # TODO: fix .to_a bug in client
+    projects = client.projects.list_for_org!(org_name, :name => project_name)
 
-    project = client.projects.list_for_org(org_name, :name => project_name).to_a.first
-
-    raise Sem::Errors::ResourceNotFound.new("Project", [org_name, project_name]) if project.nil?
-
-    new(org_name, project)
+    new(org_name, projects.to_a.first)
+  rescue SemaphoreClient::Exceptions::NotFound => e
+    raise Sem::Errors::ResourceNotFound.new("Project", [org_name, project_name])
   end
 
   def self.create!(project_srn, args)
     org_name, name = Sem::SRN.parse_project(project_srn)
 
-    project = client.projects.create_for_org(org_name, args.merge(:name => name))
-
-    raise Sem::Errors::ResourceNotCreated.new("Project", [org_name, name]) if project.nil?
+    project = client.projects.create_for_org!(org_name, args.merge(:name => name))
 
     new(org_name, project)
+  rescue SemaphoreClient::Exceptions::NotFound => e
+    raise Sem::Errors::ResourceNotFound.new("Organization", [org_name])
   end
 
   attr_reader :org_name

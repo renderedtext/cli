@@ -96,6 +96,19 @@ describe Sem::CLI::Projects do
         expect(stdout).to include(project[:id])
       end
     end
+
+    context "validation error" do
+      it "prints the error" do
+        error = { "message" => "Validation failed. Name is already taken." }
+
+        stub_api(:post, "/orgs/rt/projects").to_return(422, error)
+
+        stdout, _stderr, status = sem_run("projects:create rt/cli --url git@github.com:renderedtext/cli.git")
+
+        expect(stdout).to include("Validation failed. Name is already taken.")
+        expect(status).to eq(:fail)
+      end
+    end
   end
 
   describe Sem::CLI::Projects::Files do

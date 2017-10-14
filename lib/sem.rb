@@ -56,6 +56,10 @@ module Sem
       on_server_error(e)
 
       1
+    rescue SemaphoreClient::Exceptions::UnprocessableEntity => e
+      puts "[ERROR] #{e.message}"
+
+      1
     rescue StandardError => e
       on_unhandled_error(e)
 
