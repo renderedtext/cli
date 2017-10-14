@@ -85,6 +85,19 @@ describe Sem::CLI::Teams do
       end
     end
 
+    context "organization not found" do
+      before do
+        stub_api(:get, "/orgs/rt/teams").to_return(404, {})
+      end
+
+      it "displays the error" do
+        stdout, _stderr, status = sem_run("teams:info rt/devs")
+
+        expect(stdout).to include("Team rt/devs not found.")
+        expect(status).to eq(:fail)
+      end
+    end
+
     context "team not found" do
       before do
         stub_api(:get, "/orgs/rt/teams").to_return(200, [])
@@ -231,6 +244,19 @@ describe Sem::CLI::Teams do
     end
 
     describe "#list" do
+      context "team not found" do
+        before do
+          stub_api(:get, "/orgs/rt/teams").to_return(404, {})
+        end
+
+        it "displays team not found" do
+          stdout, _stderr, status = sem_run("teams:members:list rt/devs")
+
+          expect(stdout).to include("Team rt/devs not found")
+          expect(status).to eq(:fail)
+        end
+      end
+
       context "when the team has several members" do
         let(:user1) { ApiResponse.user }
         let(:user2) { ApiResponse.user }

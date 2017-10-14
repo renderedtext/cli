@@ -10,11 +10,15 @@ class Sem::API::Team < SimpleDelegator
   def self.find!(team_srn)
     org_name, team_name = Sem::SRN.parse_team(team_srn)
 
-    team = client.teams.list_for_org(org_name).find { |t| t.name == team_name }
+    team = client.teams.list_for_org!(org_name).find { |t| t.name == team_name }
 
-    raise Sem::Errors::ResourceNotFound.new("Team", [org_name, team_name]) if team.nil?
+    if team.nil?
+      raise Sem::Errors::ResourceNotFound.new("Team", [org_name, team_name])
+    end
 
     new(org_name, team)
+  rescue SemaphoreClient::Exceptions::NotFound => e
+    raise Sem::Errors::ResourceNotFound.new("Team", [org_name, team_name])
   end
 
   def self.create!(team_srn, args)
