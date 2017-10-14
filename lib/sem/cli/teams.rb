@@ -1,6 +1,6 @@
 class Sem::CLI::Teams < Dracula
 
-  ALLOWED_PERMISSIONS = ["admin", "edit", "read"]
+  ALLOWED_PERMISSIONS = ["admin", "edit", "read"].freeze
 
   desc "list", "list teams"
   def list

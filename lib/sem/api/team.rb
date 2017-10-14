@@ -17,7 +17,7 @@ class Sem::API::Team < SimpleDelegator
     end
 
     new(org_name, team)
-  rescue SemaphoreClient::Exceptions::NotFound => e
+  rescue SemaphoreClient::Exceptions::NotFound
     raise Sem::Errors::ResourceNotFound.new("Team", [org_name, team_name])
   end
 
@@ -27,7 +27,7 @@ class Sem::API::Team < SimpleDelegator
     team = client.teams.create_for_org!(org_name, args.merge(:name => team_name))
 
     new(org_name, team)
-  rescue SemaphoreClient::Exceptions::NotFound => e
+  rescue SemaphoreClient::Exceptions::NotFound
     raise Sem::Errors::ResourceNotFound.new("Organization", [org_name])
   end
 
@@ -51,25 +51,25 @@ class Sem::API::Team < SimpleDelegator
 
   def add_user(username)
     Sem::API::Base.client.users.attach_to_team!(username, id)
-  rescue SemaphoreClient::Exceptions::NotFound => e
+  rescue SemaphoreClient::Exceptions::NotFound
     raise Sem::Errors::ResourceNotFound.new("User", [username])
   end
 
   def remove_user(username)
     Sem::API::Base.client.users.detach_from_team!(username, id)
-  rescue SemaphoreClient::Exceptions::NotFound => e
+  rescue SemaphoreClient::Exceptions::NotFound
     raise Sem::Errors::ResourceNotFound.new("User", [username])
   end
 
   def add_project(project)
     Sem::API::Base.client.projects.attach_to_team!(project.id, id)
-  rescue SemaphoreClient::Exceptions::NotFound => e
+  rescue SemaphoreClient::Exceptions::NotFound
     raise Sem::Errors::ResourceNotFound.new("Project", [project.full_name])
   end
 
   def remove_project(project)
     Sem::API::Base.client.projects.detach_from_team!(project.id, id)
-  rescue SemaphoreClient::Exceptions::NotFound => e
+  rescue SemaphoreClient::Exceptions::NotFound
     raise Sem::Errors::ResourceNotFound.new("Project", [project.full_name])
   end
 

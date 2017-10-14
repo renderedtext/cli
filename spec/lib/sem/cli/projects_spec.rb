@@ -58,9 +58,9 @@ describe Sem::CLI::Projects do
       it "shows project not found" do
         stub_api(:get, "/orgs/rt/projects?name=cli").to_return(404, [])
 
-        stdout, _stderr, status = sem_run("projects:info rt/cli")
+        _stdout, stderr, status = sem_run("projects:info rt/cli")
 
-        expect(stdout).to include("Project rt/cli not found")
+        expect(stderr).to include("Project rt/cli not found")
         expect(status).to eq(:fail)
       end
     end
@@ -72,7 +72,7 @@ describe Sem::CLI::Projects do
         _stdout, stderr, status = sem_run("projects:create rt/cli --url github.com:renderedtext")
 
         expect(stderr).to include("Git URL github.com:renderedtext is invalid.")
-        expect(status).to eq(:system_error)
+        expect(status).to eq(:fail)
       end
     end
 
@@ -103,9 +103,9 @@ describe Sem::CLI::Projects do
 
         stub_api(:post, "/orgs/rt/projects").to_return(422, error)
 
-        stdout, _stderr, status = sem_run("projects:create rt/cli --url git@github.com:renderedtext/cli.git")
+        _stdout, stderr, status = sem_run("projects:create rt/cli --url git@github.com:renderedtext/cli.git")
 
-        expect(stdout).to include("Validation failed. Name is already taken.")
+        expect(stderr).to include("Validation failed. Name is already taken.")
         expect(status).to eq(:fail)
       end
     end
@@ -152,7 +152,7 @@ describe Sem::CLI::Projects do
 
         expect(stderr.strip).to eq(msg.join("\n"))
         expect(stdout).to eq("")
-        expect(status).to eq(:system_error)
+        expect(status).to eq(:fail)
       end
     end
   end

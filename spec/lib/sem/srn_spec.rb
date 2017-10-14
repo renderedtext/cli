@@ -12,9 +12,7 @@ describe Sem::SRN do
 
     context "format is invalid" do
       it "raises an exception" do
-        expected_message = "Org \"\" not found."
-
-        expect { described_class.parse_org(nil) }.to raise_exception(Sem::Errors::InvalidSRN, expected_message)
+        expect { described_class.parse_org(nil) }.to raise_exception(Sem::Errors::InvalidSRN)
       end
     end
   end
@@ -30,9 +28,7 @@ describe Sem::SRN do
 
     context "format is invalid" do
       it "raises an exception" do
-        expected_message = "Team \"team\" not found."
-
-        expect { described_class.parse_team("team") }.to raise_exception(Sem::Errors::InvalidSRN, expected_message)
+        expect { described_class.parse_team("team") }.to raise_exception(Sem::Errors::InvalidSRN)
       end
     end
   end
@@ -48,10 +44,7 @@ describe Sem::SRN do
 
     context "format is invalid" do
       it "raises an exception" do
-        expected_message = "Project \"project\" not found."
-
-        expect { described_class.parse_project("project") }.to raise_exception(Sem::Errors::InvalidSRN,
-                                                                               expected_message)
+        expect { described_class.parse_project("project") }.to raise_exception(Sem::Errors::InvalidSRN)
       end
     end
   end
@@ -67,10 +60,7 @@ describe Sem::SRN do
 
     context "format is invalid" do
       it "raises an exception" do
-        expected_message = "Shared config \"shared_config\" not found."
-
-        expect { described_class.parse_shared_config("shared_config") }.to raise_exception(Sem::Errors::InvalidSRN,
-                                                                                           expected_message)
+        expect { described_class.parse_shared_config("shared_config") }.to raise_exception(Sem::Errors::InvalidSRN)
       end
     end
   end
@@ -86,10 +76,7 @@ describe Sem::SRN do
 
     context "format is invalid" do
       it "raises an exception" do
-        expected_message = "User \"\" not found."
-
-        expect { described_class.parse_user(nil) }.to raise_exception(Sem::Errors::InvalidSRN,
-                                                                      expected_message)
+        expect { described_class.parse_user(nil) }.to raise_exception(Sem::Errors::InvalidSRN)
       end
     end
   end

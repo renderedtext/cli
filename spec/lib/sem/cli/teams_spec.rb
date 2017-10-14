@@ -91,9 +91,9 @@ describe Sem::CLI::Teams do
       end
 
       it "displays the error" do
-        stdout, _stderr, status = sem_run("teams:info rt/devs")
+        _stdout, stderr, status = sem_run("teams:info rt/devs")
 
-        expect(stdout).to include("Team rt/devs not found.")
+        expect(stderr).to include("Team rt/devs not found.")
         expect(status).to eq(:fail)
       end
     end
@@ -104,9 +104,9 @@ describe Sem::CLI::Teams do
       end
 
       it "displays the error" do
-        stdout, _stderr, status = sem_run("teams:info rt/devs")
+        _stdout, stderr, status = sem_run("teams:info rt/devs")
 
-        expect(stdout).to include("Team rt/devs not found.")
+        expect(stderr).to include("Team rt/devs not found.")
         expect(status).to eq(:fail)
       end
     end
@@ -136,9 +136,9 @@ describe Sem::CLI::Teams do
       end
 
       it "displays the failure" do
-        stdout, _stderr, status = sem_run("teams:create rt/devs --permission edit")
+        _stdout, stderr, status = sem_run("teams:create rt/devs --permission edit")
 
-        expect(stdout).to include("Validation Failed. Name has already been taken.")
+        expect(stderr).to include("Validation Failed. Name has already been taken.")
         expect(status).to eq(:fail)
       end
     end
@@ -148,7 +148,7 @@ describe Sem::CLI::Teams do
         _stdout, stderr, status = sem_run("teams:create rt/devs --permission owner")
 
         expect(stderr).to include("Permission must be one of [admin, edit, read]")
-        expect(status).to eq(:system_error)
+        expect(status).to eq(:fail)
       end
     end
   end
@@ -185,9 +185,9 @@ describe Sem::CLI::Teams do
       end
 
       it "displays the team" do
-        stdout, _stderr, status = sem_run("teams:rename rt/devs rt/admins")
+        _stdout, stderr, status = sem_run("teams:rename rt/devs rt/admins")
 
-        expect(stdout).to include("Validation Failed. Name contains spaces.")
+        expect(stderr).to include("Validation Failed. Name contains spaces.")
         expect(status).to eq(:fail)
       end
     end
@@ -224,9 +224,9 @@ describe Sem::CLI::Teams do
       end
 
       it "displays the team" do
-        stdout, _stderr, status = sem_run("teams:set-permission rt/devs --permission admin")
+        _stdout, stderr, status = sem_run("teams:set-permission rt/devs --permission admin")
 
-        expect(stdout).to include("Validation Failed")
+        expect(stderr).to include("Validation Failed")
         expect(status).to eq(:fail)
       end
     end
@@ -261,9 +261,9 @@ describe Sem::CLI::Teams do
         end
 
         it "displays team not found" do
-          stdout, _stderr, status = sem_run("teams:members:list rt/devs")
+          _stdout, stderr, status = sem_run("teams:members:list rt/devs")
 
-          expect(stdout).to include("Team rt/devs not found")
+          expect(stderr).to include("Team rt/devs not found")
           expect(status).to eq(:fail)
         end
       end
@@ -316,9 +316,9 @@ describe Sem::CLI::Teams do
         end
 
         it "displays that the user is not found" do
-          stdout, _stderr = sem_run("teams:members:add rt/devs jojojo")
+          _stdout, stderr = sem_run("teams:members:add rt/devs jojojo")
 
-          expect(stdout).to include("User jojojo not found")
+          expect(stderr).to include("User jojojo not found")
         end
       end
     end
@@ -342,9 +342,9 @@ describe Sem::CLI::Teams do
         end
 
         it "displays that the user is not found" do
-          stdout, _stderr = sem_run("teams:members:remove rt/devs jojojo")
+          _stdout, stderr = sem_run("teams:members:remove rt/devs jojojo")
 
-          expect(stdout).to include("User jojojo not found")
+          expect(stderr).to include("User jojojo not found")
         end
       end
     end
@@ -390,9 +390,9 @@ describe Sem::CLI::Teams do
         end
 
         it "offers a way to add first project" do
-          stdout, _stderr = sem_run("teams:projects:list rt/devs")
+          _stdout, stderr = sem_run("teams:projects:list rt/devs")
 
-          expect(stdout).to include("Team rt/devs not found")
+          expect(stderr).to include("Team rt/devs not found")
         end
       end
     end
@@ -419,9 +419,9 @@ describe Sem::CLI::Teams do
         end
 
         it "displays the error" do
-          stdout, _stderr = sem_run("teams:projects:add rt/devs rt/cli")
+          _stdout, stderr = sem_run("teams:projects:add rt/devs rt/cli")
 
-          expect(stdout).to include("Project rt/cli not found")
+          expect(stderr).to include("Project rt/cli not found")
         end
       end
     end
@@ -448,9 +448,9 @@ describe Sem::CLI::Teams do
         end
 
         it "displays the error" do
-          stdout, _stderr = sem_run("teams:projects:add rt/devs rt/cli")
+          _stdout, stderr = sem_run("teams:projects:add rt/devs rt/cli")
 
-          expect(stdout).to include("Project rt/cli not found")
+          expect(stderr).to include("Project rt/cli not found")
         end
       end
 
@@ -461,9 +461,9 @@ describe Sem::CLI::Teams do
         end
 
         it "add a project to the team" do
-          stdout, _stderr = sem_run("teams:projects:remove rt/devs rt/cli")
+          _stdout, stderr = sem_run("teams:projects:remove rt/devs rt/cli")
 
-          expect(stdout).to include("Project rt/cli not found")
+          expect(stderr).to include("Project rt/cli not found")
         end
       end
     end
@@ -516,9 +516,9 @@ describe Sem::CLI::Teams do
         end
 
         it "displays an error" do
-          stdout, _stderr = sem_run("teams:shared-configs:list rt/devs")
+          _stdout, stderr = sem_run("teams:shared-configs:list rt/devs")
 
-          expect(stdout).to include("Team rt/devs not found")
+          expect(stderr).to include("Team rt/devs not found")
         end
       end
     end
@@ -545,9 +545,9 @@ describe Sem::CLI::Teams do
         end
 
         it "displays and error" do
-          stdout, _stderr = sem_run("teams:shared-configs:add rt/devs rt/tokens")
+          _stdout, stderr = sem_run("teams:shared-configs:add rt/devs rt/tokens")
 
-          expect(stdout).to include("Shared Configuration rt/tokens not found")
+          expect(stderr).to include("Shared Configuration rt/tokens not found")
         end
       end
     end
@@ -574,9 +574,9 @@ describe Sem::CLI::Teams do
         end
 
         it "displays and error" do
-          stdout, _stderr = sem_run("teams:shared-configs:remove rt/devs rt/tokens")
+          _stdout, stderr = sem_run("teams:shared-configs:remove rt/devs rt/tokens")
 
-          expect(stdout).to include("Shared Configuration rt/tokens not found")
+          expect(stderr).to include("Shared Configuration rt/tokens not found")
         end
       end
     end

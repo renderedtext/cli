@@ -70,9 +70,9 @@ describe Sem::CLI::SharedConfigs do
       end
 
       it "displays an error" do
-        stdout, _stderr, status = sem_run("shared-configs:info rt/tokens")
+        _stdout, stderr, status = sem_run("shared-configs:info rt/tokens")
 
-        expect(stdout).to include("Shared Configuration rt/tokens not found.")
+        expect(stderr).to include("Shared Configuration rt/tokens not found.")
         expect(status).to eq(:fail)
       end
     end
@@ -102,9 +102,9 @@ describe Sem::CLI::SharedConfigs do
       end
 
       it "displays an error" do
-        stdout, _stderr, status = sem_run("shared-configs:create rt/tokens")
+        _stdout, stderr, status = sem_run("shared-configs:create rt/tokens")
 
-        expect(stdout).to include("Shared Configuration rt/tokens not created.")
+        expect(stderr).to include("Shared Configuration rt/tokens not created.")
         expect(status).to eq(:fail)
       end
     end
@@ -138,9 +138,9 @@ describe Sem::CLI::SharedConfigs do
       end
 
       it "displays an error" do
-        stdout, _stderr, status = sem_run("shared-configs:rename rt/tokens rt/secrets")
+        _stdout, stderr, status = sem_run("shared-configs:rename rt/tokens rt/secrets")
 
-        expect(stdout).to include("Shared Configuration rt/tokens not updated")
+        expect(stderr).to include("Shared Configuration rt/tokens not updated")
         expect(status).to eq(:fail)
       end
     end
@@ -223,7 +223,7 @@ describe Sem::CLI::SharedConfigs do
         it "aborts and displays an error" do
           _stdout, stderr, status = sem_run("shared-configs:files:add rt/tokens --path-on-semaphore /etc/aliases --local-path /tmp/aliases")
 
-          expect(status).to be(:system_error)
+          expect(status).to be(:fail)
           expect(stderr.strip).to eq("File /tmp/aliases not found")
         end
       end

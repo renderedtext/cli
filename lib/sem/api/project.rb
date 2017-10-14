@@ -18,7 +18,7 @@ class Sem::API::Project < SimpleDelegator
     end
 
     new(org_name, project)
-  rescue SemaphoreClient::Exceptions::NotFound => e
+  rescue SemaphoreClient::Exceptions::NotFound
     raise Sem::Errors::ResourceNotFound.new("Project", [org_name, project_name])
   end
 
@@ -28,7 +28,7 @@ class Sem::API::Project < SimpleDelegator
     project = client.projects.create_for_org!(org_name, args.merge(:name => name))
 
     new(org_name, project)
-  rescue SemaphoreClient::Exceptions::NotFound => e
+  rescue SemaphoreClient::Exceptions::NotFound
     raise Sem::Errors::ResourceNotFound.new("Organization", [org_name])
   end
 

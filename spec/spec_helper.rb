@@ -16,7 +16,7 @@ SimpleCov.start do
 end
 
 def sem_run(args)
-  stdout, stderr, _, status = IOStub.collect_output do
+  stdout, stderr, status = IOStub.collect_output do
     Sem.start(args.split(" "))
   end
 

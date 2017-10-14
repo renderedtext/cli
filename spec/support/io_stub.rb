@@ -6,13 +6,11 @@ class IOStub
     $stdout = fake_stdout = IOStub.new($stdout)
     $stderr = fake_stderr = IOStub.new($stderr)
 
-    result = yield
+    yield
 
-    status = result == 0 ? :ok : :fail
-
-    [fake_stdout.data.to_s, fake_stderr.data.to_s, result, status]
+    [fake_stdout.data.to_s, fake_stderr.data.to_s, :ok]
   rescue SystemExit
-    [fake_stdout.data.to_s, fake_stderr.data.to_s, result, :system_error]
+    [fake_stdout.data.to_s, fake_stderr.data.to_s, :fail]
   ensure
     $stdout = original_stdout
     $stderr = original_stderr

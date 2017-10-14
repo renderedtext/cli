@@ -41,9 +41,9 @@ describe Sem::CLI::Orgs do
       it "displays org not found" do
         stub_api(:get, "/orgs/rt").to_return(404, org)
 
-        stdout, _stderr, status = sem_run("orgs:info rt")
+        _stdout, stderr, status = sem_run("orgs:info rt")
 
-        expect(stdout).to include("Organization rt not found.")
+        expect(stderr).to include("Organization rt not found.")
         expect(status).to eq(:fail)
       end
     end
@@ -65,9 +65,9 @@ describe Sem::CLI::Orgs do
       it "displays org not found" do
         stub_api(:get, "/orgs/rt").to_return(404, org)
 
-        stdout, _stderr, status = sem_run("orgs:members rt")
+        _stdout, stderr, status = sem_run("orgs:members rt")
 
-        expect(stdout).to include("Organization rt not found.")
+        expect(stderr).to include("Organization rt not found.")
         expect(status).to eq(:fail)
       end
     end
