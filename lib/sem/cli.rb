@@ -15,7 +15,7 @@ module Sem
     desc "login", "Log in to semaphore from the command line"
     option "auth-token", :required => true
     long_desc <<-DESC
-You can find your auth_token on the bottom of the users settings page https://semaphoreci.com/users/edit.
+You can find your auth-token on the bottom of the users settings page https://semaphoreci.com/users/edit.
 DESC
     def login
       auth_token = options["auth-token"]
