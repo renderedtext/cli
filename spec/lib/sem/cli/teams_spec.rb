@@ -129,16 +129,26 @@ describe Sem::CLI::Teams do
       end
     end
 
-    context "creation failes" do
+    context "validation fails" do
       before do
-        stub_api(:post, "/orgs/rt/teams").to_return(422, {})
+        error = { "message" => "Validation Failed. Name has already been taken." }
+        stub_api(:post, "/orgs/rt/teams").to_return(422, error)
       end
 
       it "displays the failure" do
-        stdout, _stderr, status = sem_run("teams:create rt/devs --permission owner")
+        stdout, _stderr, status = sem_run("teams:create rt/devs --permission edit")
 
-        expect(stdout).to include("Team rt/devs not created.")
+        expect(stdout).to include("Validation Failed. Name has already been taken.")
         expect(status).to eq(:fail)
+      end
+    end
+
+    context "invalid permission" do
+      it "displays the failure" do
+        _stdout, stderr, status = sem_run("teams:create rt/devs --permission owner")
+
+        expect(stderr).to include("Permission must be one of [admin, edit, read]")
+        expect(status).to eq(:system_error)
       end
     end
   end
@@ -170,13 +180,14 @@ describe Sem::CLI::Teams do
         stub_api(:get, "/orgs/rt/teams").to_return(200, [team])
         stub_api(:get, "/teams/#{team[:id]}/users").to_return(200, [user])
 
-        stub_api(:patch, "/teams/#{team[:id]}").to_return(422, {})
+        error = { "message" => "Validation Failed. Name contains spaces." }
+        stub_api(:patch, "/teams/#{team[:id]}").to_return(422, error)
       end
 
       it "displays the team" do
         stdout, _stderr, status = sem_run("teams:rename rt/devs rt/admins")
 
-        expect(stdout).to include("Team rt/devs not updated.")
+        expect(stdout).to include("Validation Failed. Name contains spaces.")
         expect(status).to eq(:fail)
       end
     end
@@ -209,13 +220,13 @@ describe Sem::CLI::Teams do
         stub_api(:get, "/orgs/rt/teams").to_return(200, [team])
         stub_api(:get, "/teams/#{team[:id]}/users").to_return(200, [user])
 
-        stub_api(:patch, "/teams/#{team[:id]}").to_return(422, {})
+        stub_api(:patch, "/teams/#{team[:id]}").to_return(422, "message" => "Validation Failed")
       end
 
       it "displays the team" do
         stdout, _stderr, status = sem_run("teams:set-permission rt/devs --permission admin")
 
-        expect(stdout).to include("Team rt/devs not updated.")
+        expect(stdout).to include("Validation Failed")
         expect(status).to eq(:fail)
       end
     end

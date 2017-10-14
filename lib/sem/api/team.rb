@@ -24,11 +24,11 @@ class Sem::API::Team < SimpleDelegator
   def self.create!(team_srn, args)
     org_name, team_name = Sem::SRN.parse_team(team_srn)
 
-    team = client.teams.create_for_org(org_name, args.merge(:name => team_name))
-
-    raise Sem::Errors::ResourceNotCreated.new("Team", [org_name, team_name]) if team.nil?
+    team = client.teams.create_for_org!(org_name, args.merge(:name => team_name))
 
     new(org_name, team)
+  rescue SemaphoreClient::Exceptions::NotFound => e
+    raise Sem::Errors::ResourceNotFound.new("Organization", [org_name])
   end
 
   attr_reader :org_name
@@ -43,10 +43,8 @@ class Sem::API::Team < SimpleDelegator
     "#{org_name}/#{name}"
   end
 
-  def update(args)
-    new_team = Sem::API::Base.client.teams.update(id, args)
-
-    raise Sem::Errors::ResourceNotUpdated.new("Team", [@org_name, name]) unless new_team
+  def update!(args)
+    new_team = Sem::API::Base.client.teams.update!(id, args)
 
     self.class.new(@org_name, new_team)
   end

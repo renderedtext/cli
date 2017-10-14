@@ -1,5 +1,7 @@
 class Sem::CLI::Teams < Dracula
 
+  ALLOWED_PERMISSIONS = ["admin", "edit", "read"]
+
   desc "list", "list teams"
   def list
     teams = Sem::API::Team.all
@@ -23,7 +25,13 @@ class Sem::CLI::Teams < Dracula
                       :aliases => "p",
                       :desc => "Permission level of the team in the organization"
   def create(team_name)
-    team = Sem::API::Team.create!(team_name, :permission => options[:permission])
+    permission = options[:permission]
+
+    unless ALLOWED_PERMISSIONS.include?(permission)
+      abort "Permission must be one of [#{ALLOWED_PERMISSIONS.join(", ")}]"
+    end
+
+    team = Sem::API::Team.create!(team_name, :permission => permission)
 
     Sem::Views::Teams.info(team)
   end
@@ -36,7 +44,7 @@ class Sem::CLI::Teams < Dracula
     abort "Team can't change its organization" unless new_org_name == old_org_name
 
     team = Sem::API::Team.find!(old_team_name)
-    team = team.update(:name => new_name)
+    team = team.update!(:name => new_name)
 
     Sem::Views::Teams.info(team)
   end
@@ -47,8 +55,14 @@ class Sem::CLI::Teams < Dracula
                       :aliases => "p",
                       :desc => "Permission level of the team in the organization"
   def set_permission(team_name) # rubocop:disable Style/AccessorMethodName
+    permission = options[:permission]
+
+    unless ALLOWED_PERMISSIONS.include?(permission)
+      abort "Permission must be one of [#{ALLOWED_PERMISSIONS.join(", ")}]"
+    end
+
     team = Sem::API::Team.find!(team_name)
-    team = team.update(:permission => options[:permission])
+    team = team.update!(:permission => permission)
 
     Sem::Views::Teams.info(team)
   end
