@@ -52,6 +52,12 @@ module Sem
       on_invalid_credentials
 
       1
+    rescue SemaphoreClient::Exceptions::Unauthorized => e
+      puts "[ERROR] Unathorized."
+      puts ""
+      puts "Check if your credentials are valid."
+
+      1
     rescue SemaphoreClient::Exceptions::ServerError => e
       on_server_error(e)
 

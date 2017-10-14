@@ -69,6 +69,22 @@ RSpec.describe Sem do
       expect(result).to eq(1)
     end
 
+    it "handles authorization exceptions" do
+      stub_api(:get, "/orgs").to_return(401, {})
+
+      stdout, _stderr, result = IOStub.collect_output { Sem.start(["orgs:list"]) }
+
+      msg = [
+        "[ERROR] Unathorized.",
+        "",
+        "Check if your credentials are valid.",
+        ""
+      ]
+
+      expect(stdout).to eq(msg.join("\n"))
+      expect(result).to eq(1)
+    end
+
     it "handles all exceptions" do
       allow(Sem::CLI).to receive(:start) { raise "Haisenberg" }
 
