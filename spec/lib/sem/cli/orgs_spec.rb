@@ -60,6 +60,17 @@ describe Sem::CLI::Orgs do
 
       expect(stdout).to include("john-snow")
     end
+
+    context "organization doesn't exists" do
+      it "displays org not found" do
+        stub_api(:get, "/orgs/rt").to_return(404, org)
+
+        stdout, _stderr, status = sem_run("orgs:members rt")
+
+        expect(stdout).to include("Organization rt not found.")
+        expect(status).to eq(:fail)
+      end
+    end
   end
 
 end
