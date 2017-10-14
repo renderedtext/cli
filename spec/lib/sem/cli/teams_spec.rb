@@ -287,26 +287,54 @@ describe Sem::CLI::Teams do
     end
 
     describe "#add" do
-      before do
-        stub_api(:post, "/teams/#{team[:id]}/users/ijovan").to_return(204, "")
+      context "user exists" do
+        before do
+          stub_api(:post, "/teams/#{team[:id]}/users/ijovan").to_return(204, "")
+        end
+
+        it "add a user to the team" do
+          stdout, _stderr = sem_run!("teams:members:add rt/devs ijovan")
+
+          expect(stdout).to include("User ijovan added to the team")
+        end
       end
 
-      it "add a user to the team" do
-        stdout, _stderr = sem_run!("teams:members:add rt/devs ijovan")
+      context "user doesn't exits" do
+        before do
+          stub_api(:post, "/teams/#{team[:id]}/users/jojojo").to_return(404, "")
+        end
 
-        expect(stdout).to include("User ijovan added to the team")
+        it "displays that the user is not found" do
+          stdout, _stderr = sem_run("teams:members:add rt/devs jojojo")
+
+          expect(stdout).to include("User jojojo not found")
+        end
       end
     end
 
     describe "#remove" do
-      before do
-        stub_api(:delete, "/teams/#{team[:id]}/users/ijovan").to_return(204, "")
+      context "user exists" do
+        before do
+          stub_api(:delete, "/teams/#{team[:id]}/users/ijovan").to_return(204, "")
+        end
+
+        it "remove a user from the team" do
+          stdout, _stderr = sem_run!("teams:members:remove rt/devs ijovan")
+
+          expect(stdout).to include("User ijovan removed from the team")
+        end
       end
 
-      it "remove a user from the team" do
-        stdout, _stderr = sem_run!("teams:members:remove rt/devs ijovan")
+      context "user doesn't exits" do
+        before do
+          stub_api(:delete, "/teams/#{team[:id]}/users/jojojo").to_return(404, "")
+        end
 
-        expect(stdout).to include("User ijovan removed from the team")
+        it "displays that the user is not found" do
+          stdout, _stderr = sem_run("teams:members:remove rt/devs jojojo")
+
+          expect(stdout).to include("User jojojo not found")
+        end
       end
     end
   end

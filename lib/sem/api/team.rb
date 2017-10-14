@@ -52,31 +52,35 @@ class Sem::API::Team < SimpleDelegator
   end
 
   def add_user(username)
-    Sem::API::Base.client.users.attach_to_team(username, id)
+    Sem::API::Base.client.users.attach_to_team!(username, id)
+  rescue SemaphoreClient::Exceptions::NotFound => e
+    raise Sem::Errors::ResourceNotFound.new("User", [username])
   end
 
   def remove_user(username)
-    Sem::API::Base.client.users.detach_from_team(username, id)
+    Sem::API::Base.client.users.detach_from_team!(username, id)
+  rescue SemaphoreClient::Exceptions::NotFound => e
+    raise Sem::Errors::ResourceNotFound.new("User", [username])
   end
 
   def add_project(project)
-    Sem::API::Base.client.projects.attach_to_team(project.id, id)
+    Sem::API::Base.client.projects.attach_to_team!(project.id, id)
   end
 
   def remove_project(project)
-    Sem::API::Base.client.projects.detach_from_team(project.id, id)
+    Sem::API::Base.client.projects.detach_from_team!(project.id, id)
   end
 
   def add_shared_config(config)
-    Sem::API::Base.client.shared_configs.attach_to_team(config.id, id)
+    Sem::API::Base.client.shared_configs.attach_to_team!(config.id, id)
   end
 
   def remove_shared_config(config)
-    Sem::API::Base.client.shared_configs.detach_from_team(config.id, id)
+    Sem::API::Base.client.shared_configs.detach_from_team!(config.id, id)
   end
 
   def delete!
-    Sem::API::Base.client.teams.delete(id)
+    Sem::API::Base.client.teams.delete!(id)
   end
 
   def users
