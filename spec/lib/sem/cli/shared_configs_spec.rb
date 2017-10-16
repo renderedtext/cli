@@ -248,6 +248,22 @@ describe Sem::CLI::SharedConfigs do
           expect(stderr.strip).to eq("File /tmp/aliases not found")
         end
       end
+
+      context "validation fails" do
+        before do
+          File.write("/tmp/aliases", "abc")
+
+          error = { "message" => "Path can't be empty" }
+          stub_api(:post, "/shared_configs/#{shared_config[:id]}/config_files").to_return(422, error)
+        end
+
+        it "displays the error" do
+          _stdout, stderr, status = sem_run("shared-configs:files:add rt/tokens --path-on-semaphore /etc/aliases --local-path /tmp/aliases")
+
+          expect(status).to be(:fail)
+          expect(stderr).to include("Path can't be empty")
+        end
+      end
     end
 
     describe "#remove" do
@@ -304,18 +320,34 @@ describe Sem::CLI::SharedConfigs do
     end
 
     describe "#add" do
-      let(:env_var) { ApiResponse.env_var }
+      context "adding a new file succeds" do
+        let(:env_var) { ApiResponse.env_var }
 
-      before do
-        body = { :name => "SECRET", :content => "abc", :encrypted => true }
+        before do
+          body = { :name => "SECRET", :content => "abc", :encrypted => true }
 
-        stub_api(:post, "/shared_configs/#{shared_config[:id]}/env_vars", body).to_return(200, env_var)
+          stub_api(:post, "/shared_configs/#{shared_config[:id]}/env_vars", body).to_return(200, env_var)
+        end
+
+        it "adds the env var to the shared config" do
+          stdout, _stderr = sem_run!("shared-configs:env-vars:add rt/tokens --name SECRET --content abc")
+
+          expect(stdout).to include("Added SECRET to rt/tokens")
+        end
       end
 
-      it "adds the env var to the shared config" do
-        stdout, _stderr = sem_run!("shared-configs:env-vars:add rt/tokens --name SECRET --content abc")
+      context "validation fails" do
+        before do
+          error = { "message" => "Content can't be empty" }
+          stub_api(:post, "/shared_configs/#{shared_config[:id]}/config_files").to_return(422, error)
+        end
 
-        expect(stdout).to include("Added SECRET to rt/tokens")
+        it "displays the error" do
+          _stdout, stderr, status = sem_run("shared-configs:files:add rt/tokens --path-on-semaphore /etc/aliases --local-path /tmp/aliases")
+
+          expect(status).to be(:fail)
+          expect(stderr).to include("Content can't be empty")
+        end
       end
     end
 
