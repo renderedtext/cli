@@ -572,9 +572,9 @@ describe Sem::CLI::Teams do
     end
 
     describe "#remove" do
-      context "shared config exists" do
-        let(:config) { ApiResponse.shared_config(:name => "tokens") }
+      let(:config) { ApiResponse.shared_config(:name => "tokens") }
 
+      context "shared config exists" do
         before do
           stub_api(:get, "/orgs/rt/shared_configs").to_return(200, [config])
           stub_api(:delete, "/teams/#{team[:id]}/shared_configs/#{config[:id]}").to_return(204, "")
@@ -590,6 +590,19 @@ describe Sem::CLI::Teams do
       context "shared config doesn't exists" do
         before do
           stub_api(:get, "/orgs/rt/shared_configs").to_return(200, [])
+        end
+
+        it "displays and error" do
+          _stdout, stderr = sem_run("teams:shared-configs:remove rt/devs rt/tokens")
+
+          expect(stderr).to include("Shared Configuration rt/tokens not found")
+        end
+      end
+
+      context "shared config is not added to the team" do
+        before do
+          stub_api(:get, "/orgs/rt/shared_configs").to_return(200, [config])
+          stub_api(:delete, "/teams/#{team[:id]}/shared_configs/#{config[:id]}").to_return(404, "")
         end
 
         it "displays and error" do
