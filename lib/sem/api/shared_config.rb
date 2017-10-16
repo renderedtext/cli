@@ -16,6 +16,8 @@ class Sem::API::SharedConfig < SimpleDelegator
     end
 
     new(org_name, config)
+  rescue SemaphoreClient::Exceptions::NotFound
+    raise Sem::Errors::ResourceNotFound.new("Shared Configuration", [org_name, shared_config_name])
   end
 
   def self.create!(shared_config_srn, args = {})

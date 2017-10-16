@@ -48,10 +48,14 @@ class Sem::API::Project < SimpleDelegator
 
   def add_shared_config(shared_config)
     Sem::API::Base.client.shared_configs.attach_to_project!(shared_config.id, id)
+  rescue SemaphoreClient::Exceptions::NotFound
+    raise Sem::Errors::ResourceNotFound.new("Shared Configuration", [shared_config.full_name])
   end
 
   def remove_shared_config(shared_config)
     Sem::API::Base.client.shared_configs.detach_from_project!(shared_config.id, id)
+  rescue SemaphoreClient::Exceptions::NotFound
+    raise Sem::Errors::ResourceNotFound.new("Shared Configuration", [shared_config.full_name])
   end
 
   def config_files
