@@ -70,9 +70,9 @@ describe Sem::CLI::SharedConfigs do
       end
 
       it "displays an error" do
-        stdout, _stderr, status = sem_run("shared-configs:info rt/tokens")
+        _stdout, stderr, status = sem_run("shared-configs:info rt/tokens")
 
-        expect(stdout).to include("Shared Configuration rt/tokens not found.")
+        expect(stderr).to include("Shared Configuration rt/tokens not found.")
         expect(status).to eq(:fail)
       end
     end
@@ -98,13 +98,14 @@ describe Sem::CLI::SharedConfigs do
 
     context "creation fails" do
       before do
-        stub_api(:post, "/orgs/rt/shared_configs").to_return(422, "")
+        error = { "message" => "Validation Failed. Name not unique." }
+        stub_api(:post, "/orgs/rt/shared_configs").to_return(422, error)
       end
 
       it "displays an error" do
-        stdout, _stderr, status = sem_run("shared-configs:create rt/tokens")
+        _stdout, stderr, status = sem_run("shared-configs:create rt/tokens")
 
-        expect(stdout).to include("Shared Configuration rt/tokens not created.")
+        expect(stderr).to include("Validation Failed. Name not unique.")
         expect(status).to eq(:fail)
       end
     end
@@ -134,13 +135,14 @@ describe Sem::CLI::SharedConfigs do
 
     context "update fails" do
       before do
-        stub_api(:patch, "/shared_configs/#{shared_config[:id]}").to_return(422, "")
+        error = { "message" => "Validation Failed. Name contains spaces" }
+        stub_api(:patch, "/shared_configs/#{shared_config[:id]}").to_return(422, error)
       end
 
       it "displays an error" do
-        stdout, _stderr, status = sem_run("shared-configs:rename rt/tokens rt/secrets")
+        _stdout, stderr, status = sem_run("shared-configs:rename rt/tokens rt/secrets")
 
-        expect(stdout).to include("Shared Configuration rt/tokens not updated")
+        expect(stderr).to include("Validation Failed. Name contains spaces")
         expect(status).to eq(:fail)
       end
     end
@@ -149,15 +151,34 @@ describe Sem::CLI::SharedConfigs do
   describe "#delete" do
     let(:shared_config) { ApiResponse.shared_config(:name => "tokens") }
 
-    before do
-      stub_api(:get, "/orgs/rt/shared_configs").to_return(200, [shared_config])
-      stub_api(:delete, "/shared_configs/#{shared_config[:id]}").to_return(204, "")
+    context "deletition succeds" do
+      before do
+        stub_api(:get, "/orgs/rt/shared_configs").to_return(200, [shared_config])
+        stub_api(:delete, "/shared_configs/#{shared_config[:id]}").to_return(204, "")
+      end
+
+      it "shows detailed information about a shared_config" do
+        stdout, _stderr = sem_run!("shared-configs:delete rt/tokens")
+
+        expect(stdout).to include("Deleted shared configuration rt/tokens")
+      end
     end
 
-    it "shows detailed information about a shared_config" do
-      stdout, _stderr = sem_run!("shared-configs:delete rt/tokens")
+    context "deletition fails" do
+      before do
+        stub_api(:get, "/orgs/rt/shared_configs").to_return(200, [shared_config])
 
-      expect(stdout).to include("Deleted shared configuration rt/tokens")
+        error = { "message" => "Shared Config is attached to some projects" }
+
+        stub_api(:delete, "/shared_configs/#{shared_config[:id]}").to_return(409, error)
+      end
+
+      it "shows detailed information about a shared_config" do
+        _stdout, stderr, status = sem_run("shared-configs:delete rt/tokens")
+
+        expect(stderr).to include("Shared Config is attached to some projects")
+        expect(status).to eq(:fail)
+      end
     end
   end
 
@@ -223,8 +244,24 @@ describe Sem::CLI::SharedConfigs do
         it "aborts and displays an error" do
           _stdout, stderr, status = sem_run("shared-configs:files:add rt/tokens --path-on-semaphore /etc/aliases --local-path /tmp/aliases")
 
-          expect(status).to be(:system_error)
+          expect(status).to be(:fail)
           expect(stderr.strip).to eq("File /tmp/aliases not found")
+        end
+      end
+
+      context "validation fails" do
+        before do
+          File.write("/tmp/aliases", "abc")
+
+          error = { "message" => "Path can't be empty" }
+          stub_api(:post, "/shared_configs/#{shared_config[:id]}/config_files").to_return(422, error)
+        end
+
+        it "displays the error" do
+          _stdout, stderr, status = sem_run("shared-configs:files:add rt/tokens --path-on-semaphore /etc/aliases --local-path /tmp/aliases")
+
+          expect(status).to be(:fail)
+          expect(stderr).to include("Path can't be empty")
         end
       end
     end
@@ -283,18 +320,34 @@ describe Sem::CLI::SharedConfigs do
     end
 
     describe "#add" do
-      let(:env_var) { ApiResponse.env_var }
+      context "adding a new file succeds" do
+        let(:env_var) { ApiResponse.env_var }
 
-      before do
-        body = { :name => "SECRET", :content => "abc", :encrypted => true }
+        before do
+          body = { :name => "SECRET", :content => "abc", :encrypted => true }
 
-        stub_api(:post, "/shared_configs/#{shared_config[:id]}/env_vars", body).to_return(200, env_var)
+          stub_api(:post, "/shared_configs/#{shared_config[:id]}/env_vars", body).to_return(200, env_var)
+        end
+
+        it "adds the env var to the shared config" do
+          stdout, _stderr = sem_run!("shared-configs:env-vars:add rt/tokens --name SECRET --content abc")
+
+          expect(stdout).to include("Added SECRET to rt/tokens")
+        end
       end
 
-      it "adds the env var to the shared config" do
-        stdout, _stderr = sem_run!("shared-configs:env-vars:add rt/tokens --name SECRET --content abc")
+      context "validation fails" do
+        before do
+          error = { "message" => "Content can't be empty" }
+          stub_api(:post, "/shared_configs/#{shared_config[:id]}/config_files").to_return(422, error)
+        end
 
-        expect(stdout).to include("Added SECRET to rt/tokens")
+        it "displays the error" do
+          _stdout, stderr, status = sem_run("shared-configs:files:add rt/tokens --path-on-semaphore /etc/aliases --local-path /tmp/aliases")
+
+          expect(status).to be(:fail)
+          expect(stderr).to include("Content can't be empty")
+        end
       end
     end
 

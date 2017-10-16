@@ -48,7 +48,7 @@ describe Sem::CLI do
         ]
 
         expect(stderr.strip).to eq(msg.join("\n"))
-        expect(status).to eq(:system_error)
+        expect(status).to eq(:fail)
       end
 
       it "does not set the auth token" do

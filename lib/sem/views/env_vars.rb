@@ -4,7 +4,9 @@ class Sem::Views::EnvVars < Sem::Views::Base
     header = ["ID", "NAME", "ENCRYPTED?", "CONTENT"]
 
     body = env_vars.map do |var|
-      [var.id, var.name, var.encrypted?, var.content]
+      content = var.encrypted? ? "*encrypted*" : var.content
+
+      [var.id, var.name, var.encrypted?, content]
     end
 
     print_table([header, *body])

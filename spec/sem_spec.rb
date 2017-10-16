@@ -14,15 +14,15 @@ RSpec.describe Sem do
     end
 
     it "passed the arguments to the CLI client" do
-      expect(Sem::CLI).to receive(:start).with(["a", "b", "c"])
+      expect(Sem::CLI).to receive(:start).with(["teams:info", "a", "b", "c"])
 
-      expect(Sem.start(["a", "b", "c"])).to eq(0)
+      sem_run!("teams:info a b c")
     end
 
     it "handles the Sem::Errors::Auth::NoCredentials exception" do
       allow(Sem::CLI).to receive(:start).and_raise(Sem::Errors::Auth::NoCredentials)
 
-      stdout, _stderr, result = IOStub.collect_output { Sem.start(["a", "b", "c"]) }
+      _stdout, stderr, status = sem_run("orgs:list")
 
       msg = [
         "[ERROR] You are not logged in.",
@@ -31,14 +31,14 @@ RSpec.describe Sem do
         ""
       ]
 
-      expect(stdout).to include(msg.join("\n"))
-      expect(result).to eq(1)
+      expect(stderr).to include(msg.join("\n"))
+      expect(status).to eq(:fail)
     end
 
     it "handles the Sem::Errors::Auth::InvalidCredentilsCredentials exception" do
       allow(Sem::CLI).to receive(:start).and_raise(Sem::Errors::Auth::InvalidCredentials)
 
-      stdout, _stderr, result = IOStub.collect_output { Sem.start(["a", "b", "c"]) }
+      _stdout, stderr, status = sem_run("orgs:list")
 
       msg = [
         "[ERROR] Your credentials are invalid.",
@@ -47,14 +47,14 @@ RSpec.describe Sem do
         ""
       ]
 
-      expect(stdout).to include(msg.join("\n"))
-      expect(result).to eq(1)
+      expect(stderr).to include(msg.join("\n"))
+      expect(status).to eq(:fail)
     end
 
     it "handles http 500 from api" do
       stub_api(:get, "/orgs").to_return(500, :message => "Server errror.")
 
-      stdout, _stderr, result = IOStub.collect_output { Sem.start(["orgs:list"]) }
+      _stdout, stderr, status = sem_run("orgs:list")
 
       msg = [
         "[ERROR] Semaphore API returned status 500.",
@@ -65,29 +65,42 @@ RSpec.describe Sem do
         ""
       ]
 
-      expect(stdout).to eq(msg.join("\n"))
-      expect(result).to eq(1)
+      expect(stderr).to eq(msg.join("\n"))
+      expect(status).to eq(:fail)
+    end
+
+    it "handles authorization exceptions" do
+      stub_api(:get, "/orgs").to_return(401, "message" => "Invalid Authenticaion Token")
+
+      _stdout, stderr, status = sem_run("orgs:list")
+
+      msg = [
+        "[ERROR] Invalid Authenticaion Token. Check if your credentials are valid.",
+        ""
+      ]
+
+      expect(stderr).to eq(msg.join("\n"))
+      expect(status).to eq(:fail)
     end
 
     it "handles all exceptions" do
       allow(Sem::CLI).to receive(:start) { raise "Haisenberg" }
 
-      stdout, _stderr, result = IOStub.collect_output { Sem.start(["a", "b", "c"]) }
+      _stdout, stderr, status = sem_run("orgs:list")
 
       msg = [
         "[PANIC] Unhandled error.",
         "",
         "Well, this is embarrassing. An unknown error was detected.",
         "",
-        "Exception:",
-        "Haisenberg",
+        "RuntimeError: Haisenberg",
         "",
         "Backtrace:"
       ]
 
-      expect(stdout).to include(msg.join("\n"))
-      expect(stdout).to include("Please report this issue to https://semaphoreci.com/support.")
-      expect(result).to eq(1)
+      expect(stderr).to include(msg.join("\n"))
+      expect(stderr).to include("Please report this issue to https://semaphoreci.com/support.")
+      expect(status).to eq(:fail)
     end
   end
 

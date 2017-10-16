@@ -1,7 +1,15 @@
 module Sem::Errors
   Base = Class.new(StandardError)
 
-  InvalidSRN = Class.new(StandardError)
+  class InvalidSRN < StandardError
+    def message
+      [
+        "[ERROR] Invalid parameter formatting.",
+        "",
+        super
+      ].join("\n")
+    end
+  end
 
   class ResourceException < Base
     def initialize(resource, path)
@@ -35,7 +43,24 @@ module Sem::Errors
   end
 
   module Auth
-    NoCredentials = Class.new(Sem::Errors::Base)
-    InvalidCredentials = Class.new(Sem::Errors::Base)
+    class NoCredentials < Sem::Errors::Base
+      def message
+        [
+          "[ERROR] You are not logged in.",
+          "",
+          "Log in with '#{Sem::CLI.program_name} login --auth-token <token>'"
+        ].join("\n")
+      end
+    end
+
+    class InvalidCredentials < Sem::Errors::Base
+      def message
+        [
+          "[ERROR] Your credentials are invalid.",
+          "",
+          "Log in with '#{Sem::CLI.program_name} login --auth-token <token>'"
+        ].join("\n")
+      end
+    end
   end
 end

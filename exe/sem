@@ -2,4 +2,4 @@
 
 require "sem"
 
-exit Sem.start(ARGV)
+Sem.start(ARGV)

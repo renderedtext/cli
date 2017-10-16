@@ -21,87 +21,55 @@ module Sem
       @trace_mode == true
     end
 
-    # Returns exit status as a number.
-    def start(args)
-      if args.include?("--trace")
-        @trace_mode = true
+    def run_in_trace_mode!
+      @trace_mode = true
+    end
 
-        args.delete("--trace")
-      end
+    # Returns exit status as a number.
+    # rubocop:disable Metrics/AbcSize
+    def start(args)
+      args.delete("--trace") && run_in_trace_mode! if args.include?("--trace")
 
       Sem::CLI.start(args)
-
-      0
-    rescue Sem::Errors::ResourceNotFound => e
-      puts e.message
-
-      1
-    rescue Sem::Errors::ResourceException => e
-      puts e.message
-
-      1
-    rescue Sem::Errors::InvalidSRN => e
-      on_invalid_srn(e)
-
-      1
-    rescue Sem::Errors::Auth::NoCredentials
-      on_no_credentials
-
-      1
-    rescue Sem::Errors::Auth::InvalidCredentials
-      on_invalid_credentials
-
-      1
+    rescue Sem::Errors::Base => e
+      abort e.message
+    rescue SemaphoreClient::Exceptions::Conflict, SemaphoreClient::Exceptions::NotAllowed => e
+      abort "[ERROR] #{e.message}"
+    rescue SemaphoreClient::Exceptions::Unauthorized => e
+      abort "[ERROR] #{e.message}. Check if your credentials are valid."
     rescue SemaphoreClient::Exceptions::ServerError => e
-      on_server_error(e)
-
-      1
+      abort on_server_error(e)
+    rescue SemaphoreClient::Exceptions::UnprocessableEntity => e
+      abort "[ERROR] #{e.message}"
     rescue StandardError => e
-      on_unhandled_error(e)
-
-      1
+      abort on_unhandled_error(e)
     end
 
     private
 
-    def on_invalid_srn(exception)
-      puts "[ERROR] Invalid parameter formatting."
-      puts ""
-      puts exception.message
-    end
-
     def on_server_error(exception)
-      puts "[ERROR] Semaphore API returned status #{exception.code}."
-      puts ""
-      puts exception.message
-      puts ""
-      puts "Please report this issue to https://semaphoreci.com/support."
-    end
-
-    def on_no_credentials
-      puts "[ERROR] You are not logged in."
-      puts ""
-      puts "Log in with '#{Sem::CLI.program_name} login --auth-token <token>'"
-    end
-
-    def on_invalid_credentials
-      puts "[ERROR] Your credentials are invalid."
-      puts ""
-      puts "Log in with '#{Sem::CLI.program_name} login --auth-token <token>'"
+      [
+        "[ERROR] Semaphore API returned status #{exception.code}.",
+        "",
+        exception.message,
+        "",
+        "Please report this issue to https://semaphoreci.com/support."
+      ].join("\n")
     end
 
     def on_unhandled_error(exception)
-      puts "[PANIC] Unhandled error."
-      puts ""
-      puts "Well, this is embarrassing. An unknown error was detected."
-      puts ""
-      puts "Exception:"
-      puts exception.message
-      puts ""
-      puts "Backtrace: "
-      puts exception.backtrace
-      puts ""
-      puts "Please report this issue to https://semaphoreci.com/support."
+      [
+        "[PANIC] Unhandled error.",
+        "",
+        "Well, this is embarrassing. An unknown error was detected.",
+        "",
+        "#{exception.class.name}: #{exception.message}",
+        "",
+        "Backtrace: ",
+        exception.backtrace,
+        "",
+        "Please report this issue to https://semaphoreci.com/support."
+      ].join("\n")
     end
   end
 
