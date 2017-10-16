@@ -68,7 +68,7 @@ module Sem
         "Backtrace: ",
         exception.backtrace,
         "",
-        "Please report this issue to https://semaphoreci.com/support."
+        "Please report this issue by opening an issue on GitHub: https://github.com/renderedtext/cli/issues/new."
       ].join("\n")
     end
   end

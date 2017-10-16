@@ -99,7 +99,7 @@ RSpec.describe Sem do
       ]
 
       expect(stderr).to include(msg.join("\n"))
-      expect(stderr).to include("Please report this issue to https://semaphoreci.com/support.")
+      expect(stderr).to include("Please report this issue by opening an issue on GitHub: https://github.com/renderedtext/cli/issues/new.")
       expect(status).to eq(:fail)
     end
   end
