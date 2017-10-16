@@ -7,7 +7,7 @@ module Sem
     require_relative "cli/teams"
     require_relative "cli/shared_configs"
 
-    desc "version", "Check CLI version"
+    desc "version", "Display CLI version"
     def version
       puts Sem::VERSION
     end
