@@ -237,13 +237,32 @@ describe Sem::CLI::Teams do
 
     before do
       stub_api(:get, "/orgs/rt/teams").to_return(200, [team])
-      stub_api(:delete, "/teams/#{team[:id]}").to_return(204, team)
     end
 
-    it "updates the name of the team" do
-      stdout, _stderr = sem_run("teams:delete rt/devs")
+    context "delete succeds" do
+      before do
+        stub_api(:delete, "/teams/#{team[:id]}").to_return(204, team)
+      end
 
-      expect(stdout).to include("Team rt/devs deleted")
+      it "updates the name of the team" do
+        stdout, _stderr = sem_run("teams:delete rt/devs")
+
+        expect(stdout).to include("Team rt/devs deleted")
+      end
+    end
+
+    context "delete fails" do
+      before do
+        error = { "message" => "Team is connected to multiple projects" }
+        stub_api(:delete, "/teams/#{team[:id]}").to_return(409, error)
+      end
+
+      it "updates the name of the team" do
+        _stdout, stderr, status = sem_run("teams:delete rt/devs")
+
+        expect(stderr).to include("[ERROR] Team is connected to multiple projects")
+        expect(status).to eq(:fail)
+      end
     end
   end
 

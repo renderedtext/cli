@@ -33,6 +33,8 @@ module Sem
       Sem::CLI.start(args)
     rescue Sem::Errors::Base => e
       abort e.message
+    rescue SemaphoreClient::Exceptions::Conflict => e
+      abort "[ERROR] #{e.message}"
     rescue SemaphoreClient::Exceptions::Unauthorized => e
       abort "[ERROR] #{e.message}. Check if your credentials are valid."
     rescue SemaphoreClient::Exceptions::ServerError => e
