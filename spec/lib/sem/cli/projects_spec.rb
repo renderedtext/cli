@@ -248,6 +248,7 @@ describe Sem::CLI::Projects do
           _stdout, stderr, status = sem_run("projects:shared-configs:add rt/cli rt/tokens")
 
           expect(stderr).to include("Shared Configuration rt/tokens not found")
+          expect(status).to eq(:fail)
         end
       end
     end
@@ -282,6 +283,7 @@ describe Sem::CLI::Projects do
           _stdout, stderr, status = sem_run("projects:shared-configs:remove rt/cli rt/tokens")
 
           expect(stderr).to include("Shared Configuration rt/tokens not found")
+          expect(status).to eq(:fail)
         end
       end
 
@@ -295,6 +297,7 @@ describe Sem::CLI::Projects do
           _stdout, stderr, status = sem_run("projects:shared-configs:add rt/cli rt/tokens")
 
           expect(stderr).to include("Shared Configuration rt/tokens not found")
+          expect(status).to eq(:fail)
         end
       end
     end
