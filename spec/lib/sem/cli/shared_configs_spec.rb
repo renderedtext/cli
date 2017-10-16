@@ -151,15 +151,34 @@ describe Sem::CLI::SharedConfigs do
   describe "#delete" do
     let(:shared_config) { ApiResponse.shared_config(:name => "tokens") }
 
-    before do
-      stub_api(:get, "/orgs/rt/shared_configs").to_return(200, [shared_config])
-      stub_api(:delete, "/shared_configs/#{shared_config[:id]}").to_return(204, "")
+    context "deletition succeds" do
+      before do
+        stub_api(:get, "/orgs/rt/shared_configs").to_return(200, [shared_config])
+        stub_api(:delete, "/shared_configs/#{shared_config[:id]}").to_return(204, "")
+      end
+
+      it "shows detailed information about a shared_config" do
+        stdout, _stderr = sem_run!("shared-configs:delete rt/tokens")
+
+        expect(stdout).to include("Deleted shared configuration rt/tokens")
+      end
     end
 
-    it "shows detailed information about a shared_config" do
-      stdout, _stderr = sem_run!("shared-configs:delete rt/tokens")
+    context "deletition fails" do
+      before do
+        stub_api(:get, "/orgs/rt/shared_configs").to_return(200, [shared_config])
 
-      expect(stdout).to include("Deleted shared configuration rt/tokens")
+        error = { "message" => "Shared Config is attached to some projects" }
+
+        stub_api(:delete, "/shared_configs/#{shared_config[:id]}").to_return(409, error)
+      end
+
+      it "shows detailed information about a shared_config" do
+        _stdout, stderr, status = sem_run("shared-configs:delete rt/tokens")
+
+        expect(stderr).to include("Shared Config is attached to some projects")
+        expect(status).to eq(:fail)
+      end
     end
   end
 
