@@ -93,8 +93,7 @@ RSpec.describe Sem do
         "",
         "Well, this is embarrassing. An unknown error was detected.",
         "",
-        "Exception:",
-        "Haisenberg",
+        "RuntimeError: Haisenberg",
         "",
         "Backtrace:"
       ]
