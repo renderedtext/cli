@@ -60,6 +60,16 @@ the [CLI development guide](guides.md).
 
 To run the CLI locally, use the `bundle exec sem`.
 
+#### Generating Docs
+
+First, generate a JSON structure of the CLI, by running:
+
+``` bash
+./bin/generate_json_structure
+```
+
+Use that structure to generate docs in the semaphore-docs-new repository.
+
 #### Semaphore Resource Name (SRN)
 
 SRN is a way of identifying Semaphore resources. This CLI uses SRNs as arguments

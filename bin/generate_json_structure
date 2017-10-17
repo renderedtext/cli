@@ -1,0 +1,6 @@
+#!/usr/bin/env ruby
+
+require "bundler/setup"
+require "sem"
+
+puts Sem::CLI.structure.to_json
