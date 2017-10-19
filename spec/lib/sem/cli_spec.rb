@@ -68,7 +68,7 @@ describe Sem::CLI do
       stdout, stderr, status = sem_run("logout")
 
       msg = [
-        "Loged out."
+        "Logged out."
       ]
 
       expect(stdout.strip).to eq(msg.join("\n"))

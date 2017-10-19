@@ -1,4 +1,4 @@
-class Sem::CLI::Teams < Dracula
+class Sem::CLI::Teams < Dracula # rubocop:disable Metrics/ClassLength
 
   ALLOWED_PERMISSIONS = ["admin", "edit", "read"].freeze
 
@@ -7,7 +7,7 @@ class Sem::CLI::Teams < Dracula
 Examples:
 
     $ sem teams:list
-    ID                                    NAME       PERMISSION  MEMBERS
+    ID                                    NAME                 PERMISSION  MEMBERS
     1bc7ed43-ac8a-487e-b488-c38bc757a034  renderedtext/devs    write       2 members
     1bc7ed43-ac8a-487e-b488-c38bc757a034  renderedtext/admins  write       0 members
 DESC
