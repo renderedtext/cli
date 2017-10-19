@@ -4,7 +4,7 @@ class Sem::Views::Files < Sem::Views::Base
     header = ["ID", "PATH", "ENCRYPTED?"]
 
     body = files.map do |file|
-      [file.id, file.path, file.encrypted?]
+      [file.id, "/home/runner/#{file.path}", file.encrypted?]
     end
 
     print_table([header, *body])

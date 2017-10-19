@@ -223,7 +223,7 @@ describe Sem::CLI::SharedConfigs do
       let(:file) { ApiResponse.file(:path => "/etc/a") }
 
       before do
-        body = { :path => "/etc/aliases", :content => "abc", :encrypted => true }
+        body = { :path => "aliases", :content => "abc", :encrypted => true }
 
         stub_api(:post, "/shared_configs/#{shared_config[:id]}/config_files", body).to_return(200, file)
       end
@@ -232,9 +232,9 @@ describe Sem::CLI::SharedConfigs do
         before { File.write("/tmp/aliases", "abc") }
 
         it "adds the file to the shared config" do
-          stdout, _stderr = sem_run("shared-configs:files:add rt/tokens --path-on-semaphore /etc/aliases --local-path /tmp/aliases")
+          stdout, _stderr = sem_run("shared-configs:files:add rt/tokens --path-on-semaphore aliases --local-path /tmp/aliases")
 
-          expect(stdout).to include("Added /etc/aliases to rt/tokens")
+          expect(stdout).to include("Added /home/runner/aliases to rt/tokens.")
         end
       end
 
@@ -267,7 +267,7 @@ describe Sem::CLI::SharedConfigs do
     end
 
     describe "#remove" do
-      let(:file) { ApiResponse.file(:path => "/etc/a") }
+      let(:file) { ApiResponse.file(:path => "a") }
 
       before do
         stub_api(:get, "/shared_configs/#{shared_config[:id]}/config_files").to_return(200, [file])
@@ -275,9 +275,9 @@ describe Sem::CLI::SharedConfigs do
       end
 
       it "removes the shared configuration to the project" do
-        stdout, _stderr = sem_run!("shared-configs:files:remove rt/tokens --path /etc/a")
+        stdout, _stderr = sem_run!("shared-configs:files:remove rt/tokens --path a")
 
-        expect(stdout).to include("Removed /etc/a from rt/tokens")
+        expect(stdout).to include("Removed /home/runner/a from rt/tokens")
       end
     end
   end
