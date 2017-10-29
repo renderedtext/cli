@@ -1,6 +1,6 @@
 require "spec_helper"
 
-describe Sem::CLI::SharedConfigs do
+describe Sem::CLI::Secrets do
 
   describe "#list" do
     let(:org1) { ApiResponse.organization(:username => "rt") }
@@ -23,7 +23,7 @@ describe Sem::CLI::SharedConfigs do
       end
 
       it "lists all shared_configs" do
-        stdout, _stderr = sem_run!("shared-configs:list")
+        stdout, _stderr = sem_run!("secrets:list")
 
         expect(stdout).to include(shared_config1[:id])
         expect(stdout).to include(shared_config2[:id])
@@ -39,7 +39,7 @@ describe Sem::CLI::SharedConfigs do
       end
 
       it "offers you to set up a shared_config on semaphore" do
-        stdout, _stderr = sem_run!("shared-configs:list")
+        stdout, _stderr = sem_run!("secrets:list")
 
         expect(stdout).to include("Create your first shared configuration")
       end
@@ -58,7 +58,7 @@ describe Sem::CLI::SharedConfigs do
       end
 
       it "shows detailed information about a shared_config" do
-        stdout, _stderr = sem_run!("shared-configs:info rt/tokens")
+        stdout, _stderr = sem_run!("secrets:info rt/tokens")
 
         expect(stdout).to include(shared_config[:id])
       end
@@ -70,7 +70,7 @@ describe Sem::CLI::SharedConfigs do
       end
 
       it "displays an error" do
-        _stdout, stderr, status = sem_run("shared-configs:info rt/tokens")
+        _stdout, stderr, status = sem_run("secrets:info rt/tokens")
 
         expect(stderr).to include("Shared Configuration rt/tokens not found.")
         expect(status).to eq(:fail)
@@ -90,7 +90,7 @@ describe Sem::CLI::SharedConfigs do
       end
 
       it "shows detailed information about a shared_config" do
-        stdout, _stderr = sem_run!("shared-configs:create rt/tokens")
+        stdout, _stderr = sem_run!("secrets:create rt/tokens")
 
         expect(stdout).to include(shared_config[:id])
       end
@@ -103,7 +103,7 @@ describe Sem::CLI::SharedConfigs do
       end
 
       it "displays an error" do
-        _stdout, stderr, status = sem_run("shared-configs:create rt/tokens")
+        _stdout, stderr, status = sem_run("secrets:create rt/tokens")
 
         expect(stderr).to include("Validation Failed. Name not unique.")
         expect(status).to eq(:fail)
@@ -127,7 +127,7 @@ describe Sem::CLI::SharedConfigs do
       end
 
       it "shows detailed information about a shared_config" do
-        stdout, _stderr = sem_run!("shared-configs:rename rt/tokens rt/secrets")
+        stdout, _stderr = sem_run!("secrets:rename rt/tokens rt/secrets")
 
         expect(stdout).to include(shared_config[:id])
       end
@@ -140,7 +140,7 @@ describe Sem::CLI::SharedConfigs do
       end
 
       it "displays an error" do
-        _stdout, stderr, status = sem_run("shared-configs:rename rt/tokens rt/secrets")
+        _stdout, stderr, status = sem_run("secrets:rename rt/tokens rt/secrets")
 
         expect(stderr).to include("Validation Failed. Name contains spaces")
         expect(status).to eq(:fail)
@@ -158,7 +158,7 @@ describe Sem::CLI::SharedConfigs do
       end
 
       it "shows detailed information about a shared_config" do
-        stdout, _stderr = sem_run!("shared-configs:delete rt/tokens")
+        stdout, _stderr = sem_run!("secrets:delete rt/tokens")
 
         expect(stdout).to include("Deleted shared configuration rt/tokens")
       end
@@ -174,7 +174,7 @@ describe Sem::CLI::SharedConfigs do
       end
 
       it "shows detailed information about a shared_config" do
-        _stdout, stderr, status = sem_run("shared-configs:delete rt/tokens")
+        _stdout, stderr, status = sem_run("secrets:delete rt/tokens")
 
         expect(stderr).to include("Shared Config is attached to some projects")
         expect(status).to eq(:fail)
@@ -182,7 +182,7 @@ describe Sem::CLI::SharedConfigs do
     end
   end
 
-  describe Sem::CLI::SharedConfigs::Files do
+  describe Sem::CLI::Secrets::Files do
     let(:shared_config) { ApiResponse.shared_config(:name => "tokens") }
 
     before do
@@ -199,7 +199,7 @@ describe Sem::CLI::SharedConfigs do
         end
 
         it "lists all shared configurations on the project" do
-          stdout, _stderr = sem_run("shared-configs:files:list rt/tokens")
+          stdout, _stderr = sem_run("secrets:files:list rt/tokens")
 
           expect(stdout).to include(file1[:path])
           expect(stdout).to include(file2[:path])
@@ -212,7 +212,7 @@ describe Sem::CLI::SharedConfigs do
         end
 
         it "offers you to create and attach a shared configuration" do
-          stdout, _stderr = sem_run!("shared-configs:files:list rt/tokens")
+          stdout, _stderr = sem_run!("secrets:files:list rt/tokens")
 
           expect(stdout).to include("Add your first file")
         end
@@ -232,7 +232,7 @@ describe Sem::CLI::SharedConfigs do
         before { File.write("/tmp/aliases", "abc") }
 
         it "adds the file to the shared config" do
-          stdout, _stderr = sem_run("shared-configs:files:add rt/tokens --path-on-semaphore aliases --local-path /tmp/aliases")
+          stdout, _stderr = sem_run("secrets:files:add rt/tokens --path-on-semaphore aliases --local-path /tmp/aliases")
 
           expect(stdout).to include("Added /home/runner/aliases to rt/tokens.")
         end
@@ -242,7 +242,7 @@ describe Sem::CLI::SharedConfigs do
         before { FileUtils.rm_f("/tmp/aliases") }
 
         it "aborts and displays an error" do
-          _stdout, stderr, status = sem_run("shared-configs:files:add rt/tokens --path-on-semaphore /etc/aliases --local-path /tmp/aliases")
+          _stdout, stderr, status = sem_run("secrets:files:add rt/tokens --path-on-semaphore /etc/aliases --local-path /tmp/aliases")
 
           expect(status).to be(:fail)
           expect(stderr.strip).to eq("File /tmp/aliases not found")
@@ -258,7 +258,7 @@ describe Sem::CLI::SharedConfigs do
         end
 
         it "displays the error" do
-          _stdout, stderr, status = sem_run("shared-configs:files:add rt/tokens --path-on-semaphore /etc/aliases --local-path /tmp/aliases")
+          _stdout, stderr, status = sem_run("secrets:files:add rt/tokens --path-on-semaphore /etc/aliases --local-path /tmp/aliases")
 
           expect(status).to be(:fail)
           expect(stderr).to include("Path can't be empty")
@@ -275,14 +275,14 @@ describe Sem::CLI::SharedConfigs do
       end
 
       it "removes the shared configuration to the project" do
-        stdout, _stderr = sem_run!("shared-configs:files:remove rt/tokens --path a")
+        stdout, _stderr = sem_run!("secrets:files:remove rt/tokens --path a")
 
         expect(stdout).to include("Removed /home/runner/a from rt/tokens")
       end
     end
   end
 
-  describe Sem::CLI::SharedConfigs::EnvVars do
+  describe Sem::CLI::Secrets::EnvVars do
     let(:shared_config) { ApiResponse.shared_config(:name => "tokens") }
 
     before do
@@ -299,7 +299,7 @@ describe Sem::CLI::SharedConfigs do
         end
 
         it "lists all env vars in a shared_config" do
-          stdout, _stderr = sem_run("shared-configs:env-vars:list rt/tokens")
+          stdout, _stderr = sem_run("secrets:env-vars:list rt/tokens")
 
           expect(stdout).to include(env_var1[:name])
           expect(stdout).to include(env_var2[:name])
@@ -312,7 +312,7 @@ describe Sem::CLI::SharedConfigs do
         end
 
         it "offers you to create and attach an env var" do
-          stdout, _stderr = sem_run!("shared-configs:env-vars:list rt/tokens")
+          stdout, _stderr = sem_run!("secrets:env-vars:list rt/tokens")
 
           expect(stdout).to include("Add your first environment variable")
         end
@@ -330,7 +330,7 @@ describe Sem::CLI::SharedConfigs do
         end
 
         it "adds the env var to the shared config" do
-          stdout, _stderr = sem_run!("shared-configs:env-vars:add rt/tokens --name SECRET --content abc")
+          stdout, _stderr = sem_run!("secrets:env-vars:add rt/tokens --name SECRET --content abc")
 
           expect(stdout).to include("Added SECRET to rt/tokens")
         end
@@ -343,7 +343,7 @@ describe Sem::CLI::SharedConfigs do
         end
 
         it "displays the error" do
-          _stdout, stderr, status = sem_run("shared-configs:files:add rt/tokens --path-on-semaphore /etc/aliases --local-path /tmp/aliases")
+          _stdout, stderr, status = sem_run("secrets:files:add rt/tokens --path-on-semaphore /etc/aliases --local-path /tmp/aliases")
 
           expect(status).to be(:fail)
           expect(stderr).to include("Content can't be empty")
@@ -360,7 +360,7 @@ describe Sem::CLI::SharedConfigs do
       end
 
       it "removes the env vars from the shared configurations" do
-        stdout, _stderr = sem_run!("shared-configs:env-vars:remove rt/tokens --name TOKEN")
+        stdout, _stderr = sem_run!("secrets:env-vars:remove rt/tokens --name TOKEN")
 
         expect(stdout).to include("Removed TOKEN from rt/tokens")
       end

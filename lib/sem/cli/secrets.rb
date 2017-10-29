@@ -50,7 +50,7 @@ Examples:
     Updated                2017-08-02 13:14:40 +0200
 DESC
   def create(secrets_name)
-    secret = Sem::API::SharedConfig.create!(secret_name)
+    secret = Sem::API::Secret.create!(secret_name)
 
     Sem::Views::Secrets.info(secret)
   end
