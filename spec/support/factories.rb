@@ -29,11 +29,11 @@ module StubFactory
     Sem::API::Project.new(org_name, api_model)
   end
 
-  def shared_config(org_name, params = {})
+  def secret(org_name, params = {})
     api_response = ApiResponse.project(params)
     api_model = RSpec::Mocks::Double.new(SemaphoreClient::Model::SharedConfig, api_response)
 
-    Sem::API::SharedConfig.new(org_name, api_model)
+    Sem::API::Secret.new(org_name, api_model)
   end
 
   def file(params = {})

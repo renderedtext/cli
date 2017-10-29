@@ -1,11 +1,11 @@
-class Sem::Views::SharedConfigs < Sem::Views::Base
+class Sem::Views::Secrets < Sem::Views::Base
 
-  def self.setup_first_shared_config
-    puts "You don't have any shared configurations on Semaphore."
+  def self.setup_first_secrets
+    puts "You don't have any secrets on Semaphore."
     puts ""
-    puts "Create your first shared configuration:"
+    puts "Create your first secrets:"
     puts ""
-    puts "  sem shared-config:create SHARED_CONFIG_NAME"
+    puts "  sem secrets:create SECRETS_NAME"
     puts ""
   end
 
@@ -30,21 +30,21 @@ class Sem::Views::SharedConfigs < Sem::Views::Base
     ]
   end
 
-  def self.add_first_file(shared_config)
-    puts "You don't have any files in this shared configuration."
+  def self.add_first_file(secret)
+    puts "You don't have any files in these secrets"
     puts ""
     puts "Add your first file:"
     puts ""
-    puts "  sem shared-config:files:add #{shared_config.full_name} --local-path <file> --path-on-semaphore <path>"
+    puts "  sem secrets:files:add #{secret.full_name} --local-path <file> --path-on-semaphore <path>"
     puts ""
   end
 
-  def self.add_first_env_var(shared_config)
-    puts "You don't have any environment variable in this shared configuration."
+  def self.add_first_env_var(secret)
+    puts "You don't have any environment variable in these secrets"
     puts ""
     puts "Add your first environment variable:"
     puts ""
-    puts "  sem shared-config:env-vars:add #{shared_config.full_name} --local-path <file> --path-on-semaphore <path>"
+    puts "  sem secrets:env-vars:add #{secrets.full_name} --local-path <file> --path-on-semaphore <path>"
     puts ""
   end
 
