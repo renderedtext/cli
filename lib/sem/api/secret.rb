@@ -6,30 +6,30 @@ class Sem::API::Secret < SimpleDelegator
   end
 
   def self.find!(secrets_srn)
-    org_name, secret_name = Sem::SRN.parse_secrets(shared_config_srn)
+    org_name, secret_name = Sem::SRN.parse_secret(secrets_srn)
 
     configs = client.shared_configs.list_for_org!(org_name)
-    config = configs.find { |c| c.name == shared_config_name }
+    config = configs.find { |c| c.name == secret_name }
 
     if config.nil?
-      raise Sem::Errors::ResourceNotFound.new("Secret", [org_name, shared_config_name])
+      raise Sem::Errors::ResourceNotFound.new("Secret", [org_name, secret_name])
     end
 
     new(org_name, config)
   rescue SemaphoreClient::Exceptions::NotFound
-    raise Sem::Errors::ResourceNotFound.new("Secret", [org_name, shared_config_name])
+    raise Sem::Errors::ResourceNotFound.new("Secret", [org_name, secret_name])
   end
 
-  def self.create!(shared_config_srn, args = {})
-    org_name, shared_config_name = Sem::SRN.parse_shared_config(shared_config_srn)
+  def self.create!(secret_srn, args = {})
+    org_name, secret_name = Sem::SRN.parse_secret(secret_srn)
 
-    shared_config = client.shared_configs.create_for_org!(org_name, args.merge(:name => shared_config_name))
+    secret = client.shared_configs.create_for_org!(org_name, args.merge(:name => secret_name))
 
-    if shared_config.nil?
-      raise Sem::Errors::ResourceNotCreated.new("Secret", [org_name, shared_config_name])
+    if secret.nil?
+      raise Sem::Errors::ResourceNotCreated.new("Secret", [org_name, secret_name])
     end
 
-    new(org_name, shared_config)
+    new(org_name, secret)
   end
 
   attr_reader :org_name

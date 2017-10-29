@@ -522,10 +522,10 @@ describe Sem::CLI::Teams do
           stub_api(:get, "/teams/#{team[:id]}/shared_configs").to_return(200, [])
         end
 
-        it "offers a way to add first project" do
+        it "offers a way to add first secrets" do
           stdout, _stderr = sem_run!("teams:secrets:list rt/devs")
 
-          expect(stdout).to include("Add your first shared configuration")
+          expect(stdout).to include("Add your first secrets")
         end
       end
 
@@ -545,20 +545,20 @@ describe Sem::CLI::Teams do
     describe "#add" do
       let(:config) { ApiResponse.shared_config(:name => "tokens") }
 
-      context "shared config exists" do
+      context "secrets exists" do
         before do
           stub_api(:get, "/orgs/rt/shared_configs").to_return(200, [config])
           stub_api(:post, "/teams/#{team[:id]}/shared_configs/#{config[:id]}").to_return(204, "")
         end
 
-        it "add a shared_config to the team" do
+        it "add secrets to the team" do
           stdout, _stderr = sem_run!("teams:secrets:add rt/devs rt/tokens")
 
-          expect(stdout).to include("Shared Configuration rt/tokens added to the team")
+          expect(stdout).to include("Secrets rt/tokens added to the team")
         end
       end
 
-      context "shared config doesn't exists" do
+      context "secrets don't exist" do
         before do
           stub_api(:get, "/orgs/rt/shared_configs").to_return(200, [])
         end
@@ -566,7 +566,7 @@ describe Sem::CLI::Teams do
         it "displays and error" do
           _stdout, stderr = sem_run("teams:secrets:add rt/devs rt/tokens")
 
-          expect(stderr).to include("Shared Configuration rt/tokens not found")
+          expect(stderr).to include("Secret rt/tokens not found")
         end
       end
     end
@@ -574,16 +574,16 @@ describe Sem::CLI::Teams do
     describe "#remove" do
       let(:config) { ApiResponse.shared_config(:name => "tokens") }
 
-      context "shared config exists" do
+      context "secrets exist" do
         before do
           stub_api(:get, "/orgs/rt/shared_configs").to_return(200, [config])
           stub_api(:delete, "/teams/#{team[:id]}/shared_configs/#{config[:id]}").to_return(204, "")
         end
 
-        it "remove a shared_config from the team" do
+        it "remove a secret from the team" do
           stdout, _stderr = sem_run!("teams:secrets:remove rt/devs rt/tokens")
 
-          expect(stdout).to include("Shared Configuration rt/tokens removed from the team")
+          expect(stdout).to include("Secrets rt/tokens removed from the team")
         end
       end
 
@@ -595,7 +595,7 @@ describe Sem::CLI::Teams do
         it "displays and error" do
           _stdout, stderr = sem_run("teams:secrets:remove rt/devs rt/tokens")
 
-          expect(stderr).to include("Secrets rt/tokens not found")
+          expect(stderr).to include("Secret rt/tokens not found")
         end
       end
 
@@ -608,7 +608,7 @@ describe Sem::CLI::Teams do
         it "displays and error" do
           _stdout, stderr = sem_run("teams:secrets:remove rt/devs rt/tokens")
 
-          expect(stderr).to include("Shared Configuration rt/tokens not found")
+          expect(stderr).to include("Secret rt/tokens not found")
         end
       end
     end

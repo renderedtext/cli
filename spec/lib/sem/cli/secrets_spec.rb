@@ -6,7 +6,7 @@ describe Sem::CLI::Secrets do
     let(:org1) { ApiResponse.organization(:username => "rt") }
     let(:org2) { ApiResponse.organization(:username => "z-fighters") }
 
-    context "you have at least one shared config on semaphore" do
+    context "you have at least one secret on semaphore" do
       let(:shared_config1) { ApiResponse.shared_config }
       let(:shared_config2) { ApiResponse.shared_config }
 
@@ -41,13 +41,13 @@ describe Sem::CLI::Secrets do
       it "offers you to set up a shared_config on semaphore" do
         stdout, _stderr = sem_run!("secrets:list")
 
-        expect(stdout).to include("Create your first shared configuration")
+        expect(stdout).to include("Create your first secrets")
       end
     end
   end
 
   describe "#info" do
-    context "shared_config exists" do
+    context "secrets exists" do
       let(:shared_config) { ApiResponse.shared_config(:name => "tokens") }
 
       before do
@@ -57,14 +57,14 @@ describe Sem::CLI::Secrets do
         stub_api(:get, "/shared_configs/#{shared_config[:id]}/env_vars").to_return(200, [])
       end
 
-      it "shows detailed information about a shared_config" do
+      it "shows detailed information about a secret" do
         stdout, _stderr = sem_run!("secrets:info rt/tokens")
 
         expect(stdout).to include(shared_config[:id])
       end
     end
 
-    context "shared_config doesn't exists" do
+    context "secrets doesn't exists" do
       before do
         stub_api(:get, "/orgs/rt/shared_configs").to_return(200, [])
       end
@@ -72,7 +72,7 @@ describe Sem::CLI::Secrets do
       it "displays an error" do
         _stdout, stderr, status = sem_run("secrets:info rt/tokens")
 
-        expect(stderr).to include("Shared Configuration rt/tokens not found.")
+        expect(stderr).to include("Secret rt/tokens not found.")
         expect(status).to eq(:fail)
       end
     end
@@ -126,7 +126,7 @@ describe Sem::CLI::Secrets do
         stub_api(:get, "/shared_configs/#{shared_config[:id]}/env_vars").to_return(200, [])
       end
 
-      it "shows detailed information about a shared_config" do
+      it "shows detailed information about secrets" do
         stdout, _stderr = sem_run!("secrets:rename rt/tokens rt/secrets")
 
         expect(stdout).to include(shared_config[:id])

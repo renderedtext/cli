@@ -26,12 +26,12 @@ class Sem::Views::Projects < Sem::Views::Base
     ]
   end
 
-  def self.attach_first_shared_config(project)
-    puts "You don't have any shared configurations on this project."
+  def self.attach_first_secrets(project)
+    puts "You don't have any secrets on this project."
     puts ""
-    puts "Add your first shared configuration:"
+    puts "Add your first secrets:"
     puts ""
-    puts "  sem projects:shared-configs:add #{project.full_name} SHARED_CONFIG_NAME"
+    puts "  sem projects:secrets:add #{project.full_name} SECRETS_NAME"
     puts ""
   end
 

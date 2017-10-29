@@ -272,7 +272,7 @@ DESC
       if !configs.empty?
         Sem::Views::Secrets.list(configs)
       else
-        Sem::Views::Teams.add_first_secret(team)
+        Sem::Views::Teams.add_first_secrets(team)
       end
     end
 
@@ -289,7 +289,7 @@ DESC
 
       team.add_secret(secret)
 
-      puts "Secrets #{shared_config_name} added to the team."
+      puts "Secrets #{secret_name} added to the team."
     end
 
     desc "remove", "removes secrets from the team"
@@ -299,13 +299,13 @@ Examples:
     $ sem team:secrets:remove renderedtext/devs renderedtext/secrets
     Secrets renderedtext/secrets removed from the team.
 DESC
-    def remove(team_name, secrets_name)
+    def remove(team_name, secret_name)
       team = Sem::API::Team.find!(team_name)
       secret = Sem::API::Secret.find!(secret_name)
 
       team.remove_secret(secret)
 
-      puts "Secrets #{shared_config_name} removed from the team."
+      puts "Secrets #{secret_name} removed from the team."
     end
   end
 

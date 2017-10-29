@@ -24,7 +24,7 @@ class Sem::API::Org < SimpleDelegator
   end
 
   def shared_configs
-    Sem::API::Base.client.shared_configs.list_for_org!(username).map { |config| Sem::API::SharedConfig.new(username, config) }
+    Sem::API::Base.client.shared_configs.list_for_org!(username).map { |secret| Sem::API::Secret.new(username, secret) }
   end
 
 end

@@ -10,12 +10,12 @@ Examples:
     1133ed43-ac8a-487e-b488-c38bc757a044  renderedtext/secrets            0         1
 DESC
   def list
-    secrets = Sem::API::Secrets.all
+    secrets = Sem::API::Secret.all
 
     if !secrets.empty?
       Sem::Views::Secrets.list(secrets)
     else
-      Sem::Views::Secrets.setup_first_secret
+      Sem::Views::Secrets.setup_first_secrets
     end
   end
 
@@ -34,7 +34,7 @@ DESC
   def info(secret_name)
     secret = Sem::API::Secret.find!(secret_name)
 
-    Sem::Views::Secrets.info(secrets)
+    Sem::Views::Secrets.info(secret)
   end
 
   desc "create", "create new secrets"
@@ -49,7 +49,7 @@ Examples:
     Created                2017-08-01 13:14:40 +0200
     Updated                2017-08-02 13:14:40 +0200
 DESC
-  def create(secrets_name)
+  def create(secret_name)
     secret = Sem::API::Secret.create!(secret_name)
 
     Sem::Views::Secrets.info(secret)
