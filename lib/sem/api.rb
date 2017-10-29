@@ -6,7 +6,7 @@ module Sem
     require_relative "api/project"
     require_relative "api/env_var"
     require_relative "api/file"
-    require_relative "api/shared_config"
+    require_relative "api/secret"
     require_relative "api/team"
   end
 end

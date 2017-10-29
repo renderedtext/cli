@@ -51,16 +51,16 @@ describe Sem::SRN do
 
   describe ".parse_shared_config" do
     context "format is valid" do
-      it "returns the org and shared config names" do
-        return_value = described_class.parse_shared_config("org/shared_config")
+      it "returns the org and secret names" do
+        return_value = described_class.parse_secret("rt/tokens")
 
-        expect(return_value).to eql(["org", "shared_config"])
+        expect(return_value).to eql(["rt", "tokens"])
       end
     end
 
     context "format is invalid" do
       it "raises an exception" do
-        expect { described_class.parse_shared_config("shared_config") }.to raise_exception(Sem::Errors::InvalidSRN)
+        expect { described_class.parse_secret("tokens") }.to raise_exception(Sem::Errors::InvalidSRN)
       end
     end
   end

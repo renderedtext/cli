@@ -42,20 +42,20 @@ class Sem::API::Project < SimpleDelegator
     "#{@org_name}/#{name}"
   end
 
-  def shared_configs
-    Sem::API::Base.client.shared_configs.list_for_project!(id).map { |config| Sem::API::SharedConfig.new(org_name, config) }
+  def secrets
+    Sem::API::Base.client.shared_configs.list_for_project!(id).map { |secret| Sem::API::Secret.new(org_name, secret) }
   end
 
-  def add_shared_config(shared_config)
-    Sem::API::Base.client.shared_configs.attach_to_project!(shared_config.id, id)
+  def add_secret(secret)
+    Sem::API::Base.client.shared_configs.attach_to_project!(secret.id, id)
   rescue SemaphoreClient::Exceptions::NotFound
-    raise Sem::Errors::ResourceNotFound.new("Shared Configuration", [shared_config.full_name])
+    raise Sem::Errors::ResourceNotFound.new("Secret", [secret.full_name])
   end
 
-  def remove_shared_config(shared_config)
-    Sem::API::Base.client.shared_configs.detach_from_project!(shared_config.id, id)
+  def remove_secret(secret)
+    Sem::API::Base.client.shared_configs.detach_from_project!(secret.id, id)
   rescue SemaphoreClient::Exceptions::NotFound
-    raise Sem::Errors::ResourceNotFound.new("Shared Configuration", [shared_config.full_name])
+    raise Sem::Errors::ResourceNotFound.new("Secret", [secret.full_name])
   end
 
   def config_files
