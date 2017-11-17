@@ -23,8 +23,8 @@ class Sem::API::Org < SimpleDelegator
     Sem::API::Base.client.projects.list_for_org!(username).map { |project| Sem::API::Project.new(username, project) }
   end
 
-  def shared_configs
-    Sem::API::Base.client.shared_configs.list_for_org!(username).map { |secret| Sem::API::Secret.new(username, secret) }
+  def secrets
+    Sem::API::Base.client.secrets.list_for_org!(username).map { |secret| Sem::API::Secret.new(username, secret) }
   end
 
 end

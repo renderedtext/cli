@@ -52,7 +52,7 @@ class Sem::Views::Teams < Sem::Views::Base
     puts ""
     puts "Add your first secrets:"
     puts ""
-    puts "  sem teams:secrets:add #{team.full_name} SHARED_CONFIG_NAME"
+    puts "  sem teams:secrets:add #{team.full_name} SECRET_NAME"
     puts ""
   end
 end

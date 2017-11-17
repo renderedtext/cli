@@ -113,66 +113,63 @@ DESC
 
   end
 
-  class SharedConfigs < Dracula
+  class Secrets < Dracula
 
-    desc "list", "list shared configurations on a project"
+    desc "list", "list secrets on a project"
     long_desc <<-DESC
 Examples:
 
-    $ sem projects:shared-configs:list renderedtext/cli
+    $ sem projects:secrets:list renderedtext/cli
     ID                                    NAME                 CONFIG FILES  ENV VARS
     99c7ed43-ac8a-487e-b488-c38bc757a034  renderedtext/tokens             1         0
     99c7ed43-ac8a-487e-b488-c38bc757a034  renderedtext/secrets            0         1
 DESC
     def list(project_name)
       project = Sem::API::Project.find!(project_name)
-      shared_configs = project.shared_configs
+      secrets = project.secrets
 
-      if !shared_configs.empty?
-        Sem::Views::SharedConfigs.list(shared_configs)
+      if !secrets.empty?
+        Sem::Views::Secrets.list(secrets)
       else
-        Sem::Views::Projects.attach_first_shared_config(project)
+        Sem::Views::Projects.attach_first_secret(project)
       end
     end
 
-    desc "add", "attach a shared configuration to a project"
+    desc "add", "attach a secret to a project"
     long_desc <<-DESC
 Examples:
 
-    $ sem projects:shared-configs:add renderedtext/cli renderedtext/secrets
-    Shared Configuration renderedtext/secrets added to the project.
+    $ sem projects:secrets:add renderedtext/cli renderedtext/secrets
+    Secret renderedtext/secrets added to the project.
 DESC
-    def add(project_name, shared_config_name)
+    def add(project_name, secret_name)
       project = Sem::API::Project.find!(project_name)
-      shared_config = Sem::API::SharedConfig.find!(shared_config_name)
+      secret = Sem::API::Secret.find!(secret_name)
 
-      project.add_shared_config(shared_config)
+      project.add_secret(secret)
 
-      shared_config.env_vars.each { |var| project.add_env_var(var) }
-      shared_config.files.each { |file| project.add_config_file(file) }
-
-      puts "Shared Configuration #{shared_config_name} added to the project."
+      puts "Secret #{secret_name} added to the project."
     end
 
-    desc "remove", "removes a shared configuration from the project"
+    desc "remove", "removes a secret from the project"
     long_desc <<-DESC
 Examples:
 
-    $ sem projects:shared-configs:remove renderedtext/cli renderedtext/secrets
-    Shared Configuration renderedtext/secrets removed from the project.
+    $ sem projects:secrets:remove renderedtext/cli renderedtext/secrets
+    Secret renderedtext/secrets removed from the project.
 DESC
-    def remove(project_name, shared_config_name)
+    def remove(project_name, secret_name)
       project = Sem::API::Project.find!(project_name)
-      shared_config = Sem::API::SharedConfig.find!(shared_config_name)
+      secret = Sem::API::Secret.find!(secret_name)
 
-      project.remove_shared_config(shared_config)
+      project.remove_secret(secret)
 
-      puts "Shared Configuration #{shared_config_name} removed from the project."
+      puts "Secret #{secret_name} removed from the project."
     end
 
   end
 
-  register "shared-configs", "manage shared configurations", SharedConfigs
+  register "secrets", "manage secrets", Secrets
   register "files", "manage projects' config files", Files
   register "env-vars", "manage projects' environment variables", EnvVars
 end

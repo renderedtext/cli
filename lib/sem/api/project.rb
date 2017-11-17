@@ -43,17 +43,17 @@ class Sem::API::Project < SimpleDelegator
   end
 
   def secrets
-    Sem::API::Base.client.shared_configs.list_for_project!(id).map { |secret| Sem::API::Secret.new(org_name, secret) }
+    Sem::API::Base.client.secrets.list_for_project!(id).map { |secret| Sem::API::Secret.new(org_name, secret) }
   end
 
   def add_secret(secret)
-    Sem::API::Base.client.shared_configs.attach_to_project!(secret.id, id)
+    Sem::API::Base.client.secrets.attach_to_project!(secret.id, id)
   rescue SemaphoreClient::Exceptions::NotFound
     raise Sem::Errors::ResourceNotFound.new("Secret", [secret.full_name])
   end
 
   def remove_secret(secret)
-    Sem::API::Base.client.shared_configs.detach_from_project!(secret.id, id)
+    Sem::API::Base.client.secrets.detach_from_project!(secret.id, id)
   rescue SemaphoreClient::Exceptions::NotFound
     raise Sem::Errors::ResourceNotFound.new("Secret", [secret.full_name])
   end

@@ -9,24 +9,24 @@ class Sem::Views::Secrets < Sem::Views::Base
     puts ""
   end
 
-  def self.list(configs)
+  def self.list(secrets)
     header = ["ID", "NAME", "CONFIG FILES", "ENV VARS"]
 
-    body = configs.map do |config|
-      [config.id, config.full_name, config.files.count, config.env_vars.count]
+    body = secrets.map do |secret|
+      [secret.id, secret.full_name, secret.files.count, secret.env_vars.count]
     end
 
     print_table [header, *body]
   end
 
-  def self.info(config)
+  def self.info(secret)
     print_table [
-      ["ID", config.id],
-      ["Name", config.full_name],
-      ["Config Files", config.files.count.to_s],
-      ["Environment Variables", config.env_vars.count.to_s],
-      ["Created", config.created_at],
-      ["Updated", config.updated_at]
+      ["ID", secret.id],
+      ["Name", secret.full_name],
+      ["Config Files", secret.files.count.to_s],
+      ["Environment Variables", secret.env_vars.count.to_s],
+      ["Created", secret.created_at],
+      ["Updated", secret.updated_at]
     ]
   end
 

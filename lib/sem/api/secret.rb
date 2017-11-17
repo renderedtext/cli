@@ -2,16 +2,16 @@ class Sem::API::Secret < SimpleDelegator
   extend Sem::API::Base
 
   def self.all
-    Sem::API::Org.all.pmap(&:shared_configs).flatten
+    Sem::API::Org.all.pmap(&:secrets).flatten
   end
 
   def self.find!(secrets_srn)
     org_name, secret_name = Sem::SRN.parse_secret(secrets_srn)
 
-    configs = client.shared_configs.list_for_org!(org_name)
-    config = configs.find { |c| c.name == secret_name }
+    secrets = client.secrets.list_for_org!(org_name)
+    secret = secrets.find { |c| c.name == secret_name }
 
-    if config.nil?
+    if secret.nil?
       raise Sem::Errors::ResourceNotFound.new("Secret", [org_name, secret_name])
     end
 
@@ -23,7 +23,7 @@ class Sem::API::Secret < SimpleDelegator
   def self.create!(secret_srn, args = {})
     org_name, secret_name = Sem::SRN.parse_secret(secret_srn)
 
-    secret = client.shared_configs.create_for_org!(org_name, args.merge(:name => secret_name))
+    secret = client.secrets.create_for_org!(org_name, args.merge(:name => secret_name))
 
     if secret.nil?
       raise Sem::Errors::ResourceNotCreated.new("Secret", [org_name, secret_name])
@@ -34,10 +34,10 @@ class Sem::API::Secret < SimpleDelegator
 
   attr_reader :org_name
 
-  def initialize(org_name, shared_config)
+  def initialize(org_name, secret)
     @org_name = org_name
 
-    super(shared_config)
+    super(secret)
   end
 
   def full_name
@@ -45,7 +45,7 @@ class Sem::API::Secret < SimpleDelegator
   end
 
   def add_config_file(args)
-    file = Sem::API::Base.client.config_files.create_for_shared_config!(id, args)
+    file = Sem::API::Base.client.config_files.create_for_secret!(id, args)
 
     if file.nil?
       raise Sem::Errors::ResourceNotCreated.new("Configuration File", [org_name, path])
@@ -65,7 +65,7 @@ class Sem::API::Secret < SimpleDelegator
   end
 
   def add_env_var(args)
-    env_var = Sem::API::Base.client.env_vars.create_for_shared_config!(id, args)
+    env_var = Sem::API::Base.client.env_vars.create_for_secret!(id, args)
 
     if env_var.nil?
       raise Sem::Errors::ResourceNotCreated.new("Environment Variable", [org_name, args[:name]])
@@ -85,25 +85,25 @@ class Sem::API::Secret < SimpleDelegator
   end
 
   def update!(args)
-    shared_config = Sem::API::Base.client.shared_configs.update!(id, args)
+    secret = Sem::API::Base.client.secrets.update!(id, args)
 
-    if shared_config.nil?
+    if secret.nil?
       raise Sem::Errors::ResourceNotUpdated.new("Secret", [org_name, name])
     end
 
-    self.class.new(org_name, shared_config)
+    self.class.new(org_name, secret)
   end
 
   def delete!
-    Sem::API::Base.client.shared_configs.delete!(id)
+    Sem::API::Base.client.secrets.delete!(id)
   end
 
   def files
-    Sem::API::Base.client.config_files.list_for_shared_config!(id).map { |file| Sem::API::File.new(file) }
+    Sem::API::Base.client.config_files.list_for_secret!(id).map { |file| Sem::API::File.new(file) }
   end
 
   def env_vars
-    Sem::API::Base.client.env_vars.list_for_shared_config!(id).map { |env_var| Sem::API::EnvVar.new(env_var) }
+    Sem::API::Base.client.env_vars.list_for_secret!(id).map { |env_var| Sem::API::EnvVar.new(env_var) }
   end
 
 end

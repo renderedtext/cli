@@ -26,10 +26,10 @@ class Sem::Views::Projects < Sem::Views::Base
     ]
   end
 
-  def self.attach_first_secrets(project)
+  def self.attach_first_secret(project)
     puts "You don't have any secrets on this project."
     puts ""
-    puts "Add your first secrets:"
+    puts "Add your first secret:"
     puts ""
     puts "  sem projects:secrets:add #{project.full_name} SECRETS_NAME"
     puts ""

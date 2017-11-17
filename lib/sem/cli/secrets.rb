@@ -90,7 +90,7 @@ DESC
     secret = Sem::API::Secret.find!(secrets_name)
     secret.delete!
 
-    puts "Deleted #{shared_config_name}."
+    puts "Deleted #{secrets_name}."
   end
 
   class Files < Dracula
