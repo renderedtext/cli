@@ -68,8 +68,8 @@ Examples:
     Updated                2017-08-02 13:14:40 +0200
 DESC
   def rename(old_secrets_name, new_secrets_name)
-    old_org_name, _old_name = Sem::SRN.parse_secrets(old_secrets_name)
-    new_org_name, new_name = Sem::SRN.parse_secrets(new_secrets_name)
+    old_org_name, _old_name = Sem::SRN.parse_secret(old_secrets_name)
+    new_org_name, new_name = Sem::SRN.parse_secret(new_secrets_name)
 
     abort "Secrets can't change their organization" unless new_org_name == old_org_name
 
@@ -84,13 +84,13 @@ DESC
 Examples:
 
     $ sem secrets:delete renderedtext/tokens
-    Deleted renderedtext/tokens.
+    Deleted secret renderedtext/tokens.
 DESC
   def delete(secrets_name)
     secret = Sem::API::Secret.find!(secrets_name)
     secret.delete!
 
-    puts "Deleted #{secrets_name}."
+    puts "Deleted secret #{secrets_name}."
   end
 
   class Files < Dracula

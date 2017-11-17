@@ -15,7 +15,7 @@ class Sem::API::Secret < SimpleDelegator
       raise Sem::Errors::ResourceNotFound.new("Secret", [org_name, secret_name])
     end
 
-    new(org_name, config)
+    new(org_name, secret)
   rescue SemaphoreClient::Exceptions::NotFound
     raise Sem::Errors::ResourceNotFound.new("Secret", [org_name, secret_name])
   end

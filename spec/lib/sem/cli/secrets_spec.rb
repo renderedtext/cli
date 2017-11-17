@@ -160,7 +160,7 @@ describe Sem::CLI::Secrets do
       it "shows detailed information about a secret" do
         stdout, _stderr = sem_run!("secrets:delete rt/tokens")
 
-        expect(stdout).to include("Deleted shared configuration rt/tokens")
+        expect(stdout).to include("Deleted secret rt/tokens")
       end
     end
 
@@ -168,7 +168,7 @@ describe Sem::CLI::Secrets do
       before do
         stub_api(:get, "/orgs/rt/secrets").to_return(200, [secret])
 
-        error = { "message" => "Shared Config is attached to some projects" }
+        error = { "message" => "Secret is attached to some projects" }
 
         stub_api(:delete, "/secrets/#{secret[:id]}").to_return(409, error)
       end
@@ -176,7 +176,7 @@ describe Sem::CLI::Secrets do
       it "shows detailed information about a secret" do
         _stdout, stderr, status = sem_run("secrets:delete rt/tokens")
 
-        expect(stderr).to include("Shared Config is attached to some projects")
+        expect(stderr).to include("Secret is attached to some projects")
         expect(status).to eq(:fail)
       end
     end
@@ -190,7 +190,7 @@ describe Sem::CLI::Secrets do
     end
 
     describe "#list" do
-      context "you have at least one file added to the shared configuration" do
+      context "you have at least one file added to the secret" do
         let(:file1) { ApiResponse.file(:path => "/etc/a") }
         let(:file2) { ApiResponse.file(:path => "/tmp/b") }
 
@@ -198,7 +198,7 @@ describe Sem::CLI::Secrets do
           stub_api(:get, "/secrets/#{secret[:id]}/config_files").to_return(200, [file1, file2])
         end
 
-        it "lists all shared configurations on the project" do
+        it "lists all secrets on the project" do
           stdout, _stderr = sem_run("secrets:files:list rt/tokens")
 
           expect(stdout).to include(file1[:path])
@@ -206,12 +206,12 @@ describe Sem::CLI::Secrets do
         end
       end
 
-      context "no files are added to the shared configuration" do
+      context "no files are added to the secret" do
         before do
           stub_api(:get, "/secrets/#{secret[:id]}/config_files").to_return(200, [])
         end
 
-        it "offers you to create and attach a shared configuration" do
+        it "offers you to create and attach a secret" do
           stdout, _stderr = sem_run!("secrets:files:list rt/tokens")
 
           expect(stdout).to include("Add your first file")
@@ -290,7 +290,7 @@ describe Sem::CLI::Secrets do
     end
 
     describe "#list" do
-      context "you have at least one env_var added to the shared configuration" do
+      context "you have at least one env_var added to the secret" do
         let(:env_var1) { ApiResponse.env_var }
         let(:env_var2) { ApiResponse.env_var }
 
@@ -306,7 +306,7 @@ describe Sem::CLI::Secrets do
         end
       end
 
-      context "no files are added to the shared configuration" do
+      context "no files are added to the secret" do
         before do
           stub_api(:get, "/secrets/#{secret[:id]}/env_vars").to_return(200, [])
         end
@@ -329,7 +329,7 @@ describe Sem::CLI::Secrets do
           stub_api(:post, "/secrets/#{secret[:id]}/env_vars", body).to_return(200, env_var)
         end
 
-        it "adds the env var to the shared config" do
+        it "adds the env var to the secret" do
           stdout, _stderr = sem_run!("secrets:env-vars:add rt/tokens --name SECRET --content abc")
 
           expect(stdout).to include("Added SECRET to rt/tokens")
@@ -359,7 +359,7 @@ describe Sem::CLI::Secrets do
         stub_api(:delete, "/env_vars/#{env_var[:id]}").to_return(204, "")
       end
 
-      it "removes the env vars from the shared configurations" do
+      it "removes the env vars from the secret" do
         stdout, _stderr = sem_run!("secrets:env-vars:remove rt/tokens --name TOKEN")
 
         expect(stdout).to include("Removed TOKEN from rt/tokens")

@@ -512,8 +512,8 @@ describe Sem::CLI::Teams do
         it "lists team's secrets" do
           stdout, _stderr = sem_run!("teams:secrets:list rt/devs")
 
-          expect(stdout).to include(config1[:name])
-          expect(stdout).to include(config2[:name])
+          expect(stdout).to include(secret1[:name])
+          expect(stdout).to include(secret2[:name])
         end
       end
 
