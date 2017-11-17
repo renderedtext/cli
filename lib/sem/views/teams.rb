@@ -47,12 +47,12 @@ class Sem::Views::Teams < Sem::Views::Base
     puts ""
   end
 
-  def self.add_first_shared_config(team)
-    puts "You don't have any shared configurations in this team."
+  def self.add_first_secrets(team)
+    puts "You don't have any secrets in this team."
     puts ""
-    puts "Add your first shared configuration:"
+    puts "Add your first secrets:"
     puts ""
-    puts "  sem teams:shared-configs:add #{team.full_name} SHARED_CONFIG_NAME"
+    puts "  sem teams:secrets:add #{team.full_name} SECRET_NAME"
     puts ""
   end
 end

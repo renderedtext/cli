@@ -255,61 +255,61 @@ DESC
     end
   end
 
-  class SharedConfigs < Dracula
-    desc "list", "list shared configurations in a team"
+  class Secrets < Dracula
+    desc "list", "list secrets in a team"
     long_desc <<-DESC
 Examples:
 
-    $ sem team:shared-configs:list renderedtext/devs
+    $ sem team:secrets:list renderedtext/devs
     ID                                    NAME                 CONFIG FILES  ENV VARS
     99c7ed43-ac8a-487e-b488-c38bc757a034  renderedtext/tokens             1         0
     1133ed43-ac8a-487e-b488-c38bc757a044  renderedtext/secrets            0         1
 DESC
     def list(team_name)
       team = Sem::API::Team.find!(team_name)
-      configs = team.shared_configs
+      configs = team.secrets
 
       if !configs.empty?
-        Sem::Views::SharedConfigs.list(configs)
+        Sem::Views::Secrets.list(configs)
       else
-        Sem::Views::Teams.add_first_shared_config(team)
+        Sem::Views::Teams.add_first_secrets(team)
       end
     end
 
-    desc "add", "add a shared configuration to a team"
+    desc "add", "add secrets to a team"
     long_desc <<-DESC
 Examples:
 
-    $ sem team:shared-configs:add renderedtext/devs renderedtext/secrets
-    Shared Configuration renderedtext/secrets added to the team.
+    $ sem team:secrets:add renderedtext/devs renderedtext/tokens
+    Secrets renderedtext/token added to the team.
 DESC
-    def add(team_name, shared_config_name)
+    def add(team_name, secret_name)
       team = Sem::API::Team.find!(team_name)
-      shared_config = Sem::API::SharedConfig.find!(shared_config_name)
+      secret = Sem::API::Secret.find!(secret_name)
 
-      team.add_shared_config(shared_config)
+      team.add_secret(secret)
 
-      puts "Shared Configuration #{shared_config_name} added to the team."
+      puts "Secrets #{secret_name} added to the team."
     end
 
-    desc "remove", "removes a shared Configuration from the team"
+    desc "remove", "removes secrets from the team"
     long_desc <<-DESC
 Examples:
 
-    $ sem team:shared-configs:remove renderedtext/devs renderedtext/secrets
-    Shared Configuration renderedtext/secrets removed from the team.
+    $ sem team:secrets:remove renderedtext/devs renderedtext/secrets
+    Secrets renderedtext/secrets removed from the team.
 DESC
-    def remove(team_name, shared_config_name)
+    def remove(team_name, secret_name)
       team = Sem::API::Team.find!(team_name)
-      shared_config = Sem::API::SharedConfig.find!(shared_config_name)
+      secret = Sem::API::Secret.find!(secret_name)
 
-      team.remove_shared_config(shared_config)
+      team.remove_secret(secret)
 
-      puts "Shared Configuration #{shared_config_name} removed from the team."
+      puts "Secrets #{secret_name} removed from the team."
     end
   end
 
   register "members", "manage team members", Members
   register "projects", "manage team members", Projects
-  register "shared-configs", "manage shared configurations", SharedConfigs
+  register "secrets", "manage secrets", Secrets
 end

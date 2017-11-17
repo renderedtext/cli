@@ -5,7 +5,7 @@ module Sem
     require_relative "cli/orgs"
     require_relative "cli/projects"
     require_relative "cli/teams"
-    require_relative "cli/shared_configs"
+    require_relative "cli/secrets"
 
     desc "version", "Display CLI version"
     def version
@@ -49,7 +49,7 @@ DESC
 
     register "orgs", "manage organizations", Sem::CLI::Orgs
     register "teams", "manage teams and team membership", Sem::CLI::Teams
-    register "shared-configs", "manage shared configurations", Sem::CLI::SharedConfigs
+    register "secrets", "manage secrets", Sem::CLI::Secrets
     register "projects", "manage projects", Sem::CLI::Projects
   end
 end

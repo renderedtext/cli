@@ -71,16 +71,16 @@ class Sem::API::Team < SimpleDelegator
     raise Sem::Errors::ResourceNotFound.new("Project", [project.full_name])
   end
 
-  def add_shared_config(config)
-    Sem::API::Base.client.shared_configs.attach_to_team!(config.id, id)
+  def add_secret(secret)
+    Sem::API::Base.client.secrets.attach_to_team!(secret.id, id)
   rescue SemaphoreClient::Exceptions::NotFound
-    raise Sem::Errors::ResourceNotFound.new("Shared Configuration", [config.full_name])
+    raise Sem::Errors::ResourceNotFound.new("Secret", [secret.full_name])
   end
 
-  def remove_shared_config(config)
-    Sem::API::Base.client.shared_configs.detach_from_team!(config.id, id)
+  def remove_secret(secret)
+    Sem::API::Base.client.secrets.detach_from_team!(secret.id, id)
   rescue SemaphoreClient::Exceptions::NotFound
-    raise Sem::Errors::ResourceNotFound.new("Shared Configuration", [config.full_name])
+    raise Sem::Errors::ResourceNotFound.new("Secret", [secret.full_name])
   end
 
   def delete!
@@ -95,8 +95,8 @@ class Sem::API::Team < SimpleDelegator
     Sem::API::Base.client.projects.list_for_team!(id).map { |project| Sem::API::Project.new(org_name, project) }
   end
 
-  def shared_configs
-    Sem::API::Base.client.shared_configs.list_for_team!(id).map { |config| Sem::API::SharedConfig.new(org_name, config) }
+  def secrets
+    Sem::API::Base.client.secrets.list_for_team!(id).map { |secret| Sem::API::Secret.new(org_name, secret) }
   end
 
 end

@@ -14,8 +14,8 @@ class Sem::SRN
       parse_srn(semaphore_resource_name, "org_name/project_name")
     end
 
-    def parse_shared_config(semaphore_resource_name)
-      parse_srn(semaphore_resource_name, "org_name/shared_config_name")
+    def parse_secret(semaphore_resource_name)
+      parse_srn(semaphore_resource_name, "org_name/secret_name")
     end
 
     def parse_user(semaphore_resource_name)

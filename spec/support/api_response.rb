@@ -38,7 +38,7 @@ module ApiResponse
     }.merge(params)
   end
 
-  def shared_config(params = {})
+  def secret(params = {})
     {
       :id => "33c7ed43-ac8a-487e-b488-c38bc757a034",
       :name => "cli",
