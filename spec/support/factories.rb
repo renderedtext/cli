@@ -31,7 +31,7 @@ module StubFactory
 
   def secret(org_name, params = {})
     api_response = ApiResponse.project(params)
-    api_model = RSpec::Mocks::Double.new(SemaphoreClient::Model::SharedConfig, api_response)
+    api_model = RSpec::Mocks::Double.new(SemaphoreClient::Model::Secret, api_response)
 
     Sem::API::Secret.new(org_name, api_model)
   end

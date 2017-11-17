@@ -7,38 +7,38 @@ describe Sem::CLI::Secrets do
     let(:org2) { ApiResponse.organization(:username => "z-fighters") }
 
     context "you have at least one secret on semaphore" do
-      let(:shared_config1) { ApiResponse.shared_config }
-      let(:shared_config2) { ApiResponse.shared_config }
+      let(:secret1) { ApiResponse.secret }
+      let(:secret2) { ApiResponse.secret }
 
       before do
         stub_api(:get, "/orgs").to_return(200, [org1, org2])
 
-        stub_api(:get, "/orgs/rt/shared_configs").to_return(200, [shared_config1])
-        stub_api(:get, "/orgs/z-fighters/shared_configs").to_return(200, [shared_config2])
+        stub_api(:get, "/orgs/rt/secrets").to_return(200, [secret1])
+        stub_api(:get, "/orgs/z-fighters/secrets").to_return(200, [secret2])
 
-        stub_api(:get, "/shared_configs/#{shared_config1[:id]}/config_files").to_return(200, [])
-        stub_api(:get, "/shared_configs/#{shared_config1[:id]}/env_vars").to_return(200, [])
-        stub_api(:get, "/shared_configs/#{shared_config2[:id]}/config_files").to_return(200, [])
-        stub_api(:get, "/shared_configs/#{shared_config2[:id]}/env_vars").to_return(200, [])
+        stub_api(:get, "/secrets/#{secret1[:id]}/config_files").to_return(200, [])
+        stub_api(:get, "/secrets/#{secret1[:id]}/env_vars").to_return(200, [])
+        stub_api(:get, "/secrets/#{secret2[:id]}/config_files").to_return(200, [])
+        stub_api(:get, "/secrets/#{secret2[:id]}/env_vars").to_return(200, [])
       end
 
-      it "lists all shared_configs" do
+      it "lists all secrets" do
         stdout, _stderr = sem_run!("secrets:list")
 
-        expect(stdout).to include(shared_config1[:id])
-        expect(stdout).to include(shared_config2[:id])
+        expect(stdout).to include(secret1[:id])
+        expect(stdout).to include(secret2[:id])
       end
     end
 
-    context "no shared_config on semaphore" do
+    context "no secret on semaphore" do
       before do
         stub_api(:get, "/orgs").to_return(200, [org1, org2])
 
-        stub_api(:get, "/orgs/rt/shared_configs").to_return(200, [])
-        stub_api(:get, "/orgs/z-fighters/shared_configs").to_return(200, [])
+        stub_api(:get, "/orgs/rt/secrets").to_return(200, [])
+        stub_api(:get, "/orgs/z-fighters/secrets").to_return(200, [])
       end
 
-      it "offers you to set up a shared_config on semaphore" do
+      it "offers you to set up a secret on semaphore" do
         stdout, _stderr = sem_run!("secrets:list")
 
         expect(stdout).to include("Create your first secrets")
@@ -48,25 +48,25 @@ describe Sem::CLI::Secrets do
 
   describe "#info" do
     context "secrets exists" do
-      let(:shared_config) { ApiResponse.shared_config(:name => "tokens") }
+      let(:secret) { ApiResponse.secret(:name => "tokens") }
 
       before do
-        stub_api(:get, "/orgs/rt/shared_configs").to_return(200, [shared_config])
+        stub_api(:get, "/orgs/rt/secrets").to_return(200, [secret])
 
-        stub_api(:get, "/shared_configs/#{shared_config[:id]}/config_files").to_return(200, [])
-        stub_api(:get, "/shared_configs/#{shared_config[:id]}/env_vars").to_return(200, [])
+        stub_api(:get, "/secrets/#{secret[:id]}/config_files").to_return(200, [])
+        stub_api(:get, "/secrets/#{secret[:id]}/env_vars").to_return(200, [])
       end
 
       it "shows detailed information about a secret" do
         stdout, _stderr = sem_run!("secrets:info rt/tokens")
 
-        expect(stdout).to include(shared_config[:id])
+        expect(stdout).to include(secret[:id])
       end
     end
 
     context "secrets doesn't exists" do
       before do
-        stub_api(:get, "/orgs/rt/shared_configs").to_return(200, [])
+        stub_api(:get, "/orgs/rt/secrets").to_return(200, [])
       end
 
       it "displays an error" do
@@ -80,26 +80,26 @@ describe Sem::CLI::Secrets do
 
   describe "#create" do
     context "creation succeds" do
-      let(:shared_config) { ApiResponse.shared_config(:name => "tokens") }
+      let(:secret) { ApiResponse.secret(:name => "tokens") }
 
       before do
-        stub_api(:post, "/orgs/rt/shared_configs").to_return(200, shared_config)
+        stub_api(:post, "/orgs/rt/secrets").to_return(200, secret)
 
-        stub_api(:get, "/shared_configs/#{shared_config[:id]}/config_files").to_return(200, [])
-        stub_api(:get, "/shared_configs/#{shared_config[:id]}/env_vars").to_return(200, [])
+        stub_api(:get, "/secrets/#{secret[:id]}/config_files").to_return(200, [])
+        stub_api(:get, "/secrets/#{secret[:id]}/env_vars").to_return(200, [])
       end
 
-      it "shows detailed information about a shared_config" do
+      it "shows detailed information about a secret" do
         stdout, _stderr = sem_run!("secrets:create rt/tokens")
 
-        expect(stdout).to include(shared_config[:id])
+        expect(stdout).to include(secret[:id])
       end
     end
 
     context "creation fails" do
       before do
         error = { "message" => "Validation Failed. Name not unique." }
-        stub_api(:post, "/orgs/rt/shared_configs").to_return(422, error)
+        stub_api(:post, "/orgs/rt/secrets").to_return(422, error)
       end
 
       it "displays an error" do
@@ -112,31 +112,31 @@ describe Sem::CLI::Secrets do
   end
 
   describe "#rename" do
-    let(:shared_config) { ApiResponse.shared_config(:name => "tokens") }
+    let(:secret) { ApiResponse.secret(:name => "tokens") }
 
     before do
-      stub_api(:get, "/orgs/rt/shared_configs").to_return(200, [shared_config])
+      stub_api(:get, "/orgs/rt/secrets").to_return(200, [secret])
     end
 
     context "update succeds" do
       before do
-        stub_api(:patch, "/shared_configs/#{shared_config[:id]}", :name => "secrets").to_return(200, shared_config)
+        stub_api(:patch, "/secrets/#{secret[:id]}", :name => "secrets").to_return(200, secret)
 
-        stub_api(:get, "/shared_configs/#{shared_config[:id]}/config_files").to_return(200, [])
-        stub_api(:get, "/shared_configs/#{shared_config[:id]}/env_vars").to_return(200, [])
+        stub_api(:get, "/secrets/#{secret[:id]}/config_files").to_return(200, [])
+        stub_api(:get, "/secrets/#{secret[:id]}/env_vars").to_return(200, [])
       end
 
       it "shows detailed information about secrets" do
         stdout, _stderr = sem_run!("secrets:rename rt/tokens rt/secrets")
 
-        expect(stdout).to include(shared_config[:id])
+        expect(stdout).to include(secret[:id])
       end
     end
 
     context "update fails" do
       before do
         error = { "message" => "Validation Failed. Name contains spaces" }
-        stub_api(:patch, "/shared_configs/#{shared_config[:id]}").to_return(422, error)
+        stub_api(:patch, "/secrets/#{secret[:id]}").to_return(422, error)
       end
 
       it "displays an error" do
@@ -149,15 +149,15 @@ describe Sem::CLI::Secrets do
   end
 
   describe "#delete" do
-    let(:shared_config) { ApiResponse.shared_config(:name => "tokens") }
+    let(:secret) { ApiResponse.secret(:name => "tokens") }
 
     context "deletition succeds" do
       before do
-        stub_api(:get, "/orgs/rt/shared_configs").to_return(200, [shared_config])
-        stub_api(:delete, "/shared_configs/#{shared_config[:id]}").to_return(204, "")
+        stub_api(:get, "/orgs/rt/secrets").to_return(200, [secret])
+        stub_api(:delete, "/secrets/#{secret[:id]}").to_return(204, "")
       end
 
-      it "shows detailed information about a shared_config" do
+      it "shows detailed information about a secret" do
         stdout, _stderr = sem_run!("secrets:delete rt/tokens")
 
         expect(stdout).to include("Deleted shared configuration rt/tokens")
@@ -166,14 +166,14 @@ describe Sem::CLI::Secrets do
 
     context "deletition fails" do
       before do
-        stub_api(:get, "/orgs/rt/shared_configs").to_return(200, [shared_config])
+        stub_api(:get, "/orgs/rt/secrets").to_return(200, [secret])
 
         error = { "message" => "Shared Config is attached to some projects" }
 
-        stub_api(:delete, "/shared_configs/#{shared_config[:id]}").to_return(409, error)
+        stub_api(:delete, "/secrets/#{secret[:id]}").to_return(409, error)
       end
 
-      it "shows detailed information about a shared_config" do
+      it "shows detailed information about a secret" do
         _stdout, stderr, status = sem_run("secrets:delete rt/tokens")
 
         expect(stderr).to include("Shared Config is attached to some projects")
@@ -183,10 +183,10 @@ describe Sem::CLI::Secrets do
   end
 
   describe Sem::CLI::Secrets::Files do
-    let(:shared_config) { ApiResponse.shared_config(:name => "tokens") }
+    let(:secret) { ApiResponse.secret(:name => "tokens") }
 
     before do
-      stub_api(:get, "/orgs/rt/shared_configs").to_return(200, [shared_config])
+      stub_api(:get, "/orgs/rt/secrets").to_return(200, [secret])
     end
 
     describe "#list" do
@@ -195,7 +195,7 @@ describe Sem::CLI::Secrets do
         let(:file2) { ApiResponse.file(:path => "/tmp/b") }
 
         before do
-          stub_api(:get, "/shared_configs/#{shared_config[:id]}/config_files").to_return(200, [file1, file2])
+          stub_api(:get, "/secrets/#{secret[:id]}/config_files").to_return(200, [file1, file2])
         end
 
         it "lists all shared configurations on the project" do
@@ -208,7 +208,7 @@ describe Sem::CLI::Secrets do
 
       context "no files are added to the shared configuration" do
         before do
-          stub_api(:get, "/shared_configs/#{shared_config[:id]}/config_files").to_return(200, [])
+          stub_api(:get, "/secrets/#{secret[:id]}/config_files").to_return(200, [])
         end
 
         it "offers you to create and attach a shared configuration" do
@@ -225,7 +225,7 @@ describe Sem::CLI::Secrets do
       before do
         body = { :path => "aliases", :content => "abc", :encrypted => true }
 
-        stub_api(:post, "/shared_configs/#{shared_config[:id]}/config_files", body).to_return(200, file)
+        stub_api(:post, "/secrets/#{secret[:id]}/config_files", body).to_return(200, file)
       end
 
       context "local file exists" do
@@ -254,7 +254,7 @@ describe Sem::CLI::Secrets do
           File.write("/tmp/aliases", "abc")
 
           error = { "message" => "Path can't be empty" }
-          stub_api(:post, "/shared_configs/#{shared_config[:id]}/config_files").to_return(422, error)
+          stub_api(:post, "/secrets/#{secret[:id]}/config_files").to_return(422, error)
         end
 
         it "displays the error" do
@@ -270,7 +270,7 @@ describe Sem::CLI::Secrets do
       let(:file) { ApiResponse.file(:path => "a") }
 
       before do
-        stub_api(:get, "/shared_configs/#{shared_config[:id]}/config_files").to_return(200, [file])
+        stub_api(:get, "/secrets/#{secret[:id]}/config_files").to_return(200, [file])
         stub_api(:delete, "/config_files/#{file[:id]}").to_return(204, "")
       end
 
@@ -283,10 +283,10 @@ describe Sem::CLI::Secrets do
   end
 
   describe Sem::CLI::Secrets::EnvVars do
-    let(:shared_config) { ApiResponse.shared_config(:name => "tokens") }
+    let(:secret) { ApiResponse.secret(:name => "tokens") }
 
     before do
-      stub_api(:get, "/orgs/rt/shared_configs").to_return(200, [shared_config])
+      stub_api(:get, "/orgs/rt/secrets").to_return(200, [secret])
     end
 
     describe "#list" do
@@ -295,10 +295,10 @@ describe Sem::CLI::Secrets do
         let(:env_var2) { ApiResponse.env_var }
 
         before do
-          stub_api(:get, "/shared_configs/#{shared_config[:id]}/env_vars").to_return(200, [env_var1, env_var2])
+          stub_api(:get, "/secrets/#{secret[:id]}/env_vars").to_return(200, [env_var1, env_var2])
         end
 
-        it "lists all env vars in a shared_config" do
+        it "lists all env vars in a secret" do
           stdout, _stderr = sem_run("secrets:env-vars:list rt/tokens")
 
           expect(stdout).to include(env_var1[:name])
@@ -308,7 +308,7 @@ describe Sem::CLI::Secrets do
 
       context "no files are added to the shared configuration" do
         before do
-          stub_api(:get, "/shared_configs/#{shared_config[:id]}/env_vars").to_return(200, [])
+          stub_api(:get, "/secrets/#{secret[:id]}/env_vars").to_return(200, [])
         end
 
         it "offers you to create and attach an env var" do
@@ -326,7 +326,7 @@ describe Sem::CLI::Secrets do
         before do
           body = { :name => "SECRET", :content => "abc", :encrypted => true }
 
-          stub_api(:post, "/shared_configs/#{shared_config[:id]}/env_vars", body).to_return(200, env_var)
+          stub_api(:post, "/secrets/#{secret[:id]}/env_vars", body).to_return(200, env_var)
         end
 
         it "adds the env var to the shared config" do
@@ -339,7 +339,7 @@ describe Sem::CLI::Secrets do
       context "validation fails" do
         before do
           error = { "message" => "Content can't be empty" }
-          stub_api(:post, "/shared_configs/#{shared_config[:id]}/config_files").to_return(422, error)
+          stub_api(:post, "/secrets/#{secret[:id]}/config_files").to_return(422, error)
         end
 
         it "displays the error" do
@@ -355,7 +355,7 @@ describe Sem::CLI::Secrets do
       let(:env_var) { ApiResponse.env_var(:name => "TOKEN") }
 
       before do
-        stub_api(:get, "/shared_configs/#{shared_config[:id]}/env_vars").to_return(200, [env_var])
+        stub_api(:get, "/secrets/#{secret[:id]}/env_vars").to_return(200, [env_var])
         stub_api(:delete, "/env_vars/#{env_var[:id]}").to_return(204, "")
       end
 

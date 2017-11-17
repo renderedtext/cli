@@ -496,17 +496,17 @@ describe Sem::CLI::Teams do
     end
 
     describe "#list" do
-      context "when the team has several shared configs" do
-        let(:config1) { ApiResponse.shared_config(:name => "tokens") }
-        let(:config2) { ApiResponse.shared_config(:name => "secrets") }
+      context "when the team has several secrets" do
+        let(:secret1) { ApiResponse.secret(:name => "tokens") }
+        let(:secret2) { ApiResponse.secret(:name => "secrets") }
 
         before do
-          stub_api(:get, "/teams/#{team[:id]}/shared_configs").to_return(200, [config1, config2])
+          stub_api(:get, "/teams/#{team[:id]}/secrets").to_return(200, [secret1, secret2])
 
-          stub_api(:get, "/shared_configs/#{config1[:id]}/config_files").to_return(200, [])
-          stub_api(:get, "/shared_configs/#{config2[:id]}/config_files").to_return(200, [])
-          stub_api(:get, "/shared_configs/#{config1[:id]}/env_vars").to_return(200, [])
-          stub_api(:get, "/shared_configs/#{config2[:id]}/env_vars").to_return(200, [])
+          stub_api(:get, "/secrets/#{secret1[:id]}/config_files").to_return(200, [])
+          stub_api(:get, "/secrets/#{secret2[:id]}/config_files").to_return(200, [])
+          stub_api(:get, "/secrets/#{secret1[:id]}/env_vars").to_return(200, [])
+          stub_api(:get, "/secrets/#{secret2[:id]}/env_vars").to_return(200, [])
         end
 
         it "lists team's secrets" do
@@ -517,9 +517,9 @@ describe Sem::CLI::Teams do
         end
       end
 
-      context "when the team has no shared configs" do
+      context "when the team has no secrets" do
         before do
-          stub_api(:get, "/teams/#{team[:id]}/shared_configs").to_return(200, [])
+          stub_api(:get, "/teams/#{team[:id]}/secrets").to_return(200, [])
         end
 
         it "offers a way to add first secrets" do
@@ -543,12 +543,12 @@ describe Sem::CLI::Teams do
     end
 
     describe "#add" do
-      let(:config) { ApiResponse.shared_config(:name => "tokens") }
+      let(:secret) { ApiResponse.secret(:name => "tokens") }
 
       context "secrets exists" do
         before do
-          stub_api(:get, "/orgs/rt/shared_configs").to_return(200, [config])
-          stub_api(:post, "/teams/#{team[:id]}/shared_configs/#{config[:id]}").to_return(204, "")
+          stub_api(:get, "/orgs/rt/secrets").to_return(200, [secret])
+          stub_api(:post, "/teams/#{team[:id]}/secrets/#{secret[:id]}").to_return(204, "")
         end
 
         it "add secrets to the team" do
@@ -560,7 +560,7 @@ describe Sem::CLI::Teams do
 
       context "secrets don't exist" do
         before do
-          stub_api(:get, "/orgs/rt/shared_configs").to_return(200, [])
+          stub_api(:get, "/orgs/rt/secrets").to_return(200, [])
         end
 
         it "displays and error" do
@@ -572,12 +572,12 @@ describe Sem::CLI::Teams do
     end
 
     describe "#remove" do
-      let(:config) { ApiResponse.shared_config(:name => "tokens") }
+      let(:secret) { ApiResponse.secret(:name => "tokens") }
 
       context "secrets exist" do
         before do
-          stub_api(:get, "/orgs/rt/shared_configs").to_return(200, [config])
-          stub_api(:delete, "/teams/#{team[:id]}/shared_configs/#{config[:id]}").to_return(204, "")
+          stub_api(:get, "/orgs/rt/secrets").to_return(200, [secret])
+          stub_api(:delete, "/teams/#{team[:id]}/secrets/#{secret[:id]}").to_return(204, "")
         end
 
         it "remove a secret from the team" do
@@ -589,7 +589,7 @@ describe Sem::CLI::Teams do
 
       context "secret doesn't exists" do
         before do
-          stub_api(:get, "/orgs/rt/shared_configs").to_return(200, [])
+          stub_api(:get, "/orgs/rt/secrets").to_return(200, [])
         end
 
         it "displays and error" do
@@ -601,8 +601,8 @@ describe Sem::CLI::Teams do
 
       context "secrets not added to the team" do
         before do
-          stub_api(:get, "/orgs/rt/shared_configs").to_return(200, [config])
-          stub_api(:delete, "/teams/#{team[:id]}/shared_configs/#{config[:id]}").to_return(404, "")
+          stub_api(:get, "/orgs/rt/secrets").to_return(200, [secret])
+          stub_api(:delete, "/teams/#{team[:id]}/secrets/#{secret[:id]}").to_return(404, "")
         end
 
         it "displays and error" do

@@ -172,131 +172,128 @@ describe Sem::CLI::Projects do
     end
   end
 
-  describe Sem::CLI::Projects::SharedConfigs do
+  describe Sem::CLI::Projects::Secrets do
     let(:project) { ApiResponse.project(:name => "cli") }
 
     describe "#list" do
-      context "you have at least one shared_config attached to a project" do
-        let(:shared_config1) { ApiResponse.shared_config }
-        let(:shared_config2) { ApiResponse.shared_config }
+      context "you have at least one secret attached to a project" do
+        let(:secret1) { ApiResponse.secret }
+        let(:secret2) { ApiResponse.secret }
 
         before do
           stub_api(:get, "/orgs/rt/projects?name=cli").to_return(200, [project])
-          stub_api(:get, "/projects/#{project[:id]}/shared_configs").to_return(200, [shared_config1, shared_config2])
+          stub_api(:get, "/projects/#{project[:id]}/secrets").to_return(200, [secret1, secret2])
 
-          stub_api(:get, "/shared_configs/#{shared_config1[:id]}/config_files").to_return(200, [])
-          stub_api(:get, "/shared_configs/#{shared_config2[:id]}/config_files").to_return(200, [])
+          stub_api(:get, "/secrets/#{secret1[:id]}/config_files").to_return(200, [])
+          stub_api(:get, "/secrets/#{secret2[:id]}/config_files").to_return(200, [])
 
-          stub_api(:get, "/shared_configs/#{shared_config1[:id]}/env_vars").to_return(200, [])
-          stub_api(:get, "/shared_configs/#{shared_config2[:id]}/env_vars").to_return(200, [])
+          stub_api(:get, "/secrets/#{secret1[:id]}/env_vars").to_return(200, [])
+          stub_api(:get, "/secrets/#{secret2[:id]}/env_vars").to_return(200, [])
         end
 
-        it "lists all shared configurations on the project" do
-          stdout, _stderr = sem_run!("projects:shared-configs:list rt/cli")
+        it "lists all secrets on the project" do
+          stdout, _stderr = sem_run!("projects:secrets:list rt/cli")
 
-          expect(stdout).to include(shared_config1[:id])
-          expect(stdout).to include(shared_config2[:id])
+          expect(stdout).to include(secret1[:id])
+          expect(stdout).to include(secret2[:id])
         end
       end
 
-      context "no shared_configuration attached to the project" do
+      context "no secret attached to the project" do
         before do
           stub_api(:get, "/orgs/rt/projects?name=cli").to_return(200, [project])
-          stub_api(:get, "/projects/#{project[:id]}/shared_configs").to_return(200, [])
+          stub_api(:get, "/projects/#{project[:id]}/secrets").to_return(200, [])
         end
 
-        it "offers you to create and attach a shared configuration" do
-          stdout, _stderr = sem_run!("projects:shared-configs:list rt/cli")
+        it "offers you to create and attach a secret" do
+          stdout, _stderr = sem_run!("projects:secrets:list rt/cli")
 
-          expect(stdout).to include("Add your first shared configuration")
+          expect(stdout).to include("Add your first secret")
         end
       end
     end
 
     describe "#add" do
-      context "shared config exists" do
-        let(:shared_config) { ApiResponse.shared_config(:name => "tokens") }
+      context "secret exists" do
+        let(:secret) { ApiResponse.secret(:name => "tokens") }
         let(:file) { ApiResponse.file }
         let(:env_var) { ApiResponse.env_var }
 
         before do
           stub_api(:get, "/orgs/rt/projects?name=cli").to_return(200, [project])
-          stub_api(:get, "/orgs/rt/shared_configs").to_return(200, [shared_config])
-          stub_api(:post, "/projects/#{project[:id]}/shared_configs/#{shared_config[:id]}").to_return(204, "")
+          stub_api(:get, "/orgs/rt/secrets").to_return(200, [secret])
+          stub_api(:post, "/projects/#{project[:id]}/secrets/#{secret[:id]}").to_return(204, "")
 
-          stub_api(:get, "/shared_configs/#{shared_config[:id]}/config_files").to_return(200, [file])
-          stub_api(:get, "/shared_configs/#{shared_config[:id]}/env_vars").to_return(200, [env_var])
-
-          stub_api(:post, "/projects/#{project[:id]}/env_vars/#{env_var[:id]}").to_return(204, "")
-          stub_api(:post, "/projects/#{project[:id]}/config_files/#{file[:id]}").to_return(204, "")
+          stub_api(:get, "/secrets/#{secret[:id]}/config_files").to_return(200, [file])
+          stub_api(:get, "/secrets/#{secret[:id]}/env_vars").to_return(200, [env_var])
         end
 
-        it "adds the shared configuration to the project" do
-          stdout, _stderr = sem_run!("projects:shared-configs:add rt/cli rt/tokens")
+        it "adds the secret to the project" do
+          stdout, _stderr = sem_run!("projects:secrets:add rt/cli rt/tokens")
 
-          expect(stdout).to include("Shared Configuration rt/tokens added to the project.")
+          expect(stdout).to include("Secret rt/tokens added to the project.")
         end
       end
 
-      context "shared_config not found" do
+      context "secret not found" do
         before do
           stub_api(:get, "/orgs/rt/projects?name=cli").to_return(200, [project])
-          stub_api(:get, "/orgs/rt/shared_configs").to_return(200, [])
+          stub_api(:get, "/orgs/rt/secrets").to_return(200, [])
         end
 
         it "displays error" do
-          _stdout, stderr, status = sem_run("projects:shared-configs:add rt/cli rt/tokens")
+          _stdout, stderr, status = sem_run("projects:secrets:add rt/cli rt/tokens")
 
-          expect(stderr).to include("Shared Configuration rt/tokens not found")
+          expect(stderr).to include("Secret rt/tokens not found")
           expect(status).to eq(:fail)
         end
       end
     end
 
     describe "#remove" do
-      let(:shared_config) { ApiResponse.shared_config(:name => "tokens") }
+      let(:secret) { ApiResponse.secret(:name => "tokens") }
 
-      context "shared_config exists" do
+      context "secret exists" do
         before do
           stub_api(:get, "/orgs/rt/projects?name=cli").to_return(200, [project])
-          stub_api(:get, "/orgs/rt/shared_configs").to_return(200, [shared_config])
+          stub_api(:get, "/orgs/rt/secrets").to_return(200, [secret])
 
-          stub_api(:delete, "/projects/#{project[:id]}/shared_configs/#{shared_config[:id]}").to_return(204, "")
+          stub_api(:delete, "/projects/#{project[:id]}/secrets/#{secret[:id]}").to_return(204, "")
         end
 
-        it "adds the shared configuration to the project" do
-          stdout, _stderr = sem_run!("projects:shared-configs:remove rt/cli rt/tokens")
+        it "adds the secret to the project" do
+          stdout, _stderr = sem_run!("projects:secrets:remove rt/cli rt/tokens")
 
-          expect(stdout).to include("Shared Configuration rt/tokens removed from the project.")
+          expect(stdout).to include("Secret rt/tokens removed from the project.")
         end
       end
 
-      context "shared_config not attached to project" do
+      context "secret not attached to project" do
         before do
           stub_api(:get, "/orgs/rt/projects?name=cli").to_return(200, [project])
-          stub_api(:get, "/orgs/rt/shared_configs").to_return(200, [shared_config])
+          stub_api(:get, "/orgs/rt/secrets").to_return(200, [secret])
 
-          stub_api(:delete, "/projects/#{project[:id]}/shared_configs/#{shared_config[:id]}").to_return(404, "")
+          stub_api(:delete, "/projects/#{project[:id]}/secrets/#{secret[:id]}").to_return(404, "")
         end
 
         it "displays error" do
-          _stdout, stderr, status = sem_run("projects:shared-configs:remove rt/cli rt/tokens")
+          _stdout, stderr, status = sem_run("projects:secrets:remove rt/cli rt/tokens")
 
-          expect(stderr).to include("Shared Configuration rt/tokens not found")
+          expect(stderr).to include("Secret rt/tokens not found")
           expect(status).to eq(:fail)
         end
       end
 
-      context "shared_config not found" do
+      context "secret not found" do
         before do
           stub_api(:get, "/orgs/rt/projects?name=cli").to_return(200, [project])
-          stub_api(:get, "/orgs/rt/shared_configs").to_return(200, [])
+          stub_api(:get, "/orgs/rt/secrets").to_return(200, [])
         end
 
         it "displays error" do
-          _stdout, stderr, status = sem_run("projects:shared-configs:add rt/cli rt/tokens")
+          _stdout, stderr, status = sem_run("projects:secrets:add rt/cli rt/tokens")
 
-          expect(stderr).to include("Shared Configuration rt/tokens not found")
+          expect(stderr).to include("Secret rt/tokens not found")
           expect(status).to eq(:fail)
         end
       end

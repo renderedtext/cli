@@ -44,7 +44,7 @@ class Sem::Views::Secrets < Sem::Views::Base
     puts ""
     puts "Add your first environment variable:"
     puts ""
-    puts "  sem secrets:env-vars:add #{secrets.full_name} --local-path <file> --path-on-semaphore <path>"
+    puts "  sem secrets:env-vars:add #{secret.full_name} --local-path <file> --path-on-semaphore <path>"
     puts ""
   end
 

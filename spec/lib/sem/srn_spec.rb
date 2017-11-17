@@ -49,7 +49,7 @@ describe Sem::SRN do
     end
   end
 
-  describe ".parse_shared_config" do
+  describe ".parse_secret" do
     context "format is valid" do
       it "returns the org and secret names" do
         return_value = described_class.parse_secret("rt/tokens")
