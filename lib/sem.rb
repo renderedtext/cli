@@ -4,6 +4,7 @@ require "semaphore_client"
 require "fileutils"
 require "pmap"
 require "delegate"
+require "sem/core_ext/string.rb"
 
 module Sem
   require "sem/helpers"
