@@ -15,13 +15,14 @@ module Sem
     desc "login", "Log in to Semaphore from the command line"
     option "auth-token", :required => true
     long_desc <<-DESC
-Examples:
+      Examples:
 
-    $ sem login --auth-token abcd12345
-    Your credentials have been saved to #{Sem::Configuration::CREDENTIALS_PATH}."
+          $ sem login --auth-token abcd12345
+          Your credentials have been saved to #{Sem::Configuration::CREDENTIALS_PATH}."
 
-You can find your auth-token on the bottom of the users settings page <https://semaphoreci.com/users/edit>.
-DESC
+      You can find your auth-token on the bottom of the users
+      settings page <https://semaphoreci.com/users/edit>.
+    DESC
     def login
       auth_token = options["auth-token"]
 
@@ -36,11 +37,11 @@ DESC
 
     desc "logout", "Log out from semaphore"
     long_desc <<-DESC
-Examples:
+      Examples:
 
-    $ sem logout
-    Logged out.
-DESC
+          $ sem logout
+          Logged out.
+    DESC
     def logout
       Sem::Configuration.delete_auth_token
 
