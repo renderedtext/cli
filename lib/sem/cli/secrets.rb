@@ -4,10 +4,10 @@ class Sem::CLI::Secrets < Dracula
   long_desc <<-DESC.strip_heredoc
     Examples:
 
-        $ sem secrets:list
-        ID                                    NAME                 CONFIG FILES  ENV VARS
-        99c7ed43-ac8a-487e-b488-c38bc757a034  renderedtext/tokens             1         0
-        1133ed43-ac8a-487e-b488-c38bc757a044  renderedtext/secrets            0         1
+      $ sem secrets:list
+      ID                                    NAME                 CONFIG FILES  ENV VARS
+      99c7ed43-ac8a-487e-b488-c38bc757a034  renderedtext/tokens             1         0
+      1133ed43-ac8a-487e-b488-c38bc757a044  renderedtext/secrets            0         1
   DESC
   def list
     secrets = Sem::API::Secret.all
@@ -23,13 +23,13 @@ class Sem::CLI::Secrets < Dracula
   long_desc <<-DESC.strip_heredoc
     Examples:
 
-        $ sem secrets:info renderedtext/tokens
-        ID                     99c7ed43-ac8a-487e-b488-c38bc757a034
-        Name                   renderedtext/tokens
-        Config Files           1
-        Environment Variables  0
-        Created                2017-08-01 13:14:40 +0200
-        Updated                2017-08-02 13:14:40 +0200
+      $ sem secrets:info renderedtext/tokens
+      ID                     99c7ed43-ac8a-487e-b488-c38bc757a034
+      Name                   renderedtext/tokens
+      Config Files           1
+      Environment Variables  0
+      Created                2017-08-01 13:14:40 +0200
+      Updated                2017-08-02 13:14:40 +0200
   DESC
   def info(secret_name)
     secret = Sem::API::Secret.find!(secret_name)
@@ -41,13 +41,13 @@ class Sem::CLI::Secrets < Dracula
   long_desc <<-DESC.strip_heredoc
     Examples:
 
-        $ sem secrets:create renderedtext/tokens
-        ID                     99c7ed43-ac8a-487e-b488-c38bc757a034
-        Name                   renderedtext/tokens
-        Config Files           1
-        Environment Variables  0
-        Created                2017-08-01 13:14:40 +0200
-        Updated                2017-08-02 13:14:40 +0200
+      $ sem secrets:create renderedtext/tokens
+      ID                     99c7ed43-ac8a-487e-b488-c38bc757a034
+      Name                   renderedtext/tokens
+      Config Files           1
+      Environment Variables  0
+      Created                2017-08-01 13:14:40 +0200
+      Updated                2017-08-02 13:14:40 +0200
   DESC
   def create(secret_name)
     secret = Sem::API::Secret.create!(secret_name)
@@ -59,13 +59,13 @@ class Sem::CLI::Secrets < Dracula
   long_desc <<-DESC.strip_heredoc
     Examples:
 
-        $ sem secrets:create renderedtext/tokens renderedtext/psst
-        ID                     99c7ed43-ac8a-487e-b488-c38bc757a034
-        Name                   renderedtext/psst
-        Config Files           1
-        Environment Variables  0
-        Created                2017-08-01 13:14:40 +0200
-        Updated                2017-08-02 13:14:40 +0200
+      $ sem secrets:create renderedtext/tokens renderedtext/psst
+      ID                     99c7ed43-ac8a-487e-b488-c38bc757a034
+      Name                   renderedtext/psst
+      Config Files           1
+      Environment Variables  0
+      Created                2017-08-01 13:14:40 +0200
+      Updated                2017-08-02 13:14:40 +0200
   DESC
   def rename(old_secrets_name, new_secrets_name)
     old_org_name, _old_name = Sem::SRN.parse_secret(old_secrets_name)
@@ -83,8 +83,8 @@ class Sem::CLI::Secrets < Dracula
   long_desc <<-DESC.strip_heredoc
     Examples:
 
-        $ sem secrets:delete renderedtext/tokens
-        Deleted secret renderedtext/tokens.
+      $ sem secrets:delete renderedtext/tokens
+      Deleted secret renderedtext/tokens.
   DESC
   def delete(secrets_name)
     secret = Sem::API::Secret.find!(secrets_name)
@@ -99,10 +99,10 @@ class Sem::CLI::Secrets < Dracula
     long_desc <<-DESC.strip_heredoc
       Examples:
 
-          $ sem secrets:files:list renderedtext/tokens
-          ID                                    PATH                      ENCRYPTED?
-          77c7ed43-ac8a-487e-b488-c38bc757a034  /home/runner/a            true
-          11c7ed43-bc8a-a87e-ba88-a38ba757a034  /home/runner/secrets.txt  true
+        $ sem secrets:files:list renderedtext/tokens
+        ID                                    PATH                      ENCRYPTED?
+        77c7ed43-ac8a-487e-b488-c38bc757a034  /home/runner/a            true
+        11c7ed43-bc8a-a87e-ba88-a38ba757a034  /home/runner/secrets.txt  true
     DESC
     def list(secret_name)
       secret = Sem::API::Secret.find!(secret_name)
@@ -116,13 +116,19 @@ class Sem::CLI::Secrets < Dracula
     end
 
     desc "add", "add a file to secrets"
-    option "path-on-semaphore", :aliases => "p", :desc => "Path of the file in builds relative to /home/runner directory", :required => true
-    option "local-path", :aliases => "l", :desc => "Location of the file on the local machine", :required => true
+    option "path-on-semaphore",
+           :aliases => "p",
+           :desc => "Path of the file in builds relative to /home/runner directory",
+           :required => true
+    option "local-path",
+           :aliases => "l",
+           :desc => "Location of the file on the local machine",
+           :required => true
     long_desc <<-DESC.strip_heredoc
       Examples:
 
-          $ sem secrets:files:add renderedtext/tokens --local-path /tmp/secrets.json --path-on-semaphore secrets.json
-          Added /home/runner/secrets.txt to renderedtext/secrets.
+        $ sem secrets:files:add rt/tokens --local-path /tmp/secrets.json --path-on-semaphore secrets.json
+        Added /home/runner/secrets.txt to rt/secrets.
     DESC
     def add(secrets_name)
       secret = Sem::API::Secret.find!(secrets_name)
@@ -140,12 +146,15 @@ class Sem::CLI::Secrets < Dracula
     end
 
     desc "remove", "remove a file from secrets"
-    option :path, :aliases => "p", :desc => "Path of the file in builds relative to /home/runner directory", :required => true
+    option :path,
+           :aliases => "p",
+           :desc => "Path of the file in builds relative to /home/runner directory",
+           :required => true
     long_desc <<-DESC.strip_heredoc
       Examples:
 
-          $ sem secrets:files:remove renderedtext/secrets --path secrets.json
-          Removed /home/runner/secrets.txt from renderedtext/secrets.
+        $ sem secrets:files:remove renderedtext/secrets --path secrets.json
+        Removed /home/runner/secrets.txt from renderedtext/secrets.
     DESC
     def remove(secrets_name)
       secret = Sem::API::Secret.find!(secrets_name)
@@ -163,10 +172,10 @@ class Sem::CLI::Secrets < Dracula
     long_desc <<-DESC.strip_heredoc
       Examples:
 
-          $ sem secrets:files:list renderedtext/tokens
-          ID                                    NAME    ENCRYPTED?  CONTENT
-          9997ed43-ac8a-487e-b488-c38bc757a034  SECRET  true        aaa
-          1117ed43-tc8a-387e-6488-838bc757a034  TOKEN   true        *encrypted*
+        $ sem secrets:files:list renderedtext/tokens
+        ID                                    NAME    ENCRYPTED?  CONTENT
+        9997ed43-ac8a-487e-b488-c38bc757a034  SECRET  true        aaa
+        1117ed43-tc8a-387e-6488-838bc757a034  TOKEN   true        *encrypted*
     DESC
     def list(secret_name)
       secret = Sem::API::Secret.find!(secret_name)
@@ -185,8 +194,8 @@ class Sem::CLI::Secrets < Dracula
     long_desc <<-DESC.strip_heredoc
       Examples:
 
-          $ sem secrets:env-vars:add renderedtext/secrets --name TOKEN --content "s3cr3t"
-          Added TOKEN to renderedtext/secrets.
+        $ sem secrets:env-vars:add renderedtext/secrets --name TOKEN --content "s3cr3t"
+        Added TOKEN to renderedtext/secrets.
     DESC
     def add(secret_name)
       secret = Sem::API::Secret.find!(secret_name)
@@ -201,8 +210,8 @@ class Sem::CLI::Secrets < Dracula
     long_desc <<-DESC.strip_heredoc
       Examples:
 
-          $ sem secrets:env-vars:remove renderedtext/secrets --name TOKEN
-          Removed TOKEN from renderedtext/secrets.
+        $ sem secrets:env-vars:remove renderedtext/secrets --name TOKEN
+        Removed TOKEN from renderedtext/secrets.
     DESC
     def remove(secrets_name)
       secret = Sem::API::Secret.find!(secrets_name)
