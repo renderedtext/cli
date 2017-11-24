@@ -12,7 +12,7 @@ class Sem::Views::Secrets < Sem::Views::Base
   def self.list(secrets)
     header = ["ID", "NAME", "CONFIG FILES", "ENV VARS"]
 
-    body = secrets.map do |secret|
+    body = secrets.pmap do |secret|
       [secret.id, secret.full_name, secret.files.count, secret.env_vars.count]
     end
 
