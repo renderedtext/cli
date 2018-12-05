@@ -1,13 +1,13 @@
-# Semaphore CLI
+# Semaphore Classic CLI
+
+__Note:__ This is a CLI for Semaphore Classic. If you are looking for Semaphore 2.0 CLI, visit <https://github.com/semaphoreci/cli>.
 
 ![Semaphore logo](https://d1dkupr86d302v.cloudfront.net/assets/application_bootstrap/layout/semaphore-logo-a6d954e176b6975b511f314a0cc808dc94a8030210077e3a6e904fbe69dc5354.svg)
 
 [![Build Status](https://semaphoreci.com/api/v1/renderedtext/cli/branches/master/badge.svg)](https://semaphoreci.com/renderedtext/cli)
 [![Gem Version](https://badge.fury.io/rb/sem.svg)](https://badge.fury.io/rb/sem)
 
-__Note: The Semaphore CLI gem is still an alpha release.__
-
-The Semaphore CLI is used to manage Semaphore projects from the command line.
+The Semaphore Classic CLI is used to manage Semaphore projects from the command line.
 
 For more info about Semaphore see <https://semaphoreci.com>
 
